@@ -8,29 +8,29 @@
 # (capybara-simulated 0.0.7 / Ruby 3.3.11) running
 # `bin/run-avo` (= `spec/system spec/features`).
 #
-# ~95% of these mirror Avo's own `BENCH_DRIVER=simulated` baseline at
-# the same SHA — they're properties of the gap between simulated and
-# cuprite for Avo's specific stack (flatpickr, CodeMirror, TipTap,
-# tagify, Algolia autocomplete) rather than driver bugs we can chase
-# one at a time.
+# ~95% mirror Avo's own `BENCH_DRIVER=simulated` baseline at the same
+# SHA — properties of the simulated/cuprite divergence on Avo's
+# specific stack (flatpickr + Luxon TZ db, CodeMirror layout-derived
+# measurement, TipTap, tagify, Algolia autocomplete) rather than
+# driver bugs we can chase one at a time.
 
 - test:   "Create Via Belongs to with polymorphic belongs_to when belongs_to record options exceeds associations_lookup_list_limit limits select options"
   reason: "intermittent — passes on a clean baseline run, fails when other polymorphic-options specs run first; suspected factory/cleanup ordering inside Avo"
 
 - test:   "Actions downloading files without File.open().read downloads the file and closes the modal"
-  reason: "action modal flow / file download — modal visibility + download interception edge cases"
+  reason: "action download flow — turbo-stream POST raises server-side `nil[]` (factory ordering inside Avo) before the StreamActions.download client code runs"
 
 - test:   "Actions downloading files with File.open().read downloads the file and closes the modal"
-  reason: "action modal flow / file download — modal visibility + download interception edge cases"
+  reason: "action download flow — turbo-stream POST raises server-side `nil[]` (factory ordering inside Avo) before the StreamActions.download client code runs"
 
 - test:   "Actions downloading files with File.open().read on pdf downloads the file and closes the modal"
-  reason: "action modal flow / file download — modal visibility + download interception edge cases"
+  reason: "action download flow — turbo-stream POST raises server-side `nil[]` (factory ordering inside Avo) before the StreamActions.download client code runs"
 
 - test:   "Actions redirects when no confirmation redirects to hey page"
-  reason: "action modal flow / file download — modal visibility + download interception edge cases"
+  reason: "action download flow — turbo-stream POST raises server-side `nil[]` (factory ordering inside Avo) before the StreamActions.download client code runs"
 
 - test:   "Actions close_modal closes the modal and flashes messages"
-  reason: "action modal flow / file download — modal visibility + download interception edge cases"
+  reason: "action download flow — turbo-stream POST raises server-side `nil[]` (factory ordering inside Avo) before the StreamActions.download client code runs"
 
 - test:   "App alerts only displays one alert on record destroy from has_many"
   reason: "general app-level UI interactions"
@@ -69,19 +69,19 @@
   reason: "polymorphic association picker — Algolia autocomplete"
 
 - test:   "CodeField without value edit change the projects custom_css code"
-  reason: "CodeMirror integration — gutter / line measurement gates off real layout"
+  reason: "CodeMirror integration — `hasBadBidiRects` measures DOM widths and crashes the editor before render; gutter / line measurement gates off real layout"
 
 - test:   "CodeField with regular value edit has the projects custom_css label and filled code editor"
-  reason: "CodeMirror integration — gutter / line measurement gates off real layout"
+  reason: "CodeMirror integration — `hasBadBidiRects` measures DOM widths and crashes the editor before render; gutter / line measurement gates off real layout"
 
 - test:   "CodeField with regular value edit change the projects custom_css code to another value"
-  reason: "CodeMirror integration — gutter / line measurement gates off real layout"
+  reason: "CodeMirror integration — `hasBadBidiRects` measures DOM widths and crashes the editor before render; gutter / line measurement gates off real layout"
 
 - test:   "CodeField with regular value show displays the projects custom_css"
-  reason: "CodeMirror integration — gutter / line measurement gates off real layout"
+  reason: "CodeMirror integration — `hasBadBidiRects` measures DOM widths and crashes the editor before render; gutter / line measurement gates off real layout"
 
 - test:   "CodeField with pretty_generated option for a JSON code field correctly formats JSON code on create / edit and displays it in a pretty way on the show page"
-  reason: "CodeMirror integration — gutter / line measurement gates off real layout"
+  reason: "CodeMirror integration — `hasBadBidiRects` measures DOM widths and crashes the editor before render; gutter / line measurement gates off real layout"
 
 - test:   "Create Via Belongs to edit with non-searchable belongs_to successfully creates a new user and assigns it to the comment"
   reason: "belongs-to-create flow opens a dialog whose visibility cascade we do not fully match"
@@ -98,131 +98,101 @@
 - test:   "Create Via Belongs to with models that uses prefix_id successfully creates a new course and assigns it to the course link"
   reason: "belongs-to-create flow opens a dialog whose visibility cascade we do not fully match"
 
-- test:   "Date field in a western (negative) Timezone edit sets the proper date without updates"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
-
-- test:   "Date field in a western (negative) Timezone edit sets the proper date with updates"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
-
-- test:   "Date field in an eastern (positive) Timezone edit sets the proper date without"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
-
-- test:   "Date field in an eastern (positive) Timezone edit sets the proper date with updates"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
-
 - test:   "Date field on eastern zone in an eastern (positive) Timezone edit keeps the same value on save"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field on eastern zone in an eastern (positive) Timezone edit keeps the right value on update and save"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field with relative: true index displays the date in a valid tz"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field with relative: true show displays the date in a valid tz"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field with relative: true edit when keeping the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field with relative: true edit when changing the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
-
-- test:   "Date field with relative: true edit when changing the value resets the date when reset button is clicked"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field with relative: true index displays the date in a valid tz"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field with relative: true show displays the date in a valid tz"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field with relative: true edit when keeping the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field with relative: true edit when changing the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field with allowInput: true edit when manually typing a value saves the valid date"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field with allowInput: true edit when manually typing a value reverts invalid date"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field with relative: false edit when keeping the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field with relative: false edit when changing the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field with relative: false edit when keeping the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field with relative: false edit when changing the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
-
-- test:   "Date field on UTC edit keeps the same value on save"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field on UTC edit keeps the right value on update and save"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field on western zone in a western (negative) Timezone edit keeps the same value on save"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Date field on western zone in a western (negative) Timezone edit keeps the right value on update and save"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Time field relative: false edit sets the proper time without updating"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Time field relative: false edit sets the proper time with updating"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Time field relative: false edit resets the time when reset button is clicked"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Time field relative: false edit sets the proper time without updating"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Time field relative: false edit sets the proper time with updating"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Time field relative: true index formats the time"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Time field relative: true show formats the time"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Time field relative: true edit sets the proper time without updating"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Time field relative: true edit sets the proper time with updating"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Time field relative: true index formats the time"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Time field relative: true show formats the time"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Time field relative: true edit sets the proper time without updating"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "Time field relative: true edit sets the proper time with updating"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
-
-- test:   "timezone On Romania (EET) with CET timezone configured edit when keeping the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
-
-- test:   "timezone On Romania (EET) with CET timezone configured edit when changing the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
-
-- test:   "timezone On Romania (EET) with UTC timezone configured edit when keeping the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
-
-- test:   "timezone On Romania (EET) with UTC timezone configured edit when changing the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
+  reason: "flatpickr / Luxon timezone DB — Intl.DateTimeFormat in QuickJS lacks the full IANA zone tables, so `setZone(\"Europe/Bucharest\")` falls back to UTC and the assertion sees the un-zoned datetime"
 
 - test:   "DestroyRecord foreign key constraints raises error"
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
@@ -240,9 +210,6 @@
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
 
 - test:   "Filters pagination resets when filters change with pagination set resets the pagination"
-  reason: "filter form interaction"
-
-- test:   "Filters date time filters date with range selector filters users by birthday range"
   reason: "filter form interaction"
 
 - test:   "Filters date time filters time with single selector filters courses by starting at"
@@ -336,67 +303,67 @@
   reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — class-driven cascade does not currently filter the inactive group"
 
 - test:   "Tags acts_as_taggable index shows filled state"
-  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+  reason: "tagify multi-select — overflow truncation (\"2 more items\") gates off layout-derived container width"
 
 - test:   "Tags acts_as_taggable edit shows filled state"
-  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+  reason: "tagify multi-select — overflow truncation (\"2 more items\") gates off layout-derived container width"
 
 - test:   "Tags acts_as_taggable edit adds a tag"
-  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+  reason: "tagify multi-select — overflow truncation (\"2 more items\") gates off layout-derived container width"
 
 - test:   "Tags acts_as_taggable new keeps acts as taggable tags on validation errors"
-  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+  reason: "tagify multi-select — overflow truncation (\"2 more items\") gates off layout-derived container width"
 
 - test:   "Tags without acts_as_taggable adds skills"
-  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+  reason: "tagify multi-select — overflow truncation (\"2 more items\") gates off layout-derived container width"
 
 - test:   "Tags ajax request fetches the users"
-  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+  reason: "tagify multi-select — overflow truncation (\"2 more items\") gates off layout-derived container width"
 
 - test:   "Tags format_using (same as deprecated fetch_labels) with fetch_values_from keep correct tags on validations error and edit"
-  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+  reason: "tagify multi-select — overflow truncation (\"2 more items\") gates off layout-derived container width"
 
 - test:   "Tags mode: :select on edit / update"
-  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+  reason: "tagify multi-select — overflow truncation (\"2 more items\") gates off layout-derived container width"
 
 - test:   "TestHelpers field_wrapper on self resource index finds the wrapper on table"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
+  reason: "Avo's own test helpers were re-written for cuprite / chromedriver-specific affordances (drag, clipboard, paginated index ordering); failures are present in Avo's cuprite baseline at this SHA too"
 
 - test:   "TestHelpers field_wrapper on self resource show finds the wrapper"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
+  reason: "Avo's own test helpers were re-written for cuprite / chromedriver-specific affordances (drag, clipboard, paginated index ordering); failures are present in Avo's cuprite baseline at this SHA too"
 
 - test:   "TestHelpers field_wrapper on show view related resource index finds the wrapper"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
+  reason: "Avo's own test helpers were re-written for cuprite / chromedriver-specific affordances (drag, clipboard, paginated index ordering); failures are present in Avo's cuprite baseline at this SHA too"
 
 - test:   "TestHelpers field_label on self resource index finds the label on table"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
+  reason: "Avo's own test helpers were re-written for cuprite / chromedriver-specific affordances (drag, clipboard, paginated index ordering); failures are present in Avo's cuprite baseline at this SHA too"
 
 - test:   "TestHelpers field_label on self resource show finds the label"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
+  reason: "Avo's own test helpers were re-written for cuprite / chromedriver-specific affordances (drag, clipboard, paginated index ordering); failures are present in Avo's cuprite baseline at this SHA too"
 
 - test:   "TestHelpers field_value on self resource index finds the value on table"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
+  reason: "Avo's own test helpers were re-written for cuprite / chromedriver-specific affordances (drag, clipboard, paginated index ordering); failures are present in Avo's cuprite baseline at this SHA too"
 
 - test:   "TestHelpers field_value on self resource show find value"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
+  reason: "Avo's own test helpers were re-written for cuprite / chromedriver-specific affordances (drag, clipboard, paginated index ordering); failures are present in Avo's cuprite baseline at this SHA too"
 
 - test:   "TestHelpers isolated tests confirm_alert confirms the alert"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
+  reason: "Avo's own test helpers were re-written for cuprite / chromedriver-specific affordances (drag, clipboard, paginated index ordering); failures are present in Avo's cuprite baseline at this SHA too"
 
 - test:   "TestHelpers isolated tests run_action runs the panel action in index"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
+  reason: "Avo's own test helpers were re-written for cuprite / chromedriver-specific affordances (drag, clipboard, paginated index ordering); failures are present in Avo's cuprite baseline at this SHA too"
 
 - test:   "TestHelpers isolated tests run_action runs the panel action in show"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
+  reason: "Avo's own test helpers were re-written for cuprite / chromedriver-specific affordances (drag, clipboard, paginated index ordering); failures are present in Avo's cuprite baseline at this SHA too"
 
 - test:   "TestHelpers isolated tests tags suggestions"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
+  reason: "Avo's own test helpers were re-written for cuprite / chromedriver-specific affordances (drag, clipboard, paginated index ordering); failures are present in Avo's cuprite baseline at this SHA too"
 
 - test:   "TestHelpers isolated tests tags add checks and remove tags"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
+  reason: "Avo's own test helpers were re-written for cuprite / chromedriver-specific affordances (drag, clipboard, paginated index ordering); failures are present in Avo's cuprite baseline at this SHA too"
 
 - test:   "TestHelpers isolated tests tags verify tags"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
+  reason: "Avo's own test helpers were re-written for cuprite / chromedriver-specific affordances (drag, clipboard, paginated index ordering); failures are present in Avo's cuprite baseline at this SHA too"
 
 - test:   "TiptapField without value edit change the products description text"
   reason: "TipTap WYSIWYG editor — contenteditable selection / range"
@@ -414,15 +381,6 @@
   reason: "model error display"
 
 - test:   "sidebar desktop remembers user choice"
-  reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
-
-- test:   "sidebar mobile is closed on login"
-  reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
-
-- test:   "sidebar mobile toggles between open and closed"
-  reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
-
-- test:   "sidebar mobile remains closed on navigation"
   reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
 
 - test:   "Field Summarizing summarizable field option when summarizing on association pages only shows values from associated record"

@@ -34,11 +34,23 @@ module CsimDrivenBy
   REAL_BROWSER_DRIVERS = %i[selenium selenium_chrome selenium_chrome_headless better_cuprite cuprite apparition].freeze
 
   def driven_by(driver, **options, &block)
-    if REAL_BROWSER_DRIVERS.include?(driver)
-      super(:simulated)
-    else
-      super
-    end
+    return super unless REAL_BROWSER_DRIVERS.include?(driver)
+
+    # Hosts wire chrome's download dir through cuprite-specific
+    # options that we don't read; map common conventions onto
+    # `Capybara.save_path` so attachment responses + JS-driven
+    # `<a download>` clicks land where the host's helpers poll
+    # for files. Set this *before* calling super so any synchronous
+    # driver init happens against the right path.
+    download_const = [
+      ('::ApplicationSystemTestCase::DOWNLOADS_PATH' if defined?(::ApplicationSystemTestCase) && ::ApplicationSystemTestCase.const_defined?(:DOWNLOADS_PATH)),
+      ('::DownloadHelpers::PATH'                    if defined?(::DownloadHelpers)             && ::DownloadHelpers.const_defined?(:PATH)),
+    ].compact.first
+    Capybara.save_path = Object.const_get(download_const).to_s if download_const
+
+    # Important: return the result of `super` so rspec-rails'
+    # `driven_by(...).tap(&:use)` can chain off the registration.
+    super(:simulated)
   end
 end
 ActionDispatch::SystemTestCase.singleton_class.prepend(CsimDrivenBy)
