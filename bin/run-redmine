@@ -27,11 +27,11 @@ fi
 export BUNDLE_GEMFILE="$ROOT/Gemfile.redmine"
 export RUBYOPT="-r$ROOT/support/csim_minitest.rb ${RUBYOPT:-}"
 export CSIM_DRIVER=simulated
-export CSIM_EXPECTED_FAILURES="$ROOT/lists/redmine.yml"
+export CSIM_EXPECTED_FAILURES="${CSIM_EXPECTED_FAILURES-$ROOT/lists/redmine.yml}"
 
 # Default to running every system test if the caller didn't specify.
 if [ "$#" -eq 0 ]; then
   set -- test/system
 fi
 
-exec bundle exec bin/rails test "$@"
+exec mise exec -- bundle exec bin/rails test "$@"

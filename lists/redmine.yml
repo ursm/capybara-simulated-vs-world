@@ -1,4 +1,32 @@
 # Tests we don't expect capybara-simulated to satisfy. Each entry is
-# either the exact `Class#method` string the Minitest runner prints,
-# or a Regexp matched against it.
-[]
+# one of:
+#   - "Class#method"                            # exact string match
+#   - !ruby/regexp /pattern/                    # regex match
+#   - {test: "Class#method", reason: "..."}     # exact match with reason
+#
+# Last verified against Redmine 8dfb83b3d on 2026-05-08.
+
+- test: "GanttsTest#test_progress_line_toggle_draws_zigzag_line"
+  reason: "Gantt chart draws SVG paths from layout-derived coordinates; needs a real layout engine"
+- test: "GanttsTest#test_related_issues_toggle_displays_and_hides_relation_arrows"
+  reason: "same as above — relation arrows are SVG paths over computed bbox positions"
+- test: "GanttsTest#test_selected_columns_can_be_resized_by_dragging"
+  reason: "uses Capybara::Node#drag_to with builder.action(:button_down/up); driver lacks Capybara action-chain API"
+
+- test: "IssuesImportTest#test_import_issues_without_failures"
+  reason: "click on `span.drdn` wrapper expects layout-aware click delegation to inner `.drdn-trigger`; drives the dropdown the test depends on"
+
+- test: "IssuesSystemTest#test_bulk_update_issues"
+  reason: "bulk-edit dropdown not visible after click — same span.drdn / .drdn-trigger layout dispatch as IssuesImportTest"
+- test: "IssuesSystemTest#test_issue_list_with_default_totalable_columns"
+  reason: "totalable-columns popup found but invisible — layout-dependent positioning"
+- test: "IssuesSystemTest#test_issue_trackers_description_should_select_tracker"
+  reason: "assertion against a UI flag that flips via getComputedStyle / layout"
+
+- test: "OauthProviderSystemTest#test_application_creation_and_authorization"
+  reason: "test reads Capybara.current_session.server.port; we run in-process with no real server"
+
+- test: "StickyIssueHeaderSystemTest#test_sticky_issue_header_appears_on_scroll"
+  reason: "needs scroll position + IntersectionObserver for position:sticky to trip 'is-visible'"
+- test: "StickyIssueHeaderSystemTest#test_edit_heading_is_not_hidden_behind_sticky_header_when_edit_link_is_clicked"
+  reason: "same as above — requires real scroll + sticky positioning"
