@@ -1,0 +1,489 @@
+# Tests we don't expect capybara-simulated to satisfy. Each entry is
+# `{test:, reason:}`; `test:` is preferred as the RSpec
+# `full_description` (stable across upstream line-number moves) but
+# may also be a `./spec/...rb:LINE` location string or a Regexp
+# matched against either.
+#
+# Last verified against Avo 4764edf17 on 2026-05-09
+# (capybara-simulated 0.0.7 / Ruby 3.3.11) running
+# `bin/run-avo` (= `spec/system spec/features`).
+#
+# Initial baseline; some entries plausibly recoverable by future
+# cascade / Stimulus / event-dispatch fixes.
+
+- test:   "Create Via Belongs to with polymorphic belongs_to when belongs_to record options exceeds associations_lookup_list_limit limits select options"
+  reason: "intermittent — passes on a clean baseline run, fails when other polymorphic-options specs run first; suspected factory/cleanup ordering inside Avo"
+
+- test:   "Actions action visibility option show does not find an action on show"
+  reason: "action modal flow / file download — modal visibility + download interception edge cases"
+
+- test:   "Actions downloading files without File.open().read downloads the file and closes the modal"
+  reason: "action modal flow / file download — modal visibility + download interception edge cases"
+
+- test:   "Actions downloading files with File.open().read downloads the file and closes the modal"
+  reason: "action modal flow / file download — modal visibility + download interception edge cases"
+
+- test:   "Actions downloading files with File.open().read on pdf downloads the file and closes the modal"
+  reason: "action modal flow / file download — modal visibility + download interception edge cases"
+
+- test:   "Actions redirects when no confirmation redirects to hey page"
+  reason: "action modal flow / file download — modal visibility + download interception edge cases"
+
+- test:   "Actions close_modal closes the modal and flashes messages"
+  reason: "action modal flow / file download — modal visibility + download interception edge cases"
+
+- test:   "App alerts only displays one alert on record destroy from has_many"
+  reason: "general app-level UI interactions"
+
+- test:   "App alerts destroy from index page"
+  reason: "general app-level UI interactions"
+
+- test:   "App security xss in turbo frames 1"
+  reason: "general app-level UI interactions"
+
+- test:   "App security xss in turbo frames 2"
+  reason: "general app-level UI interactions"
+
+- test:   "Associations using *_fields api attach and detach works using show and index fields api"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "Attach with extra fields allows to pass in data for extra fields"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "Attachment destroy destroying an attachment when validation fails after destroying attachment rolls back the transaction and keeps the attachment"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "Attachment destroy destroying an attachment when destroying an attachment succeeds destroys the attachment and saves the record"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "Record previews opens the preview"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "belongs_to not searchable new without an association when filling the poly association creating a polymorphic association creates the comment"
+  reason: "polymorphic association picker — Algolia autocomplete"
+
+- test:   "belongs_to not searchable new with an association nullifying a polymorphic association with just selecting a different association empties the commentable association"
+  reason: "polymorphic association picker — Algolia autocomplete"
+
+- test:   "belongs_to not searchable new with an association nullifying a polymorphic association with just selecting a different association changes associated record"
+  reason: "polymorphic association picker — Algolia autocomplete"
+
+- test:   "CodeField without value edit change the projects custom_css code"
+  reason: "CodeMirror integration — gutter / line measurement gates off real layout"
+
+- test:   "CodeField with regular value edit has the projects custom_css label and filled code editor"
+  reason: "CodeMirror integration — gutter / line measurement gates off real layout"
+
+- test:   "CodeField with regular value edit change the projects custom_css code to another value"
+  reason: "CodeMirror integration — gutter / line measurement gates off real layout"
+
+- test:   "CodeField with regular value show displays the projects custom_css"
+  reason: "CodeMirror integration — gutter / line measurement gates off real layout"
+
+- test:   "CodeField with pretty_generated option for a JSON code field correctly formats JSON code on create / edit and displays it in a pretty way on the show page"
+  reason: "CodeMirror integration — gutter / line measurement gates off real layout"
+
+- test:   "Create Via Belongs to edit with non-searchable belongs_to successfully creates a new user and assigns it to the comment"
+  reason: "belongs-to-create flow opens a dialog whose visibility cascade we do not fully match"
+
+- test:   "Create Via Belongs to edit with polymorphic belongs_to successfully creates a new commentable and assigns it to the comment"
+  reason: "belongs-to-create flow opens a dialog whose visibility cascade we do not fully match"
+
+- test:   "Create Via Belongs to with non-searchable belongs_to successfully creates a new user and assigns it to the comment"
+  reason: "belongs-to-create flow opens a dialog whose visibility cascade we do not fully match"
+
+- test:   "Create Via Belongs to with polymorphic belongs_to successfully creates a new commentable and assigns it to the comment"
+  reason: "belongs-to-create flow opens a dialog whose visibility cascade we do not fully match"
+
+- test:   "Create Via Belongs to with models that uses prefix_id successfully creates a new course and assigns it to the course link"
+  reason: "belongs-to-create flow opens a dialog whose visibility cascade we do not fully match"
+
+- test:   "Date field in a western (negative) Timezone edit sets the proper date without updates"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field in a western (negative) Timezone edit sets the proper date with updates"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field in an eastern (positive) Timezone edit sets the proper date without"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field in an eastern (positive) Timezone edit sets the proper date with updates"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field on eastern zone in an eastern (positive) Timezone edit keeps the same value on save"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field on eastern zone in an eastern (positive) Timezone edit keeps the right value on update and save"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with relative: true index displays the date in a valid tz"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with relative: true show displays the date in a valid tz"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with relative: true edit when keeping the value saves the valid date"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with relative: true edit when changing the value saves the valid date"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with relative: true edit when changing the value resets the date when reset button is clicked"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with relative: true index displays the date in a valid tz"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with relative: true show displays the date in a valid tz"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with relative: true edit when keeping the value saves the valid date"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with relative: true edit when changing the value saves the valid date"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with allowInput: true edit when manually typing a value saves the valid date"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with allowInput: true edit when manually typing a value reverts invalid date"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with relative: false edit when keeping the value saves the valid date"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with relative: false edit when changing the value saves the valid date"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with relative: false edit when keeping the value saves the valid date"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field with relative: false edit when changing the value saves the valid date"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field on UTC edit keeps the same value on save"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field on UTC edit keeps the right value on update and save"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field on western zone in a western (negative) Timezone edit keeps the same value on save"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Date field on western zone in a western (negative) Timezone edit keeps the right value on update and save"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Time field relative: false edit sets the proper time without updating"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Time field relative: false edit sets the proper time with updating"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Time field relative: false edit resets the time when reset button is clicked"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Time field relative: false edit sets the proper time without updating"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Time field relative: false edit sets the proper time with updating"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Time field relative: true index formats the time"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Time field relative: true show formats the time"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Time field relative: true edit sets the proper time without updating"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Time field relative: true edit sets the proper time with updating"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Time field relative: true index formats the time"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Time field relative: true show formats the time"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Time field relative: true edit sets the proper time without updating"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "Time field relative: true edit sets the proper time with updating"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "timezone On Romania (EET) with CET timezone configured edit when keeping the value saves the valid date"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "timezone On Romania (EET) with CET timezone configured edit when changing the value saves the valid date"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "timezone On Romania (EET) with UTC timezone configured edit when keeping the value saves the valid date"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "timezone On Romania (EET) with UTC timezone configured edit when changing the value saves the valid date"
+  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+
+- test:   "DestroyRecord foreign key constraints raises error"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "discreet_information discreet information display when viewing a product shows product status tooltip"
+  reason: "tooltip / popover visibility"
+
+- test:   "discreet_information discreet information display when viewing a product shows timestamps tooltip"
+  reason: "tooltip / popover visibility"
+
+- test:   "DynamicFilters populates the cities list"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "ExposedMethodsBaseController message after_destroy_path && destroy_success_message"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "Main menu and fields across multiple methods finds all test fields/tabs/sidebars where they should be"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "Fields view types list view and change to grid, delete works on both"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "Filters pagination resets when filters change with pagination set resets the pagination"
+  reason: "filter form interaction"
+
+- test:   "Filters date time filters date with range selector filters users by birthday range"
+  reason: "filter form interaction"
+
+- test:   "Filters date time filters time with single selector filters courses by starting at"
+  reason: "filter form interaction"
+
+- test:   "FiltersEmptyValuesMessage shows the custom empty message"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "FiltersPanelOpen when the filters panel should be open keeps the panel open on selection"
+  reason: "filter panel toggle uses cascade-resolved class transitions"
+
+- test:   "FiltersPanelOpen when the filters panel should be open keeps the panel open on selection and closes them on page changes"
+  reason: "filter panel toggle uses cascade-resolved class transitions"
+
+- test:   "FiltersPanelOpen when the filters panel should be closed keeps the panel closed on selection"
+  reason: "filter panel toggle uses cascade-resolved class transitions"
+
+- test:   "for_attribute option text field changing secondary field edits real value"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "HasAndBelongsToManyField show with an attached user detaches the user"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "HasManyField show delete notification visible shows the notification when delete fails"
+  reason: "has_many association editor — Stimulus-driven row management"
+
+- test:   "HasManyField with a related post deletes a post"
+  reason: "has_many association editor — Stimulus-driven row management"
+
+- test:   "HasManyField with a related post detaches a post"
+  reason: "has_many association editor — Stimulus-driven row management"
+
+- test:   "HasOneFieldName show without a related post attaches and detaches a post"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "HasOneField omits parent record hides the belongs_to field pointing back to the parent on the embedded show page"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "KeyValueFields without value won't change the value"
+  reason: "key/value pair editor uses Stimulus-driven row insertion that races with our synchronous JS"
+
+- test:   "KeyValueFields without value edit adds a row to meta table and input one row with values"
+  reason: "key/value pair editor uses Stimulus-driven row insertion that races with our synchronous JS"
+
+- test:   "KeyValueFields with value edit adds a row to meta table with key and value"
+  reason: "key/value pair editor uses Stimulus-driven row insertion that races with our synchronous JS"
+
+- test:   "KeyValueFields with value edit adds a row to meta table only with key"
+  reason: "key/value pair editor uses Stimulus-driven row insertion that races with our synchronous JS"
+
+- test:   "KeyValueFields with 0 and false edit preserves types when changing 0 to 1 (Integer) and false to true (Boolean)"
+  reason: "key/value pair editor uses Stimulus-driven row insertion that races with our synchronous JS"
+
+- test:   "OpenFieldAttachment with PDF attachment opens attachment in new window without download"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "ResourceSidebars allow fields to be edited on sidebar"
+  reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
+
+- test:   "SelectAll without applied filters uncheck one of them releases the fish from the selected page - 1"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "SignOutDropdown when signed in signs out the user"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "SkipShowView skip_show_view = true can save and destroy on edit page"
+  reason: "show-view-skipping resource flow"
+
+- test:   "SkipShowView skip_show_view = true create and delete association redirects to the edit page"
+  reason: "show-view-skipping resource flow"
+
+- test:   "SkipShowView skip_show_view = false can save but can't destroy on edit page"
+  reason: "show-view-skipping resource flow"
+
+- test:   "SkipShowView skip_show_view = false create and delete association redirects to the show page"
+  reason: "show-view-skipping resource flow"
+
+- test:   "StimulusJS edit_controller#toggle toggles off a field"
+  reason: "custom Stimulus controllers needing real layout / scroll"
+
+- test:   "StimulusJS city-in-country#onCountryChange changes the cities"
+  reason: "custom Stimulus controllers needing real layout / scroll"
+
+- test:   "StimulusJS city-in-country#onCountryChange (attached to ShowCurrentTime Action) filters cities based on a given country"
+  reason: "custom Stimulus controllers needing real layout / scroll"
+
+- test:   "Tabs date_time field works on tabs"
+  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+
+- test:   "Tabs keeps the pagination on tab when back is used"
+  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+
+- test:   "Tabs keeps the per_page on association when back is used"
+  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+
+- test:   "Tabs lazy_load"
+  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+
+- test:   "Tabs doesn't display tabs content on index doesn't display the birthday from the tab content"
+  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+
+- test:   "Tabs tabs show switches the tabs"
+  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+
+- test:   "Tabs tabs show hides the birthday tab"
+  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+
+- test:   "Tabs tabs edit shows the birthday in the tab"
+  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+
+- test:   "Tabs tabs edit hides the Projects tab"
+  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+
+- test:   "Tabs un-authorized tabs hides the tab"
+  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+
+- test:   "Tabs durable tabs keeps same tab between show and edit"
+  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+
+- test:   "Tabs tabs with names that have spaces keeps tab on reload"
+  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+
+- test:   "Tabs tabs with non-ASCII names renders the correct turbo frame content for tabs with non-ascii names"
+  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+
+- test:   "Tags acts_as_taggable index shows filled state"
+  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+
+- test:   "Tags acts_as_taggable edit shows filled state"
+  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+
+- test:   "Tags acts_as_taggable edit adds a tag"
+  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+
+- test:   "Tags acts_as_taggable new keeps acts as taggable tags on validation errors"
+  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+
+- test:   "Tags without acts_as_taggable adds skills"
+  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+
+- test:   "Tags ajax request fetches the users"
+  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+
+- test:   "Tags format_using (same as deprecated fetch_labels) with fetch_values_from keep correct tags on validations error and edit"
+  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+
+- test:   "Tags mode: :select on edit / update"
+  reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
+
+- test:   "TestHelpers field_wrapper on self resource index finds the wrapper on table"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+
+- test:   "TestHelpers field_wrapper on self resource show finds the wrapper"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+
+- test:   "TestHelpers field_wrapper on show view related resource index finds the wrapper"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+
+- test:   "TestHelpers field_wrapper on show view related resource show finds the wrapper"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+
+- test:   "TestHelpers field_label on self resource index finds the label on table"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+
+- test:   "TestHelpers field_label on self resource show finds the label"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+
+- test:   "TestHelpers field_value on self resource index finds the value on table"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+
+- test:   "TestHelpers field_value on self resource show find value"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+
+- test:   "TestHelpers isolated tests confirm_alert confirms the alert"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+
+- test:   "TestHelpers isolated tests run_action runs the panel action in index"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+
+- test:   "TestHelpers isolated tests run_action runs the panel action in show"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+
+- test:   "TestHelpers isolated tests tags suggestions"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+
+- test:   "TestHelpers isolated tests tags add checks and remove tags"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+
+- test:   "TestHelpers isolated tests tags verify tags"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+
+- test:   "TiptapField without value edit change the products description text"
+  reason: "TipTap WYSIWYG editor — contenteditable selection / range"
+
+- test:   "TiptapField with regular value edit change the products description tiptap to another simple text value"
+  reason: "TipTap WYSIWYG editor — contenteditable selection / range"
+
+- test:   "TrixField with regular value show displays the posts body"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "UserForms accesses the create user page"
+  reason: "multi-step form interaction with conditional fields"
+
+- test:   "UserForms displays valdation errors"
+  reason: "multi-step form interaction with conditional fields"
+
+- test:   "UserForms submits the form on enter"
+  reason: "multi-step form interaction with conditional fields"
+
+- test:   "UserForms creates a user"
+  reason: "multi-step form interaction with conditional fields"
+
+- test:   "has_one persisting has_one persisting Main component redirect back after submit the form"
+  reason: "has_one persistence flow"
+
+- test:   "has_one persisting has_one persisting Main component redirects back when cancel is clicked"
+  reason: "has_one persistence flow"
+
+- test:   "ModelErrors does not swallow errors"
+  reason: "model error display"
+
+- test:   "sidebar desktop remembers user choice"
+  reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
+
+- test:   "sidebar mobile is closed on login"
+  reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
+
+- test:   "sidebar mobile toggles between open and closed"
+  reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
+
+- test:   "sidebar mobile remains closed on navigation"
+  reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
+
+- test:   "Field Summarizing summarizable field option provides the ability to see the distribution of values, toggleable"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+
+- test:   "Field Summarizing summarizable field option when summarizing on association pages only shows values from associated record"
+  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"

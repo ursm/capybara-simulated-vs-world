@@ -4,3 +4,6 @@
 [submodule "apps/forem"]
 	path = apps/forem
 	url = https://github.com/forem/forem.git
+[submodule "apps/avo"]
+	path = apps/avo
+	url = https://github.com/avo-hq/avo.git

@@ -23,6 +23,7 @@ list entry, not a hand-wave.
 |---|---|---:|---:|---:|---:|---:|
 | [Redmine](apps/redmine) | jQuery 3.7 + jQuery UI 1.13 + Stimulus | 122 | 115 | 7 | 0 | 94.3% |
 | [Forem](apps/forem)¹ | Preact 10 + Stimulus + ahoy.js + Crayons | 192 | 191 | 1 | 0 | 99.5% |
+| [Avo](apps/avo) | Stimulus + flatpickr + CodeMirror + TipTap + Algolia autocomplete | 951 | 792 | 159 | 0 | 83.3% |
 
 ¹ Forem's untagged system specs run under `:rack_test` (no JS); only
 the `:js`-tagged subset exercises capybara-simulated. The

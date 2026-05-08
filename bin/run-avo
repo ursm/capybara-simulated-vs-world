@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# Run Avo's RSpec system suite through capybara-simulated. Args after
+# the first are passed to `bin/rspec`.
+#
+#   bin/run-avo
+#   bin/run-avo spec/system/avo/index_spec.rb
+#   bin/run-avo spec/system/avo/index_spec.rb:42
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+APP="$ROOT/apps/avo"
+
+cd "$APP"
+
+# Per-app Ruby pin; mise's prebuilt 3.3.x line works fine for Avo's
+# `.ruby-version` of 3.3.1 (Avo's Gemfile doesn't pin exact like
+# Forem's does, so we don't need the strip-and-eval trick here).
+RUBY_VERSION=3.3.11
+
+# Avo's dummy app's Sprockets manifest reaches up into the gem's
+# `app/assets/builds/`, which doesn't exist on a fresh clone — yarn
+# builds for both the gem JS (`build:js`) and the dummy's custom JS
+# (`build:custom-js`), plus the Tailwind output (`build:css`), all
+# land there. Run once on first invocation; sentinel skips next time.
+# Crucially the build runs *before* we export `RUBYOPT` — yarn shells
+# out to ruby in a few places (rake-driven tailwind etc.) and a
+# stray `RUBYOPT=-rcsim_rspec.rb` would force Bundler.setup against
+# whatever ambient Ruby the shell-out picks up.
+if command -v mise >/dev/null 2>&1; then
+  ruby_wrap() { mise exec "ruby@$RUBY_VERSION" -- "$@"; }
+else
+  ruby_wrap() { "$@"; }
+fi
+
+if [ ! -e tmp/csim-assets-built ]; then
+  echo "==> Avo JS bundle not built yet; running yarn + esbuild (one-shot)"
+  ruby_wrap yarn install --frozen-lockfile
+  ruby_wrap yarn build
+  ruby_wrap yarn build:custom-js
+  mkdir -p tmp && touch tmp/csim-assets-built
+fi
+
+export BUNDLE_GEMFILE="$ROOT/Gemfile.avo"
+export RUBYOPT="-r$ROOT/support/csim_rspec.rb ${RUBYOPT:-}"
+export CSIM_DRIVER=simulated
+export CSIM_EXPECTED_FAILURES="${CSIM_EXPECTED_FAILURES-$ROOT/lists/avo.yml}"
+
+# Avo's `bin/rspec` shells out via Spring, which keeps an
+# application-server process warm across runs. Spring caches the
+# Rails autoload table from the first boot, so any later run with
+# different gem paths (`Gemfile.avo` vs upstream `Gemfile`) tries
+# to satisfy assets / requires through the cached one and fails on
+# things like `Asset 'avo.base.css' was not declared`. Disable
+# Spring outright — boot-time penalty is negligible vs the bundle
+# install / asset build we already paid.
+export DISABLE_SPRING=1
+
+# `spec/rails_helper.rb` calls `driven_by :cuprite` directly; our
+# `csim_rspec.rb`'s `CsimDrivenBy` override picks that up (cuprite
+# is in `REAL_BROWSER_DRIVERS`) and routes to `:simulated`. No
+# upstream patch needed.
+
+# Avo's CI default — non-`:js` system specs don't exist here, every
+# spec under `spec/system/` (and `spec/features/`) is browser-driven.
+if [ "$#" -eq 0 ]; then
+  set -- spec/system spec/features
+fi
+
+if command -v mise >/dev/null 2>&1; then
+  exec mise exec "ruby@$RUBY_VERSION" -- bundle exec bin/rspec "$@"
+fi
+exec bundle exec bin/rspec "$@"
