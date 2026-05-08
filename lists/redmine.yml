@@ -1,8 +1,6 @@
 # Tests we don't expect capybara-simulated to satisfy. Each entry is
-# one of:
-#   - "Class#method"                            # exact string match
-#   - !ruby/regexp /pattern/                    # regex match
-#   - {test: "Class#method", reason: "..."}     # exact match with reason
+# `{test:, reason:}`; `test:` is either an exact `Class#method` string
+# or a Regexp matched against it.
 #
 # Last verified against Redmine 8dfb83b3d on 2026-05-08.
 

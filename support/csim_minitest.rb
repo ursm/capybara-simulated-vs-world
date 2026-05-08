@@ -35,16 +35,14 @@ module CsimDrivenBy
 end
 ActionDispatch::SystemTestCase.singleton_class.prepend(CsimDrivenBy)
 
-# Expected-failure handling. The list is YAML; each entry is one of:
+# Expected-failure handling. The list is YAML; each entry is a hash
+# of `test:` (exact `Class#method` string or Regexp) plus `reason:`
+# (verbatim text surfaced in the skip message).
 #
-#   - "Class#method"                          # exact match
-#   - !ruby/regexp /Class#test_pattern/       # regex match
-#   - {test: "Class#method", reason: "..."}   # exact match + skip reason
-#   - {test: !ruby/regexp /.../, reason: ...} # regex match + skip reason
-#
-# String / Regexp forms get a generic "expected failure" reason in the
-# skip message; hash forms surface the reason verbatim so test output
-# tells you why each one is parked.
+#   - test: "Class#method"
+#     reason: "why this is parked"
+#   - test: !ruby/regexp /Class#test_pattern/
+#     reason: "why this whole family is parked"
 list_path = ENV['CSIM_EXPECTED_FAILURES']
 return unless list_path && File.exist?(list_path)
 
@@ -52,15 +50,9 @@ require 'yaml'
 require 'minitest'
 
 CSIM_EXPECTED_FAILURES = (YAML.load_file(list_path, permitted_classes: [Regexp]) || []).map {|entry|
-  case entry
-  when String, Regexp
-    {matcher: entry, reason: nil}
-  when Hash
-    h = entry.transform_keys(&:to_s)
-    {matcher: h.fetch('test'), reason: h['reason']}
-  else
-    raise "csim_minitest: unsupported expected-failure entry #{entry.inspect}"
-  end
+  raise "csim_minitest: expected-failure entry must be a hash, got #{entry.inspect}" unless entry.is_a?(Hash)
+  h = entry.transform_keys(&:to_s)
+  {matcher: h.fetch('test'), reason: h.fetch('reason')}
 }.freeze
 
 # Run each test through, then re-classify the result against the
@@ -81,11 +73,9 @@ module CsimExpectedFailures
       }
       next unless matched
 
-      label = matched[:reason] ? "expected failure (#{matched[:reason]})" : 'expected failure'
-
       if result.failures.any? {|f| !f.is_a?(Minitest::Skip) }
         result.failures.clear
-        result.failures << Minitest::Skip.new(label)
+        result.failures << Minitest::Skip.new("expected failure (#{matched[:reason]})")
       elsif result.passed?
         result.failures << Minitest::Assertion.new(
           "listed in expected_failures but passed — drop it from the list:\n  #{matched[:matcher].inspect}"
