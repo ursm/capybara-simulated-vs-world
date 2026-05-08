@@ -34,4 +34,13 @@ if [ "$#" -eq 0 ]; then
   set -- test/system
 fi
 
-exec mise exec -- bundle exec bin/rails test "$@"
+# Pin Ruby on a per-app basis without dropping a `.ruby-version` into
+# the (read-only-ish) submodule tree. Locally `mise exec` walks its
+# own install of the right Ruby; in CI `actions/setup-ruby` already
+# put the matching Ruby on PATH and mise isn't installed, so we just
+# pass through.
+RUBY_VERSION=3.4.9
+if command -v mise >/dev/null 2>&1; then
+  exec mise exec "ruby@$RUBY_VERSION" -- bundle exec bin/rails test "$@"
+fi
+exec bundle exec bin/rails test "$@"
