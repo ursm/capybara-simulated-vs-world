@@ -14,14 +14,7 @@
   reason: "uses Capybara::Node#drag_to with builder.action(:button_down/up); driver lacks Capybara action-chain API"
 
 - test: "IssuesImportTest#test_import_issues_without_failures"
-  reason: "click on `span.drdn` wrapper expects layout-aware click delegation to inner `.drdn-trigger`; drives the dropdown the test depends on"
-
-- test: "IssuesSystemTest#test_bulk_update_issues"
-  reason: "bulk-edit dropdown not visible after click — same span.drdn / .drdn-trigger layout dispatch as IssuesImportTest"
-- test: "IssuesSystemTest#test_issue_list_with_default_totalable_columns"
-  reason: "totalable-columns popup found but invisible — layout-dependent positioning"
-- test: "IssuesSystemTest#test_issue_trackers_description_should_select_tracker"
-  reason: "assertion against a UI flag that flips via getComputedStyle / layout"
+  reason: "click on `span.drdn` wrapper expects layout-aware click delegation to inner `.drdn-trigger`; we click the wrapper itself, no event reaches the trigger handler"
 
 - test: "OauthProviderSystemTest#test_application_creation_and_authorization"
   reason: "test reads Capybara.current_session.server.port; we run in-process with no real server"
