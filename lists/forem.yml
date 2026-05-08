@@ -1,0 +1,6 @@
+# Tests we don't expect capybara-simulated to satisfy. Each entry is
+# `{test:, reason:}`; `test:` is either an exact RSpec full_description
+# or location string, or a Regexp matched against either.
+#
+# Last verified against Forem 99141cc1f on 2026-05-08.
+[]

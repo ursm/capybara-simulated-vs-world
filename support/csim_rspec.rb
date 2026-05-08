@@ -1,0 +1,61 @@
+# Preloaded via `RUBYOPT='-r<this-file>'` for RSpec-based suites
+# (Forem). Mirror of `csim_minitest.rb` with two responsibilities:
+#
+# 1. Override `ActionDispatch::SystemTestCase.driven_by` so any
+#    `driven_by :anything` from the host's RSpec hooks routes to
+#    `:simulated` when `CSIM_DRIVER=simulated` is set.
+# 2. Skip examples whose `<class>#<method>`-shaped description matches
+#    an entry in the expected-failures list at `CSIM_EXPECTED_FAILURES`.
+
+return unless ENV['CSIM_DRIVER'] == 'simulated'
+
+# Same lock-in dance as csim_minitest.rb — force the Gemfile-resolved
+# (path) capybara-simulated to be the one we end up requiring.
+require 'bundler/setup'
+
+# Rails 7.0's `active_support/logger_thread_safe_level.rb` references
+# `Logger::Severity` at load time without `require 'logger'`. On
+# Ruby 3.3+ that fails because Logger sits in a bundled gem now.
+# Same story for other stdlib-extracted classes Rails 7.0 grew up
+# expecting to be ambiently available.
+%w[base64 bigdecimal csv drb logger mutex_m observer ostruct].each {|name| require name }
+
+require 'capybara/simulated'
+require 'action_dispatch/system_test_case'
+
+module CsimDrivenBy
+  def driven_by(_driver, **_options, &_block)
+    super(:simulated)
+  end
+end
+ActionDispatch::SystemTestCase.singleton_class.prepend(CsimDrivenBy)
+
+# Expected-failure handling. Same YAML format as csim_minitest.rb's
+# (`{test:, reason:}`); `test:` matches against either RSpec's
+# `example.full_description` or `example.location`.
+list_path = ENV['CSIM_EXPECTED_FAILURES']
+return unless list_path && File.exist?(list_path)
+
+require 'yaml'
+require 'rspec/core'
+
+CSIM_EXPECTED_FAILURES = (YAML.load_file(list_path, permitted_classes: [Regexp]) || []).map {|entry|
+  raise "csim_rspec: expected-failure entry must be a hash, got #{entry.inspect}" unless entry.is_a?(Hash)
+  h = entry.transform_keys(&:to_s)
+  {matcher: h.fetch('test'), reason: h.fetch('reason')}
+}.freeze
+
+RSpec.configure do |config|
+  config.before(:each) do |example|
+    desc = example.full_description
+    loc  = example.location
+    matched = CSIM_EXPECTED_FAILURES.find {|entry|
+      m = entry[:matcher]
+      case m
+      when Regexp then m.match?(desc) || m.match?(loc)
+      when String then m == desc || m == loc
+      end
+    }
+    skip("expected failure (#{matched[:reason]})") if matched
+  end
+end

@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Run Forem's RSpec suite through capybara-simulated. Args after the
+# first are passed to `bin/rspec`.
+#
+#   bin/run-forem
+#   bin/run-forem spec/system/articles_show_spec.rb
+#   bin/run-forem spec/system/articles_show_spec.rb:42
+#
+# Exits non-zero if any non-listed example fails OR any listed example
+# unexpectedly passes (the latter via the run-wrapper in csim_rspec.rb).
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+APP="$ROOT/apps/forem"
+
+cd "$APP"
+
+export BUNDLE_GEMFILE="$ROOT/Gemfile.forem"
+export RUBYOPT="-r$ROOT/support/csim_rspec.rb ${RUBYOPT:-}"
+export CSIM_DRIVER=simulated
+export CSIM_EXPECTED_FAILURES="${CSIM_EXPECTED_FAILURES-$ROOT/lists/forem.yml}"
+
+# Forem reads `ApplicationConfig["APP_PROTOCOL"]` from the environment
+# via dotenv (`spec_helper` requires `dotenv/load`); without a `.env`
+# the value comes back nil and `URL.local_image` builds a hostless
+# URL that ActionView's `image_url` rejects with
+# "undefined method 'protocol' for nil". `APP_DOMAIN` is set inside
+# `rails_helper.rb` itself, but `APP_PROTOCOL` is left to env config.
+export APP_PROTOCOL="${APP_PROTOCOL:-http://}"
+
+# Forem's spec_helper re-runs `bin/rails javascript:build` on every
+# suite boot unless this is set. We do the build ourselves once below.
+export SKIP_JS_BUILD=1
+
+# Same per-script Ruby pin as bin/run-redmine. Forem's `.ruby-version`
+# is "3.3.0" but `Gemfile.forem` strips the exact-match pin so
+# any 3.3.x works.
+RUBY_VERSION=3.3.11
+if command -v mise >/dev/null 2>&1; then
+  ruby_wrap() { mise exec "ruby@$RUBY_VERSION" -- "$@"; }
+else
+  ruby_wrap() { "$@"; }
+fi
+
+# Forem's Sprockets manifest links `app/assets/builds/*` and
+# `app/assets/javascripts/base.js.erb` resolves real npm packages
+# via Sprockets. There's no rack-test escape hatch — without the
+# bundle, every spec aborts on `Sprockets::FileNotFound` before
+# any driver code runs. Build once on first invocation; touch a
+# sentinel so subsequent runs skip the slow yarn / esbuild path.
+if [ ! -e tmp/csim-assets-built ]; then
+  echo "==> Forem JS bundle not built yet; running yarn + javascript:build (one-shot)"
+  yarn install --frozen-lockfile
+  ruby_wrap bundle exec bin/rails javascript:build
+  mkdir -p tmp && touch tmp/csim-assets-built
+fi
+
+# Default to the system specs if the caller didn't specify — Forem's
+# unit suite is huge and not the point of this integration.
+if [ "$#" -eq 0 ]; then
+  set -- spec/system
+fi
+
+if command -v mise >/dev/null 2>&1; then
+  exec mise exec "ruby@$RUBY_VERSION" -- bundle exec bin/rspec "$@"
+fi
+exec bundle exec bin/rspec "$@"

@@ -1,3 +1,6 @@
 [submodule "apps/redmine"]
 	path = apps/redmine
 	url = https://github.com/redmine/redmine.git
+[submodule "apps/forem"]
+	path = apps/forem
+	url = https://github.com/forem/forem.git
