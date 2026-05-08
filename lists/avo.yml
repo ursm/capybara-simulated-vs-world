@@ -8,14 +8,14 @@
 # (capybara-simulated 0.0.7 / Ruby 3.3.11) running
 # `bin/run-avo` (= `spec/system spec/features`).
 #
-# Initial baseline; some entries plausibly recoverable by future
-# cascade / Stimulus / event-dispatch fixes.
+# ~95% of these mirror Avo's own `BENCH_DRIVER=simulated` baseline at
+# the same SHA — they're properties of the gap between simulated and
+# cuprite for Avo's specific stack (flatpickr, CodeMirror, TipTap,
+# tagify, Algolia autocomplete) rather than driver bugs we can chase
+# one at a time.
 
 - test:   "Create Via Belongs to with polymorphic belongs_to when belongs_to record options exceeds associations_lookup_list_limit limits select options"
   reason: "intermittent — passes on a clean baseline run, fails when other polymorphic-options specs run first; suspected factory/cleanup ordering inside Avo"
-
-- test:   "Actions action visibility option show does not find an action on show"
-  reason: "action modal flow / file download — modal visibility + download interception edge cases"
 
 - test:   "Actions downloading files without File.open().read downloads the file and closes the modal"
   reason: "action modal flow / file download — modal visibility + download interception edge cases"
@@ -99,130 +99,130 @@
   reason: "belongs-to-create flow opens a dialog whose visibility cascade we do not fully match"
 
 - test:   "Date field in a western (negative) Timezone edit sets the proper date without updates"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field in a western (negative) Timezone edit sets the proper date with updates"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field in an eastern (positive) Timezone edit sets the proper date without"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field in an eastern (positive) Timezone edit sets the proper date with updates"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field on eastern zone in an eastern (positive) Timezone edit keeps the same value on save"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field on eastern zone in an eastern (positive) Timezone edit keeps the right value on update and save"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with relative: true index displays the date in a valid tz"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with relative: true show displays the date in a valid tz"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with relative: true edit when keeping the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with relative: true edit when changing the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with relative: true edit when changing the value resets the date when reset button is clicked"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with relative: true index displays the date in a valid tz"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with relative: true show displays the date in a valid tz"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with relative: true edit when keeping the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with relative: true edit when changing the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with allowInput: true edit when manually typing a value saves the valid date"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with allowInput: true edit when manually typing a value reverts invalid date"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with relative: false edit when keeping the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with relative: false edit when changing the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with relative: false edit when keeping the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field with relative: false edit when changing the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field on UTC edit keeps the same value on save"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field on UTC edit keeps the right value on update and save"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field on western zone in a western (negative) Timezone edit keeps the same value on save"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Date field on western zone in a western (negative) Timezone edit keeps the right value on update and save"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Time field relative: false edit sets the proper time without updating"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Time field relative: false edit sets the proper time with updating"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Time field relative: false edit resets the time when reset button is clicked"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Time field relative: false edit sets the proper time without updating"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Time field relative: false edit sets the proper time with updating"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Time field relative: true index formats the time"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Time field relative: true show formats the time"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Time field relative: true edit sets the proper time without updating"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Time field relative: true edit sets the proper time with updating"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Time field relative: true index formats the time"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Time field relative: true show formats the time"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Time field relative: true edit sets the proper time without updating"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "Time field relative: true edit sets the proper time with updating"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "timezone On Romania (EET) with CET timezone configured edit when keeping the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "timezone On Romania (EET) with CET timezone configured edit when changing the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "timezone On Romania (EET) with UTC timezone configured edit when keeping the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "timezone On Romania (EET) with UTC timezone configured edit when changing the value saves the valid date"
-  reason: "flatpickr-driven date/time picker — picker UI gates off layout-dependent positioning we do not compute"
+  reason: "flatpickr-driven date/time picker — original `<input>` carries a `hidden` class plus the cloned visible input that flatpickr inserts; cuprite hides one and we surface both as ambiguous matches"
 
 - test:   "DestroyRecord foreign key constraints raises error"
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
@@ -233,13 +233,7 @@
 - test:   "discreet_information discreet information display when viewing a product shows timestamps tooltip"
   reason: "tooltip / popover visibility"
 
-- test:   "DynamicFilters populates the cities list"
-  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
-
 - test:   "ExposedMethodsBaseController message after_destroy_path && destroy_success_message"
-  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
-
-- test:   "Main menu and fields across multiple methods finds all test fields/tabs/sidebars where they should be"
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
 
 - test:   "Fields view types list view and change to grid, delete works on both"
@@ -253,18 +247,6 @@
 
 - test:   "Filters date time filters time with single selector filters courses by starting at"
   reason: "filter form interaction"
-
-- test:   "FiltersEmptyValuesMessage shows the custom empty message"
-  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
-
-- test:   "FiltersPanelOpen when the filters panel should be open keeps the panel open on selection"
-  reason: "filter panel toggle uses cascade-resolved class transitions"
-
-- test:   "FiltersPanelOpen when the filters panel should be open keeps the panel open on selection and closes them on page changes"
-  reason: "filter panel toggle uses cascade-resolved class transitions"
-
-- test:   "FiltersPanelOpen when the filters panel should be closed keeps the panel closed on selection"
-  reason: "filter panel toggle uses cascade-resolved class transitions"
 
 - test:   "for_attribute option text field changing secondary field edits real value"
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
@@ -308,9 +290,6 @@
 - test:   "ResourceSidebars allow fields to be edited on sidebar"
   reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
 
-- test:   "SelectAll without applied filters uncheck one of them releases the fish from the selected page - 1"
-  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
-
 - test:   "SignOutDropdown when signed in signs out the user"
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
 
@@ -326,9 +305,6 @@
 - test:   "SkipShowView skip_show_view = false create and delete association redirects to the show page"
   reason: "show-view-skipping resource flow"
 
-- test:   "StimulusJS edit_controller#toggle toggles off a field"
-  reason: "custom Stimulus controllers needing real layout / scroll"
-
 - test:   "StimulusJS city-in-country#onCountryChange changes the cities"
   reason: "custom Stimulus controllers needing real layout / scroll"
 
@@ -336,43 +312,28 @@
   reason: "custom Stimulus controllers needing real layout / scroll"
 
 - test:   "Tabs date_time field works on tabs"
-  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+  reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — class-driven cascade does not currently filter the inactive group"
 
 - test:   "Tabs keeps the pagination on tab when back is used"
-  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+  reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — class-driven cascade does not currently filter the inactive group"
 
 - test:   "Tabs keeps the per_page on association when back is used"
-  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
-
-- test:   "Tabs lazy_load"
-  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+  reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — class-driven cascade does not currently filter the inactive group"
 
 - test:   "Tabs doesn't display tabs content on index doesn't display the birthday from the tab content"
-  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+  reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — class-driven cascade does not currently filter the inactive group"
 
 - test:   "Tabs tabs show switches the tabs"
-  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+  reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — class-driven cascade does not currently filter the inactive group"
 
 - test:   "Tabs tabs show hides the birthday tab"
-  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
-
-- test:   "Tabs tabs edit shows the birthday in the tab"
-  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+  reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — class-driven cascade does not currently filter the inactive group"
 
 - test:   "Tabs tabs edit hides the Projects tab"
-  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+  reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — class-driven cascade does not currently filter the inactive group"
 
 - test:   "Tabs un-authorized tabs hides the tab"
-  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
-
-- test:   "Tabs durable tabs keeps same tab between show and edit"
-  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
-
-- test:   "Tabs tabs with names that have spaces keeps tab on reload"
-  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
-
-- test:   "Tabs tabs with non-ASCII names renders the correct turbo frame content for tabs with non-ascii names"
-  reason: "tab Stimulus controller leans on cascade-resolved class transitions we do not fully match"
+  reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — class-driven cascade does not currently filter the inactive group"
 
 - test:   "Tags acts_as_taggable index shows filled state"
   reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
@@ -399,46 +360,43 @@
   reason: "tag multi-select autocomplete — Algolia autocomplete dropdown positioning"
 
 - test:   "TestHelpers field_wrapper on self resource index finds the wrapper on table"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
 
 - test:   "TestHelpers field_wrapper on self resource show finds the wrapper"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
 
 - test:   "TestHelpers field_wrapper on show view related resource index finds the wrapper"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
-
-- test:   "TestHelpers field_wrapper on show view related resource show finds the wrapper"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
 
 - test:   "TestHelpers field_label on self resource index finds the label on table"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
 
 - test:   "TestHelpers field_label on self resource show finds the label"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
 
 - test:   "TestHelpers field_value on self resource index finds the value on table"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
 
 - test:   "TestHelpers field_value on self resource show find value"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
 
 - test:   "TestHelpers isolated tests confirm_alert confirms the alert"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
 
 - test:   "TestHelpers isolated tests run_action runs the panel action in index"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
 
 - test:   "TestHelpers isolated tests run_action runs the panel action in show"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
 
 - test:   "TestHelpers isolated tests tags suggestions"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
 
 - test:   "TestHelpers isolated tests tags add checks and remove tags"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
 
 - test:   "TestHelpers isolated tests tags verify tags"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) we do not implement"
+  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag) that we do not implement"
 
 - test:   "TiptapField without value edit change the products description text"
   reason: "TipTap WYSIWYG editor — contenteditable selection / range"
@@ -449,23 +407,8 @@
 - test:   "TrixField with regular value show displays the posts body"
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
 
-- test:   "UserForms accesses the create user page"
-  reason: "multi-step form interaction with conditional fields"
-
-- test:   "UserForms displays valdation errors"
-  reason: "multi-step form interaction with conditional fields"
-
 - test:   "UserForms submits the form on enter"
   reason: "multi-step form interaction with conditional fields"
-
-- test:   "UserForms creates a user"
-  reason: "multi-step form interaction with conditional fields"
-
-- test:   "has_one persisting has_one persisting Main component redirect back after submit the form"
-  reason: "has_one persistence flow"
-
-- test:   "has_one persisting has_one persisting Main component redirects back when cancel is clicked"
-  reason: "has_one persistence flow"
 
 - test:   "ModelErrors does not swallow errors"
   reason: "model error display"
@@ -482,8 +425,5 @@
 - test:   "sidebar mobile remains closed on navigation"
   reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
 
-- test:   "Field Summarizing summarizable field option provides the ability to see the distribution of values, toggleable"
-  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
-
 - test:   "Field Summarizing summarizable field option when summarizing on association pages only shows values from associated record"
-  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+  reason: "field summary popover positioning"
