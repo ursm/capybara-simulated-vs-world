@@ -1,0 +1,9 @@
+# SQLite-only test database. Copied into apps/redmine/config/database.yml
+# at the start of `bin/run-redmine` so the submodule stays unmodified.
+test:
+  adapter: sqlite3
+  database: db/test.sqlite3
+
+development:
+  adapter: sqlite3
+  database: db/development.sqlite3

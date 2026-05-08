@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Run Redmine's system tests through capybara-simulated. Args after
+# the first are passed to `bin/rails test`.
+#
+#   bin/run-redmine
+#   bin/run-redmine test/system/issues_test.rb
+#   bin/run-redmine test/system/issues_test.rb:42
+#
+# Exits non-zero if any non-listed test fails OR any listed test
+# unexpectedly passes (csim_minitest.rb's run-wrapper turns the
+# latter into a synthetic Minitest::Assertion).
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+APP="$ROOT/apps/redmine"
+
+cd "$APP"
+
+# Stage configs the submodule doesn't ship. Symlink so editing the
+# overlay during dev shows up immediately and `git status` inside
+# the submodule doesn't drift.
+if [ ! -e config/database.yml ]; then
+  ln -s "$ROOT/config/redmine_database.yml" config/database.yml
+fi
+
+export BUNDLE_GEMFILE="$ROOT/Gemfile.redmine"
+export RUBYOPT="-r$ROOT/support/csim_minitest.rb ${RUBYOPT:-}"
+export CSIM_DRIVER=simulated
+export CSIM_EXPECTED_FAILURES="$ROOT/lists/redmine.yml"
+
+# Default to running every system test if the caller didn't specify.
+if [ "$#" -eq 0 ]; then
+  set -- test/system
+fi
+
+exec bundle exec bin/rails test "$@"

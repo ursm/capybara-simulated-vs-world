@@ -1,0 +1,4 @@
+# Tests we don't expect capybara-simulated to satisfy. Each entry is
+# either the exact `Class#method` string the Minitest runner prints,
+# or a Regexp matched against it.
+[]
