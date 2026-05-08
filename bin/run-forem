@@ -29,6 +29,15 @@ export CSIM_EXPECTED_FAILURES="${CSIM_EXPECTED_FAILURES-$ROOT/lists/forem.yml}"
 # `rails_helper.rb` itself, but `APP_PROTOCOL` is left to env config.
 export APP_PROTOCOL="${APP_PROTOCOL:-http://}"
 
+# Forem ships an `.env_sample` declaring `COMMUNITY_NAME="DEV(local)"`
+# and the system specs (logo / editor branding) hard-code that string
+# as the expected page text. Without it, `Settings::Community.community_name`
+# falls back to the i18n default `"New Forem"` and the assertions
+# diff. We don't want to load the whole `.env_sample` (it carries
+# DB / redis URLs that would clobber the test environment), so just
+# project the one value the specs actually pin against.
+export COMMUNITY_NAME="${COMMUNITY_NAME:-DEV(local)}"
+
 # Forem's spec_helper re-runs `bin/rails javascript:build` on every
 # suite boot unless this is set. We do the build ourselves once below.
 export SKIP_JS_BUILD=1
@@ -56,10 +65,13 @@ if [ ! -e tmp/csim-assets-built ]; then
   mkdir -p tmp && touch tmp/csim-assets-built
 fi
 
-# Default to the system specs if the caller didn't specify — Forem's
-# unit suite is huge and not the point of this integration.
+# Default to the `:js`-tagged system specs if the caller didn't
+# specify. Forem's untagged system specs run under `:rack_test` and
+# never touch capybara-simulated, so counting their passes would
+# inflate what this integration is actually exercising. Run them on
+# demand with an explicit path.
 if [ "$#" -eq 0 ]; then
-  set -- spec/system
+  set -- --tag js spec/system
 fi
 
 if command -v mise >/dev/null 2>&1; then

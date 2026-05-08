@@ -24,8 +24,21 @@ require 'capybara/simulated'
 require 'action_dispatch/system_test_case'
 
 module CsimDrivenBy
-  def driven_by(_driver, **_options, &_block)
-    super(:simulated)
+  # Only intercept calls that asked for a real-browser driver. Hosts
+  # like Forem set `driven_by :rack_test` for non-`:js` system specs
+  # to keep them fast — rerouting those to `:simulated` boots the JS
+  # runtime per spec for no benefit and surfaces JS execution paths
+  # the tests never expected to fire (Datadog mocks, OmniAuth state,
+  # etc.). Pass `:rack_test` straight through; only swap the real
+  # browsers we'd substitute for.
+  REAL_BROWSER_DRIVERS = %i[selenium selenium_chrome selenium_chrome_headless better_cuprite cuprite apparition].freeze
+
+  def driven_by(driver, **options, &block)
+    if REAL_BROWSER_DRIVERS.include?(driver)
+      super(:simulated)
+    else
+      super
+    end
   end
 end
 ActionDispatch::SystemTestCase.singleton_class.prepend(CsimDrivenBy)
