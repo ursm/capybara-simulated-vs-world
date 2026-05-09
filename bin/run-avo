@@ -33,11 +33,27 @@ else
   ruby_wrap() { "$@"; }
 fi
 
+# Mirror Avo's CI build pipeline (.github/workflows/system-tests.yml):
+#   - `yarn install` at the gem root  (gem JS deps)
+#   - `yarn install` inside spec/dummy (dummy-app JS deps — Avo's
+#     custom-stream-actions, Stimulus controllers, etc. live here)
+#   - `yarn build:js && build:css && build:custom-js` against the gem
+#     directory; outputs land in `app/assets/builds/`. Run in
+#     production mode like CI does so the bundles match the asset
+#     pipeline the test app references.
+# Crucially this runs *before* we export `RUBYOPT` — yarn shells out
+# to ruby (tailwindcss-rails) and a stray `RUBYOPT=-rcsim_rspec.rb`
+# would force `Bundler.setup` against whatever ambient Ruby the
+# subshell picks up.
 if [ ! -e tmp/csim-assets-built ]; then
   echo "==> Avo JS bundle not built yet; running yarn + esbuild (one-shot)"
   ruby_wrap yarn install --frozen-lockfile
-  ruby_wrap yarn build
+  (cd spec/dummy && ruby_wrap yarn install --frozen-lockfile)
+  export RAILS_ENV=production NODE_ENV=production
+  ruby_wrap yarn build:js
+  ruby_wrap yarn build:css
   ruby_wrap yarn build:custom-js
+  unset RAILS_ENV NODE_ENV
   mkdir -p tmp && touch tmp/csim-assets-built
 fi
 
@@ -56,15 +72,24 @@ export CSIM_EXPECTED_FAILURES="${CSIM_EXPECTED_FAILURES-$ROOT/lists/avo.yml}"
 # install / asset build we already paid.
 export DISABLE_SPRING=1
 
+# Avo gates Pro features (e.g. menu editor, custom resources panel)
+# behind `AVO_LICENSE_KEY`. Avo's own CI passes the literal
+# `license_123` (it's a no-op key the gem accepts in test mode);
+# without it many specs hit the "Pro license required" placeholder
+# instead of the real component and mismatch upstream expectations.
+export AVO_LICENSE_KEY="${AVO_LICENSE_KEY:-license_123}"
+
 # `spec/rails_helper.rb` calls `driven_by :cuprite` directly; our
 # `csim_rspec.rb`'s `CsimDrivenBy` override picks that up (cuprite
 # is in `REAL_BROWSER_DRIVERS`) and routes to `:simulated`. No
 # upstream patch needed.
 
-# Avo's CI default — non-`:js` system specs don't exist here, every
-# spec under `spec/system/` (and `spec/features/`) is browser-driven.
+# Avo's CI runs `spec/system/` only and excludes `:i18n` tests
+# (`bundle exec rspec spec/system/ --tag=~i18n`). Mirror that so the
+# pass count is comparable to the upstream baseline. Pass an
+# explicit path / flags to override.
 if [ "$#" -eq 0 ]; then
-  set -- spec/system spec/features
+  set -- --tag '~i18n' spec/system
 fi
 
 if command -v mise >/dev/null 2>&1; then

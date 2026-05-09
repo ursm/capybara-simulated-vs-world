@@ -1,7 +1,12 @@
 # Run Avo's bundle in *our* gem set: load upstream's Gemfile verbatim,
 # then layer capybara-simulated and the quickjs source branch on top.
 # Activated via `BUNDLE_GEMFILE=Gemfile.avo`.
-eval_gemfile File.expand_path('apps/avo/Gemfile', __dir__)
+# Avo's CI runs against the Appraisal-generated gemfile, NOT the
+# top-level `apps/avo/Gemfile`. The two diverge on at least
+# `view_component` (3.23.2 in Appraisal vs 4.0.0 in main), which is a
+# major bump that shifts component output. Mirror CI's choice so our
+# baseline matches "100% green on system-tests.yml".
+eval_gemfile File.expand_path('apps/avo/gemfiles/rails_8.0_ruby_3.3.gemfile', __dir__)
 
 group :test do
   gem 'capybara-simulated',

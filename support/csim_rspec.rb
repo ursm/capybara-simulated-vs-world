@@ -64,7 +64,18 @@ return unless list_path && File.exist?(list_path)
 require 'yaml'
 require 'rspec/core'
 
-CSIM_EXPECTED_FAILURES = (YAML.load_file(list_path, permitted_classes: [Regexp]) || []).map {|entry|
+# Avo's CI gemfile (Appraisal-generated) drags in psych 3.3.4, which
+# predates the `permitted_classes:` kwarg on `YAML.load_file`. Fall back
+# to `unsafe_load_file` there. Our skip lists are repo-tracked so the
+# unsafe path is fine.
+yaml_loaded =
+  begin
+    YAML.load_file(list_path, permitted_classes: [Regexp])
+  rescue ArgumentError
+    YAML.unsafe_load_file(list_path)
+  end
+
+CSIM_EXPECTED_FAILURES = (yaml_loaded || []).map {|entry|
   raise "csim_rspec: expected-failure entry must be a hash, got #{entry.inspect}" unless entry.is_a?(Hash)
   h = entry.transform_keys(&:to_s)
   {matcher: h.fetch('test'), reason: h.fetch('reason')}
