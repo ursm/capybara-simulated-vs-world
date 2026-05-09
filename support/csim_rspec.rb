@@ -81,6 +81,10 @@ CSIM_EXPECTED_FAILURES = (yaml_loaded || []).map {|entry|
   {matcher: h.fetch('test'), reason: h.fetch('reason')}
 }.freeze
 
+# `pending` (not `skip`): if the example unexpectedly passes, RSpec
+# fails it as "FIXED — the test passed; remove `pending` from it",
+# which is the signal to drop the entry from the YAML list. Mirrors
+# csim_minitest.rb's "listed but passed → Assertion failure" path.
 RSpec.configure do |config|
   config.before(:each) do |example|
     desc = example.full_description
@@ -92,7 +96,7 @@ RSpec.configure do |config|
       when String then m == desc || m == loc
       end
     }
-    skip("expected failure (#{matched[:reason]})") if matched
+    pending("expected failure (#{matched[:reason]})") if matched
   end
 end
 
