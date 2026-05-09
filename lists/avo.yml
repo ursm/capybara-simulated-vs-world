@@ -41,21 +41,6 @@
 - test:   "CodeField with pretty_generated option for a JSON code field correctly formats JSON code on create / edit and displays it in a pretty way on the show page"
   reason: "CodeMirror integration — `hasBadBidiRects` measures DOM widths and crashes the editor before render"
 
-- test:   "Create Via Belongs to edit with non-searchable belongs_to successfully creates a new user and assigns it to the comment"
-  reason: "belongs-to-create flow opens a dialog whose visibility cascade we do not fully match"
-
-- test:   "Create Via Belongs to edit with polymorphic belongs_to successfully creates a new commentable and assigns it to the comment"
-  reason: "belongs-to-create flow opens a dialog whose visibility cascade we do not fully match"
-
-- test:   "Create Via Belongs to with non-searchable belongs_to successfully creates a new user and assigns it to the comment"
-  reason: "belongs-to-create flow opens a dialog whose visibility cascade we do not fully match"
-
-- test:   "Create Via Belongs to with polymorphic belongs_to successfully creates a new commentable and assigns it to the comment"
-  reason: "belongs-to-create flow opens a dialog whose visibility cascade we do not fully match"
-
-- test:   "Create Via Belongs to with models that uses prefix_id successfully creates a new course and assigns it to the course link"
-  reason: "belongs-to-create flow opens a dialog whose visibility cascade we do not fully match"
-
 - test:   "Date field on eastern zone in an eastern (positive) Timezone edit keeps the right value on update and save"
   reason: "flatpickr internals — typing into the picker, allowInput / pre-fill edge cases that depend on the calendar dropdown layout positioning"
 
