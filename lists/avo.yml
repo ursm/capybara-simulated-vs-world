@@ -7,12 +7,6 @@
 # Last verified against Avo 4764edf17 on 2026-05-09
 # (capybara-simulated 0.0.7 / Ruby 3.3.11) running
 # `bin/run-avo` (= `spec/system spec/features`).
-#
-# Most entries mirror Avo's own `BENCH_DRIVER=simulated` baseline at
-# this SHA — properties of the simulated/cuprite divergence on Avo's
-# specific stack (CodeMirror layout-derived measurement, TipTap,
-# tagify overflow, Algolia autocomplete) and Avo-side test churn
-# (test_helpers / tabs visibility) that fail in cuprite too.
 
 - test:   "Create Via Belongs to with polymorphic belongs_to when belongs_to record options exceeds associations_lookup_list_limit limits select options"
   reason: "intermittent — passes on a clean baseline run, fails when other polymorphic-options specs run first; suspected factory/cleanup ordering inside Avo"
@@ -33,24 +27,21 @@
   reason: "action download flow — turbo-stream POST raises server-side `nil[]` (factory ordering inside Avo) before the StreamActions.download client code runs"
 
 - test:   "App alerts only displays one alert on record destroy from has_many"
-  reason: "general app-level UI interactions"
+  reason: "destroy from has_many turbo-frame — server-side delete fires but the frame update path differs from cuprite"
 
 - test:   "App alerts destroy from index page"
-  reason: "general app-level UI interactions"
+  reason: "destroy from has_many turbo-frame — server-side delete fires but the frame update path differs from cuprite"
 
 - test:   "App security xss in turbo frames 1"
-  reason: "general app-level UI interactions"
+  reason: "destroy from has_many turbo-frame — server-side delete fires but the frame update path differs from cuprite"
 
 - test:   "App security xss in turbo frames 2"
-  reason: "general app-level UI interactions"
+  reason: "destroy from has_many turbo-frame — server-side delete fires but the frame update path differs from cuprite"
 
 - test:   "Associations using *_fields api attach and detach works using show and index fields api"
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
 
 - test:   "Attach with extra fields allows to pass in data for extra fields"
-  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
-
-- test:   "Attachment destroy destroying an attachment when validation fails after destroying attachment rolls back the transaction and keeps the attachment"
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
 
 - test:   "Attachment destroy destroying an attachment when destroying an attachment succeeds destroys the attachment and saves the record"
@@ -99,25 +90,22 @@
   reason: "belongs-to-create flow opens a dialog whose visibility cascade we do not fully match"
 
 - test:   "Date field on eastern zone in an eastern (positive) Timezone edit keeps the right value on update and save"
-  reason: "flatpickr internals — typing into the picker, allowInput edge cases that depend on the calendar dropdown layout positioning"
+  reason: "flatpickr internals — typing into the picker, allowInput / pre-fill edge cases that depend on the calendar dropdown layout positioning"
 
 - test:   "Date field with allowInput: true edit when manually typing a value reverts invalid date"
-  reason: "flatpickr internals — typing into the picker, allowInput edge cases that depend on the calendar dropdown layout positioning"
+  reason: "flatpickr internals — typing into the picker, allowInput / pre-fill edge cases that depend on the calendar dropdown layout positioning"
 
 - test:   "Date field on UTC edit keeps the right value on update and save"
-  reason: "flatpickr internals — typing into the picker, allowInput edge cases that depend on the calendar dropdown layout positioning"
+  reason: "flatpickr internals — typing into the picker, allowInput / pre-fill edge cases that depend on the calendar dropdown layout positioning"
 
 - test:   "Time field relative: false edit sets the proper time with updating"
-  reason: "flatpickr internals — typing into the picker, allowInput edge cases that depend on the calendar dropdown layout positioning"
+  reason: "flatpickr internals — typing into the picker, allowInput / pre-fill edge cases that depend on the calendar dropdown layout positioning"
 
 - test:   "Time field relative: false edit sets the proper time with updating"
-  reason: "flatpickr internals — typing into the picker, allowInput edge cases that depend on the calendar dropdown layout positioning"
+  reason: "flatpickr internals — typing into the picker, allowInput / pre-fill edge cases that depend on the calendar dropdown layout positioning"
 
 - test:   "Time field relative: true edit sets the proper time with updating"
-  reason: "flatpickr internals — typing into the picker, allowInput edge cases that depend on the calendar dropdown layout positioning"
-
-- test:   "DestroyRecord foreign key constraints raises error"
-  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
+  reason: "flatpickr internals — typing into the picker, allowInput / pre-fill edge cases that depend on the calendar dropdown layout positioning"
 
 - test:   "discreet_information discreet information display when viewing a product shows product status tooltip"
   reason: "tooltip / popover visibility"
@@ -126,9 +114,6 @@
   reason: "tooltip / popover visibility"
 
 - test:   "ExposedMethodsBaseController message after_destroy_path && destroy_success_message"
-  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
-
-- test:   "Fields view types list view and change to grid, delete works on both"
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
 
 - test:   "Filters pagination resets when filters change with pagination set resets the pagination"
@@ -142,9 +127,6 @@
 
 - test:   "HasAndBelongsToManyField show with an attached user detaches the user"
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
-
-- test:   "HasManyField show delete notification visible shows the notification when delete fails"
-  reason: "has_many association editor — Stimulus-driven row management"
 
 - test:   "HasManyField with a related post deletes a post"
   reason: "has_many association editor — Stimulus-driven row management"
@@ -180,25 +162,13 @@
   reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
 
 - test:   "SignOutDropdown when signed in signs out the user"
-  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
-
-- test:   "SkipShowView skip_show_view = true can save and destroy on edit page"
-  reason: "show-view-skipping resource flow"
-
-- test:   "SkipShowView skip_show_view = true create and delete association redirects to the edit page"
-  reason: "show-view-skipping resource flow"
-
-- test:   "SkipShowView skip_show_view = false can save but can't destroy on edit page"
-  reason: "show-view-skipping resource flow"
-
-- test:   "SkipShowView skip_show_view = false create and delete association redirects to the show page"
-  reason: "show-view-skipping resource flow"
+  reason: "sign-out form-submit-after-confirm flow not redirecting to /users/sign_in"
 
 - test:   "StimulusJS city-in-country#onCountryChange changes the cities"
-  reason: "custom Stimulus controllers needing real layout / scroll"
+  reason: "custom Stimulus controllers; city-in-country fetch-on-change race we do not interleave correctly"
 
 - test:   "StimulusJS city-in-country#onCountryChange (attached to ShowCurrentTime Action) filters cities based on a given country"
-  reason: "custom Stimulus controllers needing real layout / scroll"
+  reason: "custom Stimulus controllers; city-in-country fetch-on-change race we do not interleave correctly"
 
 - test:   "Tabs date_time field works on tabs"
   reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — fails in Avo cuprite baseline at this SHA too"
@@ -298,9 +268,6 @@
 
 - test:   "UserForms submits the form on enter"
   reason: "multi-step form interaction with conditional fields"
-
-- test:   "ModelErrors does not swallow errors"
-  reason: "model error display"
 
 - test:   "sidebar desktop remembers user choice"
   reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
