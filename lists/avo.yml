@@ -74,17 +74,8 @@
 - test:   "KeyValueFields without value won't change the value"
   reason: "key/value pair editor uses Stimulus-driven row insertion that races with our synchronous JS"
 
-- test:   "OpenFieldAttachment with PDF attachment opens attachment in new window without download"
-  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
-
 - test:   "ResourceSidebars allow fields to be edited on sidebar"
   reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
-
-- test:   "SignOutDropdown when signed in signs out the user"
-  reason: "sign-out form-submit-after-confirm flow not redirecting to /users/sign_in"
-
-- test:   "StimulusJS city-in-country#onCountryChange changes the cities"
-  reason: "custom Stimulus controllers; city-in-country fetch-on-change race we do not interleave correctly"
 
 - test:   "Tabs date_time field works on tabs"
   reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — fails in Avo cuprite baseline at this SHA too"
@@ -169,9 +160,6 @@
 
 - test:   "TrixField with regular value show displays the posts body"
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
-
-- test:   "UserForms submits the form on enter"
-  reason: "multi-step form interaction with conditional fields"
 
 - test:   "sidebar desktop remembers user choice"
   reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
