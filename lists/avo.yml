@@ -158,8 +158,5 @@
 - test:   "TiptapField with regular value edit change the products description tiptap to another simple text value"
   reason: "TipTap WYSIWYG editor — contenteditable selection / range"
 
-- test:   "TrixField with regular value show displays the posts body"
-  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
-
 - test:   "sidebar desktop remembers user choice"
   reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
