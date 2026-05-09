@@ -152,11 +152,5 @@
 - test:   "TestHelpers isolated tests tags verify tags"
   reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag, paginated index ordering) that fail in cuprite baseline at this SHA too"
 
-- test:   "TiptapField without value edit change the products description text"
-  reason: "TipTap WYSIWYG editor — contenteditable selection / range"
-
-- test:   "TiptapField with regular value edit change the products description tiptap to another simple text value"
-  reason: "TipTap WYSIWYG editor — contenteditable selection / range"
-
 - test:   "sidebar desktop remembers user choice"
   reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
