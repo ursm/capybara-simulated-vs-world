@@ -65,9 +65,6 @@
 - test:   "HasAndBelongsToManyField show with an attached user detaches the user"
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
 
-- test:   "HasOneFieldName show without a related post attaches and detaches a post"
-  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
-
 - test:   "HasOneField omits parent record hides the belongs_to field pointing back to the parent on the embedded show page"
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
 
@@ -84,12 +81,6 @@
   reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — fails in Avo cuprite baseline at this SHA too"
 
 - test:   "Tabs keeps the per_page on association when back is used"
-  reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — fails in Avo cuprite baseline at this SHA too"
-
-- test:   "Tabs doesn't display tabs content on index doesn't display the birthday from the tab content"
-  reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — fails in Avo cuprite baseline at this SHA too"
-
-- test:   "Tabs tabs show switches the tabs"
   reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — fails in Avo cuprite baseline at this SHA too"
 
 - test:   "Tabs tabs show hides the birthday tab"
