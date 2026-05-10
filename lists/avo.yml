@@ -118,6 +118,3 @@
 
 - test:   "TestHelpers isolated tests tags verify tags"
   reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag, paginated index ordering) that fail in cuprite baseline at this SHA too"
-
-- test:   "sidebar desktop remembers user choice"
-  reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
