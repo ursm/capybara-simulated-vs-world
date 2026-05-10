@@ -87,25 +87,25 @@
   reason: "tagify multi-select — overflow truncation (\"2 more items\") gates off layout-derived container width"
 
 - test:   "TestHelpers field_wrapper on self resource index finds the wrapper on table"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag, paginated index ordering) that fail in cuprite baseline at this SHA too"
+  reason: "order-dependent — passes when test_helpers_spec runs alone or after tags_spec, but fails in the full-suite run after ~26 earlier specs. JS-VM is recycled per test (boot_vm always runs for module-script apps like Avo), so the contamination is Ruby- or Rails-side: a Browser @ivar that escapes reset!, AR identity map, ActionDispatch route cache, or shared rack-app state that Cuprite's separate browsing context wouldn't share"
 
 - test:   "TestHelpers field_wrapper on self resource show finds the wrapper"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag, paginated index ordering) that fail in cuprite baseline at this SHA too"
+  reason: "order-dependent — see field_wrapper on self resource index (same root cause)"
 
 - test:   "TestHelpers field_wrapper on show view related resource index finds the wrapper"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag, paginated index ordering) that fail in cuprite baseline at this SHA too"
+  reason: "order-dependent — see field_wrapper on self resource index (same root cause)"
 
 - test:   "TestHelpers field_label on self resource index finds the label on table"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag, paginated index ordering) that fail in cuprite baseline at this SHA too"
+  reason: "order-dependent — see field_wrapper on self resource index (same root cause)"
 
 - test:   "TestHelpers field_label on self resource show finds the label"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag, paginated index ordering) that fail in cuprite baseline at this SHA too"
+  reason: "order-dependent — see field_wrapper on self resource index (same root cause)"
 
 - test:   "TestHelpers field_value on self resource index finds the value on table"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag, paginated index ordering) that fail in cuprite baseline at this SHA too"
+  reason: "order-dependent — see field_wrapper on self resource index (same root cause)"
 
 - test:   "TestHelpers field_value on self resource show find value"
-  reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag, paginated index ordering) that fail in cuprite baseline at this SHA too"
+  reason: "order-dependent — see field_wrapper on self resource index (same root cause)"
 
 - test:   "TestHelpers isolated tests tags suggestions"
   reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag, paginated index ordering) that fail in cuprite baseline at this SHA too"
