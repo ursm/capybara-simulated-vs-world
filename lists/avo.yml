@@ -84,28 +84,8 @@
   reason: "tagify multi-select — overflow truncation (\"2 more items\") gates off layout-derived container width"
 
 - test:   "Tags mode: :select on edit / update"
-  reason: "tagify multi-select — overflow truncation (\"2 more items\") gates off layout-derived container width"
-
-- test:   "TestHelpers field_wrapper on self resource index finds the wrapper on table"
-  reason: "order-dependent — passes when test_helpers_spec runs alone or after tags_spec, but fails in the full-suite run after ~26 earlier specs. JS-VM is recycled per test (boot_vm always runs for module-script apps like Avo), so the contamination is Ruby- or Rails-side: a Browser @ivar that escapes reset!, AR identity map, ActionDispatch route cache, or shared rack-app state that Cuprite's separate browsing context wouldn't share"
-
-- test:   "TestHelpers field_wrapper on self resource show finds the wrapper"
-  reason: "order-dependent — see field_wrapper on self resource index (same root cause)"
-
-- test:   "TestHelpers field_wrapper on show view related resource index finds the wrapper"
-  reason: "order-dependent — see field_wrapper on self resource index (same root cause)"
-
-- test:   "TestHelpers field_label on self resource index finds the label on table"
-  reason: "order-dependent — see field_wrapper on self resource index (same root cause)"
-
-- test:   "TestHelpers field_label on self resource show finds the label"
-  reason: "order-dependent — see field_wrapper on self resource index (same root cause)"
-
-- test:   "TestHelpers field_value on self resource index finds the value on table"
-  reason: "order-dependent — see field_wrapper on self resource index (same root cause)"
-
-- test:   "TestHelpers field_value on self resource show find value"
-  reason: "order-dependent — see field_wrapper on self resource index (same root cause)"
+  reason: "tagify multi-select — overflow truncation (\"2 more items\") gates off layout-derived container width. `skip: true` prevents the body from running because Avo's `with_temporary_items` (lib/avo/concerns/can_replace_items.rb) lacks `ensure`: a mid-body failure leaks `Avo::Resources::Project.temporary_items` and breaks every downstream spec that queries `[data-field-id='name']` (TestHelpers field_*)"
+  skip:   true
 
 - test:   "TestHelpers isolated tests tags suggestions"
   reason: "Avo's own test-helper internals exercise driver paths (clipboard, drag, paginated index ordering) that fail in cuprite baseline at this SHA too"
