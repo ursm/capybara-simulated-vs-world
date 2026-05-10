@@ -12,6 +12,7 @@ src = File.read(forem_gemfile).sub(/^ruby\b.*$/, '# &')
 instance_eval(src, forem_gemfile, 1)
 
 group :test do
+  gem 'mini_racer'
   gem 'capybara-simulated',
       path: File.expand_path('../capybara-simulated', __dir__)
   gem 'quickjs',

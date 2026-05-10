@@ -9,6 +9,7 @@
 eval_gemfile File.expand_path('apps/avo/gemfiles/rails_8.0_ruby_3.3.gemfile', __dir__)
 
 group :test do
+  gem 'mini_racer'
   gem 'capybara-simulated',
       path: File.expand_path('../capybara-simulated', __dir__)
   gem 'quickjs',

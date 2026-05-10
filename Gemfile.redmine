@@ -4,6 +4,7 @@
 eval_gemfile File.expand_path('apps/redmine/Gemfile', __dir__)
 
 group :test do
+  gem 'mini_racer'
   gem 'capybara-simulated',
       path: File.expand_path('../capybara-simulated', __dir__)
   gem 'quickjs',
