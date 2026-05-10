@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ursm/quickjs.rb.git
-  revision: 9bb24b9d4c7fc95bbdfa0de36874f64d1a604488
-  branch: stack-23-bytecode-cache
+  revision: aaff86ab47c70e96a054359e2865524d5cb16bda
+  branch: stack-23-31-36
   submodules: true
   specs:
     quickjs (0.16.0)

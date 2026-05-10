@@ -8,6 +8,6 @@ group :test do
       path: File.expand_path('../capybara-simulated', __dir__)
   gem 'quickjs',
       github:     'ursm/quickjs.rb',
-      branch:     'stack-23-bytecode-cache',
+      branch:     'stack-23-31-36',
       submodules: true
 end
