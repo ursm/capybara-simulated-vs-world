@@ -8,9 +8,6 @@
 # (capybara-simulated 0.0.7 / Ruby 3.3.11) running
 # `bin/run-avo` (= `spec/system spec/features`).
 
-- test:   "Actions downloading files with File.open().read on pdf downloads the file and closes the modal"
-  reason: "action download flow — turbo-stream POST raises server-side `nil[]` (factory ordering inside Avo) before the StreamActions.download client code runs"
-
 - test:   "Actions close_modal closes the modal and flashes messages"
   reason: "action download flow — turbo-stream POST raises server-side `nil[]` (factory ordering inside Avo) before the StreamActions.download client code runs"
 
