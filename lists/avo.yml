@@ -57,7 +57,7 @@
   reason: "key/value pair editor uses Stimulus-driven row insertion that races with our synchronous JS"
 
 - test:   "ResourceSidebars allow fields to be edited on sidebar"
-  reason: "sidebar open/closed state persisted via cookie + class toggles cascade-keyed on layout"
+  reason: "CodeMirror integration — `hasBadBidiRects` measures DOM widths and crashes the editor before render"
 
 - test:   "Tabs keeps the pagination on tab when back is used"
   reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — fails in Avo cuprite baseline at this SHA too"
