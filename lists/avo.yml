@@ -83,15 +83,6 @@
 - test:   "Tabs keeps the per_page on association when back is used"
   reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — fails in Avo cuprite baseline at this SHA too"
 
-- test:   "Tabs tabs show hides the birthday tab"
-  reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — fails in Avo cuprite baseline at this SHA too"
-
-- test:   "Tabs tabs edit hides the Projects tab"
-  reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — fails in Avo cuprite baseline at this SHA too"
-
-- test:   "Tabs un-authorized tabs hides the tab"
-  reason: "multiple tab containers (show + edit views) render simultaneously when only one should be visible — fails in Avo cuprite baseline at this SHA too"
-
 - test:   "Tags acts_as_taggable edit shows filled state"
   reason: "tagify multi-select — overflow truncation (\"2 more items\") gates off layout-derived container width"
 
