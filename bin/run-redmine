@@ -12,6 +12,15 @@
 
 set -euo pipefail
 
+# capybara-simulated's V8 backend (`CSIM_JS_ENGINE=v8`) needs more
+# pthread stack than the Linux 8 MiB default — the V8 isolate's own
+# stack guard (`CSIM_V8_STACK_KB`, default 2 MiB) lives inside it,
+# and Rails system-test bootstrapping pre-consumes enough frames
+# that jQuery+UI bundles hit the guard partway through their setup.
+# Raise the OS limit before exec'ing Ruby; the inherited soft-cap
+# propagates through `mise exec` to the test process.
+ulimit -s 65536 2>/dev/null || true
+
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APP="$ROOT/apps/redmine"
 
