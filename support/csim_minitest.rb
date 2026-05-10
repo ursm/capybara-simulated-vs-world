@@ -21,6 +21,18 @@ require 'bundler/setup'
 require 'capybara/simulated'
 require 'action_dispatch/system_test_case'
 
+# `CSIM_QUICKJS_FEATURES=intl,file,…` re-registers `:simulated` with
+# extra Quickjs polyfills layered onto the gem's lean default. See
+# csim_rspec.rb for the rationale (Avo / Forem opt-ins).
+if (extra = ENV['CSIM_QUICKJS_FEATURES']) && !extra.empty?
+  features = extra.split(',').map {|n|
+    Quickjs.const_get("POLYFILL_#{n.strip.upcase}")
+  }
+  Capybara.register_driver :simulated do |app|
+    Capybara::Simulated::Driver.new(app, features: features)
+  end
+end
+
 module CsimDrivenBy
   def driven_by(_driver, **_options, &_block)
     super(:simulated)

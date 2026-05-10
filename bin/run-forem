@@ -19,6 +19,7 @@ cd "$APP"
 export BUNDLE_GEMFILE="$ROOT/Gemfile.forem"
 export RUBYOPT="-r$ROOT/support/csim_rspec.rb ${RUBYOPT:-}"
 export CSIM_DRIVER=simulated
+export CSIM_QUICKJS_FEATURES=intl
 export CSIM_EXPECTED_FAILURES="${CSIM_EXPECTED_FAILURES-$ROOT/lists/forem.yml}"
 
 # Forem reads `ApplicationConfig["APP_PROTOCOL"]` from the environment

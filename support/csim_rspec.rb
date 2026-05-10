@@ -23,6 +23,20 @@ require 'bundler/setup'
 require 'capybara/simulated'
 require 'action_dispatch/system_test_case'
 
+# Apps whose JS bundle reaches for `Intl.DateTimeFormat` / `NumberFormat`
+# during module init (Avo's flatpickr / luxon, Forem's various date
+# libs, …) opt in via `CSIM_QUICKJS_FEATURES=intl,file,…`. Resolved to
+# `Quickjs::POLYFILL_<NAME>` constants and threaded through the driver
+# registration that `lib/capybara/simulated.rb` did at require-time.
+if (extra = ENV['CSIM_QUICKJS_FEATURES']) && !extra.empty?
+  features = extra.split(',').map {|n|
+    Quickjs.const_get("POLYFILL_#{n.strip.upcase}")
+  }
+  Capybara.register_driver :simulated do |app|
+    Capybara::Simulated::Driver.new(app, features: features)
+  end
+end
+
 module CsimDrivenBy
   # Only intercept calls that asked for a real-browser driver. Hosts
   # like Forem set `driven_by :rack_test` for non-`:js` system specs
