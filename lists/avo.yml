@@ -14,9 +14,6 @@
 - test:   "Actions close_modal closes the modal and flashes messages"
   reason: "action download flow — turbo-stream POST raises server-side `nil[]` (factory ordering inside Avo) before the StreamActions.download client code runs"
 
-- test:   "Associations using *_fields api attach and detach works using show and index fields api"
-  reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
-
 - test:   "Attach with extra fields allows to pass in data for extra fields"
   reason: "Avo Stimulus / Preact UI flow not fully exercised by simulated"
 
