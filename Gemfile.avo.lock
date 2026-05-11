@@ -34,7 +34,6 @@ PATH
       capybara (>= 3.37)
       nokogiri (>= 1.18)
       p_css (>= 0.1.7)
-      quickjs (>= 0.15)
       rack (>= 2.2)
 
 PATH
@@ -404,6 +403,13 @@ GEM
       addressable (~> 2.8)
       childprocess (~> 5.0)
       logger (~> 1.6)
+    libv8-node (24.12.0.1)
+    libv8-node (24.12.0.1-aarch64-linux)
+    libv8-node (24.12.0.1-aarch64-linux-musl)
+    libv8-node (24.12.0.1-arm64-darwin)
+    libv8-node (24.12.0.1-x86_64-darwin)
+    libv8-node (24.12.0.1-x86_64-linux)
+    libv8-node (24.12.0.1-x86_64-linux-musl)
     lint_roller (1.1.0)
     listen (3.10.0)
       logger
@@ -431,6 +437,8 @@ GEM
     mini_magick (5.3.1)
       logger
     mini_mime (1.1.5)
+    mini_racer (0.21.0)
+      libv8-node (~> 24.12.0.1)
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
@@ -829,6 +837,7 @@ DEPENDENCIES
   mapkick-rb (~> 0.1.4)
   mapkick-static
   meta-tags
+  mini_racer
   money-rails (~> 1.12)
   net-smtp
   pg (>= 0.18, < 2.0)
@@ -994,6 +1003,13 @@ CHECKSUMS
   kramdown-parser-gfm (1.1.0) sha256=fb39745516427d2988543bf01fc4cf0ab1149476382393e0e9c48592f6581729
   language_server-protocol (3.17.0.5) sha256=fd1e39a51a28bf3eec959379985a72e296e9f9acfce46f6a79d31ca8760803cc
   launchy (3.1.1) sha256=72b847b5cc961589dde2c395af0108c86ff0119f42d4648d25b5440ebb10059e
+  libv8-node (24.12.0.1) sha256=d93d23b861bfe5de3ba829e34a142402fb83b4c3592dd58d9ac4e027588d739a
+  libv8-node (24.12.0.1-aarch64-linux) sha256=22bd0246cde85d70c88cf772727ac3677a20ac1d169105f82efe5f1f7c39f755
+  libv8-node (24.12.0.1-aarch64-linux-musl) sha256=791b5960f79525e87d1bd1e5f2bf3715ef2a38bac6c97f297853e98a8411ba89
+  libv8-node (24.12.0.1-arm64-darwin) sha256=124904a46b4a15c01ac024b4cf537dcf199cfb49a309cc59f66315e156e48339
+  libv8-node (24.12.0.1-x86_64-darwin) sha256=5eee594393e7a27dc230a7fca5f9f72fc11ed58bce655624a683f4d027bf2d16
+  libv8-node (24.12.0.1-x86_64-linux) sha256=e1236be4765edc109bd6ecef2989cf781bdcbac6f6e2cb3236ec9568540a9cfa
+  libv8-node (24.12.0.1-x86_64-linux-musl) sha256=7563175534c40893815bfd28e8fe27e12ff1656700c7208f53de06d14001712b
   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
   listen (3.10.0) sha256=c6e182db62143aeccc2e1960033bebe7445309c7272061979bb098d03760c9d2
   logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
@@ -1009,6 +1025,7 @@ CHECKSUMS
   mini_histogram (0.3.1) sha256=6a114b504e4618b0e076cc672996036870f7cc6f16b8e5c25c0c637726d2dd94
   mini_magick (5.3.1) sha256=29395dfd76badcabb6403ee5aff6f681e867074f8f28ce08d78661e9e4a351c4
   mini_mime (1.1.5) sha256=8681b7e2e4215f2a159f9400b5816d85e9d8c6c6b491e96a12797e798f8bccef
+  mini_racer (0.21.0) sha256=caacdfe0713dc611452f83e2d5a5250a4607da409050bbaf5dca0f5104ee4c59
   minitest (6.0.6) sha256=153ea36d1d987a62942382b61075745042a2b3123b1cd48f4c3675af9cc7d6f1
   monetize (1.13.0) sha256=0c1f8ae28aa21bbf1a6d014138d9bb0a5ce756c1a99b8b7f7d409c258b01d3b3
   money (6.19.0) sha256=ec936fa1e42f2783719241ed9fd52725d0efa628f928feea1eb5c37d5de7daf3

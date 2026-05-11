@@ -23,17 +23,26 @@ require 'bundler/setup'
 require 'capybara/simulated'
 require 'action_dispatch/system_test_case'
 
+# `CSIM_JS_ENGINE={quickjs,v8,none}` picks the runtime; unset = auto-
+# detect (quickjs preferred, then v8, then none).
+js_engine = ENV['CSIM_JS_ENGINE']&.to_sym
+
 # Apps whose JS bundle reaches for `Intl.DateTimeFormat` / `NumberFormat`
 # during module init (Avo's flatpickr / luxon, Forem's various date
 # libs, …) opt in via `CSIM_QUICKJS_FEATURES=intl,file,…`. Resolved to
-# `Quickjs::POLYFILL_<NAME>` constants and threaded through the driver
-# registration that `lib/capybara/simulated.rb` did at require-time.
-if (extra = ENV['CSIM_QUICKJS_FEATURES']) && !extra.empty?
-  features = extra.split(',').map {|n|
-    Quickjs.const_get("POLYFILL_#{n.strip.upcase}")
-  }
+# `Quickjs::POLYFILL_<NAME>` constants only when the active runtime is
+# QuickJS — V8 / none ignore the array.
+features =
+  if (extra = ENV['CSIM_QUICKJS_FEATURES']) && !extra.empty? && (js_engine.nil? || js_engine == :quickjs)
+    require 'quickjs'
+    extra.split(',').map {|n| Quickjs.const_get("POLYFILL_#{n.strip.upcase}") }
+  else
+    []
+  end
+
+if !features.empty? || js_engine
   Capybara.register_driver :simulated do |app|
-    Capybara::Simulated::Driver.new(app, features: features)
+    Capybara::Simulated::Driver.new(app, features: features, js_engine: js_engine)
   end
 end
 
