@@ -1,13 +1,3 @@
-GIT
-  remote: https://github.com/ursm/quickjs.rb.git
-  revision: aaff86ab47c70e96a054359e2865524d5cb16bda
-  branch: stack-23-31-36
-  submodules: true
-  specs:
-    quickjs (0.16.0)
-      json
-      securerandom
-
 PATH
   remote: /home/ursm/Code/github.com/ursm/capybara-simulated
   specs:
@@ -15,7 +5,6 @@ PATH
       capybara (>= 3.37)
       nokogiri (>= 1.18)
       p_css (>= 0.1.7)
-      quickjs (>= 0.15)
       rack (>= 2.2)
 
 GEM
@@ -289,6 +278,9 @@ GEM
     public_suffix (7.0.5)
     puma (8.0.1)
       nio4r (~> 2.0)
+    quickjs (0.17.0.pre)
+      json
+      securerandom
     racc (1.8.1)
     rack (3.2.6)
     rack-session (2.1.2)
@@ -487,7 +479,7 @@ DEPENDENCIES
   ostruct
   propshaft (~> 1.3.0)
   puma
-  quickjs!
+  quickjs (= 0.17.0.pre)
   rack (>= 3.1.3)
   rails (= 8.1.3)
   rails-dom-testing (>= 2.3.0)
@@ -631,7 +623,7 @@ CHECKSUMS
   psych (5.3.1) sha256=eb7a57cef10c9d70173ff74e739d843ac3b2c019a003de48447b2963d81b1974
   public_suffix (7.0.5) sha256=1a8bb08f1bbea19228d3bed6e5ed908d1cb4f7c2726d18bd9cadf60bc676f623
   puma (8.0.1) sha256=7b94e50c07655718c1fb8ae41a11fc06c7d61293208b3aa608ff71a46d3ad37c
-  quickjs (0.16.0)
+  quickjs (0.17.0.pre) sha256=a53d0fc8f6ac4077c4229971c4c6108f00e83469701a8f6f5071071c980c7a5a
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rack (3.2.6) sha256=5ed78e1f73b2e25679bec7d45ee2d4483cc4146eb1be0264fc4d94cb5ef212c2
   rack-session (2.1.2) sha256=595434f8c0c3473ae7d7ac56ecda6cc6dfd9d37c0b2b5255330aa1576967ffe8

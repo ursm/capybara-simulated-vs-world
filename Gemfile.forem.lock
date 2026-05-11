@@ -6,16 +6,6 @@ GIT
     acts_as_follower (0.2.1)
       activerecord (>= 4.0)
 
-GIT
-  remote: https://github.com/ursm/quickjs.rb.git
-  revision: aaff86ab47c70e96a054359e2865524d5cb16bda
-  branch: stack-23-31-36
-  submodules: true
-  specs:
-    quickjs (0.16.0)
-      json
-      securerandom
-
 PATH
   remote: /home/ursm/Code/github.com/ursm/capybara-simulated
   specs:
@@ -23,7 +13,6 @@ PATH
       capybara (>= 3.37)
       nokogiri (>= 1.18)
       p_css (>= 0.1.7)
-      quickjs (>= 0.15)
       rack (>= 2.2)
 
 GEM
@@ -338,12 +327,6 @@ GEM
       concurrent-ruby (~> 1.1)
       webrick (~> 1.7)
       websocket-driver (~> 0.7)
-    ffi (1.17.4-aarch64-linux-gnu)
-    ffi (1.17.4-aarch64-linux-musl)
-    ffi (1.17.4-arm-linux-gnu)
-    ffi (1.17.4-arm-linux-musl)
-    ffi (1.17.4-arm64-darwin)
-    ffi (1.17.4-x86_64-darwin)
     ffi (1.17.4-x86_64-linux-gnu)
     ffi (1.17.4-x86_64-linux-musl)
     ffi-compiler (1.4.2)
@@ -399,18 +382,6 @@ GEM
     globalid (1.3.0)
       activesupport (>= 6.1)
     google-protobuf (4.34.1)
-      bigdecimal
-      rake (~> 13.3)
-    google-protobuf (4.34.1-aarch64-linux-gnu)
-      bigdecimal
-      rake (~> 13.3)
-    google-protobuf (4.34.1-aarch64-linux-musl)
-      bigdecimal
-      rake (~> 13.3)
-    google-protobuf (4.34.1-arm64-darwin)
-      bigdecimal
-      rake (~> 13.3)
-    google-protobuf (4.34.1-x86_64-darwin)
       bigdecimal
       rake (~> 13.3)
     google-protobuf (4.34.1-x86_64-linux-gnu)
@@ -551,15 +522,8 @@ GEM
     launchy (2.5.2)
       addressable (~> 2.8)
     libdatadog (5.0.0.1.0)
-    libdatadog (5.0.0.1.0-aarch64-linux)
     libdatadog (5.0.0.1.0-x86_64-linux)
     libddwaf (1.14.0.0.0)
-      ffi (~> 1.0)
-    libddwaf (1.14.0.0.0-aarch64-linux)
-      ffi (~> 1.0)
-    libddwaf (1.14.0.0.0-arm64-darwin)
-      ffi (~> 1.0)
-    libddwaf (1.14.0.0.0-x86_64-darwin)
       ffi (~> 1.0)
     libddwaf (1.14.0.0.0-x86_64-linux)
       ffi (~> 1.0)
@@ -567,6 +531,7 @@ GEM
       addressable (~> 2.0)
       excon
       http (>= 2.0, < 6.0)
+    libv8-node (24.12.0.1-x86_64-linux)
     lint_roller (1.1.0)
     liquid (5.12.0)
       bigdecimal
@@ -611,6 +576,8 @@ GEM
     mini_histogram (0.3.1)
     mini_magick (4.13.2)
     mini_mime (1.1.5)
+    mini_racer (0.21.0)
+      libv8-node (~> 24.12.0.1)
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
@@ -647,18 +614,6 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.7.5)
-    nokogiri (1.19.3-aarch64-linux-gnu)
-      racc (~> 1.4)
-    nokogiri (1.19.3-aarch64-linux-musl)
-      racc (~> 1.4)
-    nokogiri (1.19.3-arm-linux-gnu)
-      racc (~> 1.4)
-    nokogiri (1.19.3-arm-linux-musl)
-      racc (~> 1.4)
-    nokogiri (1.19.3-arm64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.19.3-x86_64-darwin)
-      racc (~> 1.4)
     nokogiri (1.19.3-x86_64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.19.3-x86_64-linux-musl)
@@ -731,10 +686,6 @@ GEM
       ast (~> 2.4.1)
       racc
     pg (1.6.3)
-    pg (1.6.3-aarch64-linux)
-    pg (1.6.3-aarch64-linux-musl)
-    pg (1.6.3-arm64-darwin)
-    pg (1.6.3-x86_64-darwin)
     pg (1.6.3-x86_64-linux)
     pg (1.6.3-x86_64-linux-musl)
     pg_query (6.2.2)
@@ -764,6 +715,9 @@ GEM
       activesupport (>= 3.0.0)
     pundit-matchers (1.9.0)
       rspec-rails (>= 3.0.0)
+    quickjs (0.17.0.pre)
+      json
+      securerandom
     raabro (1.4.0)
     racc (1.8.1)
     rack (2.2.23)
@@ -1135,13 +1089,7 @@ GEM
     zonebie (0.6.1)
 
 PLATFORMS
-  aarch64-linux
-  aarch64-linux-gnu
-  aarch64-linux-musl
-  arm-linux-gnu
-  arm-linux-musl
-  arm64-darwin
-  x86_64-darwin
+  x86_64-linux
   x86_64-linux-gnu
   x86_64-linux-musl
 
@@ -1230,6 +1178,7 @@ DEPENDENCIES
   memory_profiler (~> 1.0)
   metainspector (~> 5.12)
   mini_magick (~> 4.13)
+  mini_racer
   mutex_m
   nakayoshi_fork (~> 0.0.4)
   nokogiri (~> 1.18)
@@ -1256,7 +1205,7 @@ DEPENDENCIES
   puma (~> 5.6.4)
   pundit (~> 2.2)
   pundit-matchers (~> 1.7)
-  quickjs!
+  quickjs (= 0.17.0.pre)
   rack-attack (~> 6.7.0)
   rack-cors (~> 1.1)
   rack-host-redirect (~> 1.3)
@@ -1433,12 +1382,6 @@ CHECKSUMS
   fastly (3.0.2) sha256=7098709d858b58ca0ce06e923bf39863386f8eea5e07ce47cfd4ecfa4d17f615
   feedjira (3.2.6) sha256=5d073730b8fc61ab44eb6adf909559c27361d390fcd71d19ddcdeecb73381c01
   ferrum (0.17.2) sha256=2c2540a850b211a46f4d81de21bfd62048f507e4c327d1807225c3823c17e6ee
-  ffi (1.17.4-aarch64-linux-gnu) sha256=b208f06f91ffd8f5e1193da3cae3d2ccfc27fc36fba577baf698d26d91c080df
-  ffi (1.17.4-aarch64-linux-musl) sha256=9286b7a615f2676245283aef0a0a3b475ae3aae2bb5448baace630bb77b91f39
-  ffi (1.17.4-arm-linux-gnu) sha256=d6dbddf7cb77bf955411af5f187a65b8cd378cb003c15c05697f5feee1cb1564
-  ffi (1.17.4-arm-linux-musl) sha256=9d4838ded0465bef6e2426935f6bcc93134b6616785a84ffd2a3d82bc3cf6f95
-  ffi (1.17.4-arm64-darwin) sha256=19071aaf1419251b0a46852abf960e77330a3b334d13a4ab51d58b31a937001b
-  ffi (1.17.4-x86_64-darwin) sha256=aa70390523cf3235096cf64962b709b4cfbd5c082a2cb2ae714eb0fe2ccda496
   ffi (1.17.4-x86_64-linux-gnu) sha256=9d3db14c2eae074b382fa9c083fe95aec6e0a1451da249eab096c34002bc752d
   ffi (1.17.4-x86_64-linux-musl) sha256=3fdf9888483de005f8ef8d1cf2d3b20d86626af206cbf780f6a6a12439a9c49e
   ffi-compiler (1.4.2) sha256=a9d69d5d9ced6f64776ddafa535867ad90e5740ad37bed7afb4de6e450da126e
@@ -1459,10 +1402,6 @@ CHECKSUMS
   gibbon (3.5.0) sha256=247782eca7655f135c25d791156123c572eee1ed9b2287eb1d44f5ba7b7602f6
   globalid (1.3.0) sha256=05c639ad6eb4594522a0b07983022f04aa7254626ab69445a0e493aa3786ff11
   google-protobuf (4.34.1) sha256=347181542b8d659c60f028fa3791c9cccce651a91ad27782dbc5c5e374796cdc
-  google-protobuf (4.34.1-aarch64-linux-gnu) sha256=f9c07607dc139c895f2792a7740fcd01cd94d4d7b0e0a939045b50d7999f0b1d
-  google-protobuf (4.34.1-aarch64-linux-musl) sha256=db58e5a4a492b43c6614486aea31b7fb86955b175d1d48f28ebf388f058d78a9
-  google-protobuf (4.34.1-arm64-darwin) sha256=2745061f973119e6e7f3c81a0c77025d291a3caa6585a2cd24a25bbc7bedb267
-  google-protobuf (4.34.1-x86_64-darwin) sha256=4dc498376e218871613589c4d872400d42ad9ae0c700bdb2606fe1c77a593075
   google-protobuf (4.34.1-x86_64-linux-gnu) sha256=87088c9fd8e47b5b40ca498fc1195add6149e941ff7e81c532a5b0b8876d4cc9
   google-protobuf (4.34.1-x86_64-linux-musl) sha256=8c0e91436fbe504ffc64f0bd621f2e69adbcce8ed2c58439d7a21117069cfdd7
   guard (2.20.1) sha256=ab9cd7873854e6b76080c0589f781ff3e390e441bdda20165804df54f977015a
@@ -1516,14 +1455,11 @@ CHECKSUMS
   language_server-protocol (3.17.0.5) sha256=fd1e39a51a28bf3eec959379985a72e296e9f9acfce46f6a79d31ca8760803cc
   launchy (2.5.2) sha256=8aa0441655aec5514008e1d04892c2de3ba57bd337afb984568da091121a241b
   libdatadog (5.0.0.1.0) sha256=c61b02584c02447089ad8e71b7aa8e5a660fd675b727635c1a2eaec59b1840e8
-  libdatadog (5.0.0.1.0-aarch64-linux) sha256=771bbe34206f72659974edc13648f9e1f1c29d49262cc70268cd94e0eca8c5be
   libdatadog (5.0.0.1.0-x86_64-linux) sha256=6bd7f0690641ba5177c32ae2ad77a989d54cecf37a9850ffe6770fe6a1aacad6
   libddwaf (1.14.0.0.0) sha256=b91ea9675f7d79d1cd10dd6513e3706760ac442cb8902164fbcef79b7082a8fd
-  libddwaf (1.14.0.0.0-aarch64-linux) sha256=549f83ba339afb0e500bd9f4c43459e274d42f5736a18d347ba2007be026649c
-  libddwaf (1.14.0.0.0-arm64-darwin) sha256=cd3c84d58b8f77f93ebb17e6ceb1cfd257c8d3a3a1ea558a7fc14d92f697cc2b
-  libddwaf (1.14.0.0.0-x86_64-darwin) sha256=33017c057fd6b4948ef4577c4a13bc89d878541961b205309fac1e71516433ff
   libddwaf (1.14.0.0.0-x86_64-linux) sha256=030640a4158ae05f9276cc1e09bfe9d19dda5af26703235cf17cf3752f1985b1
   libhoney (2.4.0) sha256=d48439e55a33630b4411d93c45d4d2819c3366585f11337240dacfb2932075f5
+  libv8-node (24.12.0.1-x86_64-linux) sha256=e1236be4765edc109bd6ecef2989cf781bdcbac6f6e2cb3236ec9568540a9cfa
   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
   liquid (5.12.0) sha256=5a3c2c2430cd925d21c53e4ed9abea52cd0a9da53b541422f81dee79aca2a673
   listen (3.10.0) sha256=c6e182db62143aeccc2e1960033bebe7445309c7272061979bb098d03760c9d2
@@ -1542,6 +1478,7 @@ CHECKSUMS
   mini_histogram (0.3.1) sha256=6a114b504e4618b0e076cc672996036870f7cc6f16b8e5c25c0c637726d2dd94
   mini_magick (4.13.2) sha256=71d6258e0e8a3d04a9a0a09784d5d857b403a198a51dd4f882510435eb95ddd9
   mini_mime (1.1.5) sha256=8681b7e2e4215f2a159f9400b5816d85e9d8c6c6b491e96a12797e798f8bccef
+  mini_racer (0.21.0) sha256=caacdfe0713dc611452f83e2d5a5250a4607da409050bbaf5dca0f5104ee4c59
   minitest (6.0.6) sha256=153ea36d1d987a62942382b61075745042a2b3123b1cd48f4c3675af9cc7d6f1
   modis (4.3.2) sha256=99a7f01c54e07ba9f06501f91474ae7fb31e72cbf7e220abe214db30fc23531b
   msgpack (1.8.0) sha256=e64ce0212000d016809f5048b48eb3a65ffb169db22238fb4b72472fecb2d732
@@ -1562,12 +1499,6 @@ CHECKSUMS
   net-smtp (0.5.1) sha256=ed96a0af63c524fceb4b29b0d352195c30d82dd916a42f03c62a3a70e5b70736
   netrc (0.11.0) sha256=de1ce33da8c99ab1d97871726cba75151113f117146becbe45aa85cb3dabee3f
   nio4r (2.7.5) sha256=6c90168e48fb5f8e768419c93abb94ba2b892a1d0602cb06eef16d8b7df1dca1
-  nokogiri (1.19.3-aarch64-linux-gnu) sha256=46b89e5d7b9e844c2ee360794240c6ea2a4e6fa0c5892a4ed487db621224b639
-  nokogiri (1.19.3-aarch64-linux-musl) sha256=8392dfdcd21be7a94dbbe9ccc138dea01b97b24cb2dc02a114ca98bfb1d9a0b7
-  nokogiri (1.19.3-arm-linux-gnu) sha256=3919d5ffc334ad778a4a9eb88fda7dcb8b1fb58c8a52ac640c6dcd2f038e774f
-  nokogiri (1.19.3-arm-linux-musl) sha256=9ce1cb6346bb9c67b1550eb537aa183ead91e4b6eadb2f36ade02d8dd2a79fb6
-  nokogiri (1.19.3-arm64-darwin) sha256=71b9bd424b1b7abc18b05052a1a3cfd3627abdca62be280854cc411791357e42
-  nokogiri (1.19.3-x86_64-darwin) sha256=77f3fba57d46c53ab31e62fc6c28f705109d1bf6264356c76f132b2be5728d4d
   nokogiri (1.19.3-x86_64-linux-gnu) sha256=2f5078620fe12e83669b5b17311b32532a8153d02eee7ad06948b926d6080976
   nokogiri (1.19.3-x86_64-linux-musl) sha256=248c906d2166eca5efb56d52fdee5f9a1f51d69a72e2b64fdac647b4ce39ea3f
   notiffany (0.1.3) sha256=d37669605b7f8dcb04e004e6373e2a780b98c776f8eb503ac9578557d7808738
@@ -1593,10 +1524,6 @@ CHECKSUMS
   parallel (1.28.0) sha256=33e6de1484baf2524792d178b0913fc8eb94c628d6cfe45599ad4458c638c970
   parser (3.3.11.1) sha256=d17ace7aabe3e72c3cc94043714be27cc6f852f104d81aa284c2281aecc65d54
   pg (1.6.3) sha256=1388d0563e13d2758c1089e35e973a3249e955c659592d10e5b77c468f628a99
-  pg (1.6.3-aarch64-linux) sha256=0698ad563e02383c27510b76bf7d4cd2de19cd1d16a5013f375dd473e4be72ea
-  pg (1.6.3-aarch64-linux-musl) sha256=06a75f4ea04b05140146f2a10550b8e0d9f006a79cdaf8b5b130cde40e3ecc2c
-  pg (1.6.3-arm64-darwin) sha256=7240330b572e6355d7c75a7de535edb5dfcbd6295d9c7777df4d9dddfb8c0e5f
-  pg (1.6.3-x86_64-darwin) sha256=ee2e04a17c0627225054ffeb43e31a95be9d7e93abda2737ea3ce4a62f2729d6
   pg (1.6.3-x86_64-linux) sha256=5d9e188c8f7a0295d162b7b88a768d8452a899977d44f3274d1946d67920ae8d
   pg (1.6.3-x86_64-linux-musl) sha256=9c9c90d98c72f78eb04c0f55e9618fe55d1512128e411035fe229ff427864009
   pg_query (6.2.2) sha256=316c194160ccfac8af9a7aff55cdc5b2d13bdd8bd8734976c6bddc477e779b6f
@@ -1612,7 +1539,7 @@ CHECKSUMS
   puma (5.6.9) sha256=20701b2451080ec8d6d78d2e4b5a2913e6d0b865a51d704a4d60db8fd39a4228
   pundit (2.5.2) sha256=e374152baa24f90b630428293faf4b4c5468fc3cc010165f7d8fcb44ce108bbd
   pundit-matchers (1.9.0) sha256=b288163c08b7b49d40d264e44d542e4b27b4eaf289e4fb8d1e6be2226ebd6b4f
-  quickjs (0.16.0)
+  quickjs (0.17.0.pre) sha256=a53d0fc8f6ac4077c4229971c4c6108f00e83469701a8f6f5071071c980c7a5a
   raabro (1.4.0) sha256=d4fa9ff5172391edb92b242eed8be802d1934b1464061ae5e70d80962c5da882
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rack (2.2.23) sha256=a8fe9d7e07064770b8ec123663fded8a59ef7e2b6db5cda7173d45a5718ab69c
