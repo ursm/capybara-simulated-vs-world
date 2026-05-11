@@ -43,6 +43,19 @@ if !features.empty? || js_engine
   end
 end
 
+# Capybara polls find/has_? via `synchronize`, sleeping
+# `default_retry_interval` (10 ms) between retries when `driver.wait?`
+# is true. Our driver is deterministic — every observable side effect
+# from the previous line has already settled — so the sleep is only
+# useful when a *real* timer is ticking down (setTimeout(N>0) waiting
+# for content to appear). `CSIM_RETRY_INTERVAL=N` overrides for ad-hoc
+# perf experiments; 0.001 keeps virtual-clock advance per tick small
+# enough that setTimeout-bound assertions still settle while cutting
+# the busy-wait cost on bad-input finds (typos that never resolve).
+if (n = ENV['CSIM_RETRY_INTERVAL'])
+  Capybara.default_retry_interval = Float(n)
+end
+
 module CsimDrivenBy
   def driven_by(_driver, **_options, &_block)
     super(:simulated)
