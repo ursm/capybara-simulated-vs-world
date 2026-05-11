@@ -8,4 +8,5 @@ group :test do
   gem 'capybara-simulated',
       path: File.expand_path('../capybara-simulated', __dir__)
   gem 'quickjs', '0.17.0.pre'
+  gem 'stackprof'
 end

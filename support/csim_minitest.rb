@@ -43,6 +43,45 @@ if !features.empty? || js_engine
   end
 end
 
+# Opt-in IPC trace for the V8 runtime — wraps every attached host fn
+# with a counter and dumps the distribution at exit. Useful to compare
+# IPC volume across changes; mini_racer's rendezvous overhead per call
+# is the dominant cost of the V8 backend on DOM-heavy suites.
+if ENV['CSIM_V8_IPC_TRACE'] == '1' && js_engine == :v8
+  require 'capybara/simulated/v8_runtime'
+  $csim_ipc_counts = Hash.new(0)
+  $csim_ipc_dom_op = Hash.new(0)
+  $csim_ipc_total  = 0
+  $csim_ipc_start  = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  Capybara::Simulated::V8Runtime.class_eval do
+    alias_method :_attach_orig_ipc, :attach_host_fns
+    define_method(:attach_host_fns) do |c|
+      orig_attach = c.method(:attach)
+      c.define_singleton_method(:attach) do |name, fn|
+        orig_attach.call(name, ->(*a) {
+          $csim_ipc_total += 1
+          $csim_ipc_counts[name] += 1
+          $csim_ipc_dom_op[a[1].to_s] += 1 if name == '__dom'
+          fn.call(*a)
+        })
+      end
+      _attach_orig_ipc(c)
+    end
+  end
+  at_exit do
+    elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - $csim_ipc_start
+    warn ''
+    warn '=== CSIM_V8_IPC_TRACE ==='
+    warn 'wall: %.2fs, total: %d' % [elapsed, $csim_ipc_total]
+    warn 'by host fn:'
+    $csim_ipc_counts.sort_by {|_, v| -v }.each {|n, c| warn '  %-32s %d' % [n, c] }
+    if $csim_ipc_dom_op.any?
+      warn 'top __dom ops:'
+      $csim_ipc_dom_op.sort_by {|_, v| -v }.first(15).each {|op, c| warn '  %-32s %d' % [op, c] }
+    end
+  end
+end
+
 # Capybara polls find/has_? via `synchronize`, sleeping
 # `default_retry_interval` (10 ms) between retries when `driver.wait?`
 # is true. Our driver is deterministic — every observable side effect
@@ -54,6 +93,42 @@ end
 # the busy-wait cost on bad-input finds (typos that never resolve).
 if (n = ENV['CSIM_RETRY_INTERVAL'])
   Capybara.default_retry_interval = Float(n)
+end
+
+# `PARALLEL_WORKERS=N PARALLEL_WITH=processes|threads` overrides the
+# host's `parallelize(workers: …, with: …)` setting. The host's
+# `test_helper.rb` (Redmine pins `workers: 1`) runs after this file,
+# so we hook the class method to substitute our values whenever it's
+# called. capybara-simulated is in-process, so `with: :threads` shares
+# the JS runtime + DB connection pool across worker threads — which is
+# exactly the configuration Selenium-based suites can't run.
+if ENV['PARALLEL_WORKERS']
+  workers = ENV['PARALLEL_WORKERS'].to_i
+  mode    = (ENV['PARALLEL_WITH'] || 'threads').to_sym
+  module CsimParallelize
+    def parallelize(workers: nil, with: nil)
+      super(workers: ::ENV['PARALLEL_WORKERS'].to_i,
+            with:    (::ENV['PARALLEL_WITH'] || 'threads').to_sym)
+    end
+  end
+  ActiveSupport::TestCase.singleton_class.prepend(CsimParallelize)
+  warn "[csim] parallelize override: workers=#{workers}, with=#{mode}"
+
+  # In `with: :threads` mode Capybara's session pool is global, keyed
+  # by [driver, session_name, app]. Worker threads all hit the
+  # default session → same Session → same Driver → same Browser →
+  # cross-thread cookie / navigation contamination. Give each worker
+  # thread its own `Capybara.session_name`; the pool then returns
+  # distinct Session instances and the Browsers stay isolated.
+  if mode == :threads && defined?(::ActionDispatch::SystemTestCase)
+    module CsimThreadSession
+      def before_setup
+        ::Capybara.session_name = "csim-thread-#{::Thread.current.object_id}"
+        super
+      end
+    end
+    ::ActionDispatch::SystemTestCase.prepend(CsimThreadSession)
+  end
 end
 
 module CsimDrivenBy
