@@ -1,14 +1,19 @@
 # Preloaded via `RUBYOPT='-r<this-file>'`. Two responsibilities:
 #
 # 1. Override `ActionDispatch::SystemTestCase.driven_by` to route to
-#    `:simulated` when `CSIM_DRIVER=simulated` is set, without
-#    patching the host app's `application_system_test_case.rb`.
+#    `:simulated` (or `:simulated_v3` — the v3 PoC driver) when
+#    CSIM_DRIVER selects one, without patching the host app's
+#    `application_system_test_case.rb`.
 # 2. Skip examples whose `<class>#<method>` matches an entry in the
 #    expected-failures list at `CSIM_EXPECTED_FAILURES`. Track
 #    actually-passing skips and fail the run when the list grows
 #    stale.
 
-return unless ENV['CSIM_DRIVER'] == 'simulated'
+CSIM_DRIVER_NAME = case ENV['CSIM_DRIVER']
+                   when 'simulated'    then :simulated
+                   when 'simulated_v3' then :simulated_v3
+                   end
+return unless CSIM_DRIVER_NAME
 
 # Bundler activates the gem set BEFORE exec'ing ruby, so $LOAD_PATH is
 # already wired up by the time RUBYOPT runs us — but the released
@@ -37,7 +42,7 @@ features =
     []
   end
 
-if !features.empty? || js_engine
+if (!features.empty? || js_engine) && CSIM_DRIVER_NAME == :simulated
   Capybara.register_driver :simulated do |app|
     Capybara::Simulated::Driver.new(app, features: features, js_engine: js_engine)
   end
@@ -133,7 +138,7 @@ end
 
 module CsimDrivenBy
   def driven_by(_driver, **_options, &_block)
-    super(:simulated)
+    super(CSIM_DRIVER_NAME)
     # Hosts often configure the real-browser download directory through
     # driver options that the simulated driver doesn't read. Mirror it
     # onto `Capybara.save_path` so attachment responses land where the
