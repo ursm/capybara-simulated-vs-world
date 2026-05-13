@@ -7,7 +7,11 @@
 # 2. Skip examples whose `<class>#<method>`-shaped description matches
 #    an entry in the expected-failures list at `CSIM_EXPECTED_FAILURES`.
 
-return unless ENV['CSIM_DRIVER'] == 'simulated'
+CSIM_DRIVER_NAME = case ENV['CSIM_DRIVER']
+                   when 'simulated'    then :simulated
+                   when 'simulated_v3' then :simulated_v3
+                   end
+return unless CSIM_DRIVER_NAME
 
 # Same lock-in dance as csim_minitest.rb — force the Gemfile-resolved
 # (path) capybara-simulated to be the one we end up requiring.
@@ -40,7 +44,7 @@ features =
     []
   end
 
-if !features.empty? || js_engine
+if (!features.empty? || js_engine) && CSIM_DRIVER_NAME == :simulated
   Capybara.register_driver :simulated do |app|
     Capybara::Simulated::Driver.new(app, features: features, js_engine: js_engine)
   end
@@ -73,7 +77,7 @@ module CsimDrivenBy
 
     # Important: return the result of `super` so rspec-rails'
     # `driven_by(...).tap(&:use)` can chain off the registration.
-    super(:simulated)
+    super(CSIM_DRIVER_NAME)
   end
 end
 ActionDispatch::SystemTestCase.singleton_class.prepend(CsimDrivenBy)
@@ -148,7 +152,7 @@ if (trace_dir = ENV['CSIM_TRACE_DIR']) && !trace_dir.empty?
 
   RSpec.configure do |config|
     config.prepend_after(:each, type: :system) do |example|
-      drv = Capybara::Simulated::Driver.current
+      drv = CSIM_DRIVER_NAME == :simulated_v3 ? Capybara::Simulated::V3Driver.current : Capybara::Simulated::Driver.current
       next unless drv&.tracing?
       drv.current_trace.metadata.merge!(
         title:     example.full_description,
