@@ -4,9 +4,13 @@
 # may also be a `./spec/...rb:LINE` location string or a Regexp
 # matched against either.
 #
-# Last verified against Forem 99141cc1f on 2026-05-09
+# Last verified against Forem 99141cc1f on 2026-05-14
 # (capybara-simulated 0.0.7 / Ruby 3.3.11), `bin/run-forem`'s default
 # `--tag js spec/system` selector.
-
-- test: "Notifications page with welcome notifications with tracking enabled tracks events"
-  reason: "ahoy tracking event is fired from a Preact effect that races with our synchronous JS execution; the assertion runs before `Ahoy::Event.count` reaches 1"
+#
+# Currently empty — every `:js`-tagged Forem system spec passes
+# under capybara-simulated. The previous lone entry (the ahoy
+# `tracks events` race) turned out to be driver spec-compliance
+# gaps, not a structural in-process limit; fixing
+# `navigator.sendBeacon`, `HTMLAnchorElement.toString`,
+# `Mozilla/5.0`-prefixed UA, and `REMOTE_ADDR` cleared it.
