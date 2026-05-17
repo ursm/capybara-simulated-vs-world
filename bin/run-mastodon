@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# Run Mastodon's RSpec system suite through capybara-simulated. Args
+# after the first are passed to `bin/rspec`.
+#
+#   bin/run-mastodon
+#   bin/run-mastodon spec/system/profile_spec.rb
+#   bin/run-mastodon spec/system/profile_spec.rb:42
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+APP="$ROOT/apps/mastodon"
+
+cd "$APP"
+
+# Mastodon's `.ruby-version` pins 4.0.3 exactly; mise has it available.
+RUBY_VERSION=4.0.3
+NODE_VERSION=24.15.0
+
+if command -v mise >/dev/null 2>&1; then
+  ruby_wrap() { mise exec "ruby@$RUBY_VERSION" -- "$@"; }
+  node_wrap() { mise exec "node@$NODE_VERSION" -- "$@"; }
+else
+  ruby_wrap() { "$@"; }
+  node_wrap() { "$@"; }
+fi
+
+# Mastodon's vite_rails serves assets via a dev server in development
+# but compiles them statically in test (vite_ruby's `auto_build`). Build
+# once on first invocation; the sentinel skips next time.
+# `corepack yarn` because Mastodon pins yarn@4.x via `packageManager`
+# — system `yarn` (if any) would be the wrong version.
+if [ ! -e tmp/csim-assets-built ]; then
+  echo "==> Mastodon JS bundle not built yet; running yarn + vite build (one-shot)"
+  node_wrap corepack enable
+  node_wrap corepack yarn install --immutable
+  RAILS_ENV=test DB_HOST=localhost DB_USER=postgres LOCAL_DOMAIN=cb.test \
+    ruby_wrap bundle exec vite build
+  mkdir -p tmp && touch tmp/csim-assets-built
+fi
+
+export BUNDLE_GEMFILE="$ROOT/Gemfile.mastodon"
+export RUBYOPT="-r$ROOT/support/csim_rspec.rb -r$ROOT/support/csim_mastodon_shims.rb ${RUBYOPT:-}"
+export CSIM_DRIVER="${CSIM_DRIVER:-simulated}"
+export CSIM_EXPECTED_FAILURES="${CSIM_EXPECTED_FAILURES-$ROOT/lists/mastodon.yml}"
+
+# Mastodon's `config/database.yml` reads `DB_HOST` / `DB_USER` from
+# env; default to local postgres superuser via TCP so the test DB is
+# reachable without per-host postgres role setup.
+export DB_HOST="${DB_HOST:-localhost}"
+export DB_USER="${DB_USER:-postgres}"
+
+# Mastodon hard-codes `cb.test` as the local domain in test setup
+# elsewhere; pin it here too so federation/URL helpers don't blow up
+# on a missing value.
+export LOCAL_DOMAIN="${LOCAL_DOMAIN:-cb.test}"
+
+# Mastodon's spec_helper / capybara.rb defaults `Capybara.javascript_driver`
+# to `:playwright`. csim_rspec's `CsimDrivenBy` override picks it up
+# (playwright is in `REAL_BROWSER_DRIVERS`) and routes to `:simulated`.
+
+# Default to JS-tagged system specs: Mastodon untagged system specs run
+# under :rack_test and never touch capybara-simulated.
+if [ "$#" -eq 0 ]; then
+  set -- --tag js spec/system
+fi
+
+if command -v mise >/dev/null 2>&1; then
+  exec mise exec "ruby@$RUBY_VERSION" -- bundle exec bin/rspec "$@"
+fi
+exec bundle exec bin/rspec "$@"

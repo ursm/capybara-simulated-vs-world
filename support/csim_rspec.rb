@@ -36,7 +36,7 @@ module CsimDrivenBy
   # the tests never expected to fire (Datadog mocks, OmniAuth state,
   # etc.). Pass `:rack_test` straight through; only swap the real
   # browsers we'd substitute for.
-  REAL_BROWSER_DRIVERS = %i[selenium selenium_chrome selenium_chrome_headless better_cuprite cuprite apparition].freeze
+  REAL_BROWSER_DRIVERS = %i[selenium selenium_chrome selenium_chrome_headless better_cuprite cuprite apparition playwright].freeze
 
   def driven_by(driver, **options, &block)
     return super unless REAL_BROWSER_DRIVERS.include?(driver)
@@ -93,6 +93,19 @@ RSpec.configure do |config|
     else
       pending("expected failure (#{matched[:reason]})")
     end
+  end
+
+  # Mastodon's `spec/support/capybara.rb` sets
+  # `Capybara.javascript_driver = :playwright` at load time, and the
+  # first `before(:each, :js)` hook that touches
+  # `Capybara.current_session.driver` instantiates Playwright (which
+  # explodes without the Chrome download). Force `:simulated` after
+  # the host's RSpec config has finished loading so any auto-driver
+  # selection on `:js`-tagged specs picks our driver, not the host's
+  # configured real-browser one.
+  config.before(:suite) do
+    require 'capybara'
+    Capybara.javascript_driver = :simulated
   end
 end
 

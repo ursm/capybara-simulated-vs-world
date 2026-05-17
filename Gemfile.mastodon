@@ -1,0 +1,25 @@
+# Run Mastodon's bundle in *our* gem set: load upstream's Gemfile
+# verbatim, then layer capybara-simulated on top.
+# Activated via `BUNDLE_GEMFILE=Gemfile.mastodon`.
+eval_gemfile File.expand_path('apps/mastodon/Gemfile', __dir__)
+
+group :test do
+  gem 'capybara-simulated',
+      path: File.expand_path('../capybara-simulated', __dir__)
+  # Both JS engines installed so the suite can exercise either via
+  # `CSIM_JS_ENGINE=v8|quickjs`. capybara-simulated.gemspec lists
+  # neither as a hard dependency.
+  gem 'mini_racer'
+  gem 'quickjs', github: 'ursm/quickjs.rb', branch: 'drain-microtasks-api', submodules: true
+end
+
+# Stdlib-extracted gems csim_rspec.rb requires defensively (Rails 7.0's
+# `active_support/logger_thread_safe_level.rb` chain). Mastodon already
+# lists `csv` + `mutex_m`; backfill the rest so they're loadable on
+# Ruby 3.4+ where they moved into bundled gems.
+gem 'base64'
+gem 'bigdecimal'
+gem 'drb'
+gem 'logger'
+gem 'observer'
+gem 'ostruct'

@@ -7,3 +7,6 @@
 [submodule "apps/avo"]
 	path = apps/avo
 	url = https://github.com/avo-hq/avo.git
+[submodule "apps/mastodon"]
+	path = apps/mastodon
+	url = https://github.com/mastodon/mastodon.git
