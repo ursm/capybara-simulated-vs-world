@@ -9,3 +9,133 @@
 # that have concrete current evidence (out-of-scope feature, real
 # layout dependency, async-runtime requirement) backed by a probe,
 # not historical guess.
+
+# ── KV: depends on a Cuprite quirk ────────────────────────────────
+- test: "KeyValueFields without value won't change the value"
+  reason: |
+    Test relies on Cuprite-specific behavior, not real-browser
+    semantics. `disabled_field.trigger("input")` is a silent no-op
+    in Cuprite 0.17 (the JS shim throws "Unknown event" for non-
+    mouse/focus/form events; Ferrum's `handle_error` only raises
+    for subtype=="error" so the string-throw passes through as
+    nil). Real Chrome fires the listener and the controller
+    updates the value to "bazz", so v3's spec-compliant dispatch
+    also runs the handler and the saved value is "bazz" rather
+    than the expected "".
+
+# ── Flatpickr: tests depend on Cuprite's synthetic-blur on every set + sleep-based real-time elapsing ──
+#
+# Each Avo time-picker test follows the pattern:
+#   set_picker_hour 17     # set value, FOCUS-or-blur depending on driver
+#   set_picker_minute 17
+#   set_picker_second 17
+#   close_picker           # `trigger("click")` on title (no focus shift)
+#   save
+#
+# flatpickr's time-input commit path is `bind(timeContainer, "blur",
+# updateTime, {capture:true})` → updateTime() → `_debouncedChange =
+# debounce(triggerChange, 300)`. Avo's `date_field_controller.js`
+# relays flatpickr's `onChange` to the REAL `<input name=...>` via
+# `updateRealInput`; the form submits that real input.
+#
+# In Cuprite, every `Node#set` explicitly fires a synthetic `blur`
+# at the end. That registers the 300ms debounce timer right then,
+# and real wall time (CDP latency between Capybara calls + the
+# `sleep 0.3` inside `close_picker`) elapses past 300 ms before
+# the save click. The debounce fires, `updateRealInput` writes the
+# correct value, the form submits with seconds intact.
+#
+# In v3 (virtual time), `set` doesn't fire synthetic blur, so the
+# debounce timer isn't registered until the LAST focus shift (the
+# save click). The fetch then serializes the form synchronously
+# inside the click chain, BEFORE the 300 ms timer can fire.
+#
+# Adding unconditional blur to v3's `set` regresses jQuery-UI
+# autocomplete (Redmine `test_edit_should_allow_adding_multiple_
+# relations_from_autocomplete` — menu closes on blur before the
+# `within('ul.ui-autocomplete')` lookup). This is fundamentally a
+# Cuprite-specific test pattern.
+
+- test: "Date field with relative: true edit when changing the value saves the valid date"
+  reason: "Flatpickr debounce timing — see lists/avo.yml header for the cluster explanation"
+- test: "Date field with relative: false edit when changing the value saves the valid date"
+  reason: "Flatpickr debounce timing — see lists/avo.yml header"
+- test: "Date field on eastern zone in an eastern (positive) Timezone edit keeps the right value on update and save"
+  reason: "Flatpickr debounce timing — TZ-converted display value never propagates"
+- test: "Date field on UTC edit keeps the right value on update and save"
+  reason: "Flatpickr debounce timing — UTC update never propagates"
+- test: "Date field on western zone in a western (negative) Timezone edit keeps the right value on update and save"
+  reason: "Flatpickr debounce timing — TZ-converted display value never propagates"
+- test: "timezone On Romania (EET) with CET timezone configured edit when changing the value saves the valid date"
+  reason: "Flatpickr debounce timing — see lists/avo.yml header"
+- test: "timezone On Romania (EET) with UTC timezone configured edit when changing the value saves the valid date"
+  reason: "Flatpickr debounce timing — see lists/avo.yml header"
+  # time_spec has two contexts with the same `it` description for
+  # both `relative: false` and `relative: true` (Bucharest + LA TZ);
+  # only the Bucharest-and-Bucharest+relative-true variants actually
+  # exercise the minute/second debounce path. Pin by file:line.
+- test: "./spec/system/avo/date_time_fields/time_spec.rb:50"
+  reason: "Flatpickr debounce timing — time field, Bucharest relative:false"
+- test: "./spec/system/avo/date_time_fields/time_spec.rb:116"
+  reason: "Flatpickr debounce timing — time field, LA relative:false"
+- test: "./spec/system/avo/date_time_fields/time_spec.rb:172"
+  reason: "Flatpickr debounce timing — time field, Bucharest relative:true"
+- test: "Filters date time filters time with single selector filters courses by starting at"
+  reason: "Flatpickr debounce timing — filter picker shares the same controller"
+
+# ── CodeMirror: real layout engine needed for `.CodeMirror-code` content rendering ──
+#
+# CodeMirror initializes via `CodeMirror.fromTextArea(ta)` which builds
+# a `.CodeMirror` widget wrapper (we verified this lands in v3). The
+# widget's `.CodeMirror-code` line container is rendered via
+# CodeMirror's measurement-driven render loop — `cm.display.measure*`
+# reads `getBoundingClientRect()` and computes line heights/cursor
+# positions. Without a layout engine, the lines never render text:
+# even when the underlying doc has content (e.g. `user.custom_css =
+# ".x{}"`), `.CodeMirror-code` stays empty. True layout dependency.
+
+# CodeMirror tests that exercise the contenteditable read-back
+# (`:47` "filled code editor", `:71` "displays the projects custom_css")
+# now pass via the per-char input pipeline (commit f6e4553) — the
+# remaining failures all require typing-into-the-CodeMirror-widget,
+# which routes through CodeMirror's measurement-based selection.
+- test: "CodeField without value edit change the projects custom_css code"
+  reason: "CodeMirror typing requires layout-engine cursor measurement"
+- test: "CodeField with regular value edit change the projects custom_css code to another value"
+  reason: "CodeMirror typing requires layout-engine cursor measurement"
+- test: "CodeField with pretty_generated option for a JSON code field correctly formats JSON code on create / edit and displays it in a pretty way on the show page"
+  reason: "CodeMirror typing requires layout-engine cursor measurement"
+- test: "ResourceSidebars allow fields to be edited on sidebar"
+  reason: "CodeMirror typing requires layout-engine cursor measurement"
+
+# All Tagify cluster tests now pass — keyboard-default-action
+# deferral via setTimeout(0) lets Tagify's `beforeKeyDown(e).then(()
+# => e.preventDefault())` promise resolve before the key's default
+# (newline insertion) runs, matching the UI Events spec's microtask
+# checkpoint between dispatch and default action.
+
+# ── Algolia autocomplete: `input.aa-Input` never constructed ──
+#
+# Avo's search uses `@algolia/autocomplete-js`. The widget mounts
+# itself onto a host element by creating a `<input class="aa-Input">`
+# sibling. In v3 the mount never produces the input — tests querying
+# `//input[@class='aa-Input']` find nothing. Algolia's autocomplete
+# uses `getBoundingClientRect` for panel positioning and has its own
+# render loop that gates on measurable geometry; without layout it
+# bails before constructing the input shell.
+
+- test: "Search resource search with multi-word query finds the record when searching with multiple words"
+  reason: "Algolia autocomplete widget needs real layout — see lists/avo.yml header"
+- test: "Search resource search with multi-word query finds the record when searching with a partial multi-word query"
+  reason: "Algolia autocomplete widget needs real layout — see lists/avo.yml header"
+- test: "TestHelpers isolated tests search opens the search box, write and select first result"
+  reason: "Algolia autocomplete widget needs real layout — see Search cluster"
+
+
+# ── Tippy: tooltip positioning requires getBoundingClientRect ──
+- test: "Record previews opens the preview"
+  reason: |
+    Tippy mounts the popover via `appendChild(<div id="tippy-N">)`
+    using `getBoundingClientRect` to compute placement. v3's
+    zero-geometry stub causes Tippy to bail before appending —
+    `#tippy-1` never appears in the DOM.
