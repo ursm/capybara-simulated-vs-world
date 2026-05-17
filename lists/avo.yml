@@ -1,8 +1,10 @@
 # Tests we don't expect capybara-simulated to satisfy. Each entry is
-# `{test:, reason:}`; `test:` is preferred as the RSpec
+# `{test:, reason:[, engine:]}`. `test:` is preferred as the RSpec
 # `full_description` (stable across upstream line-number moves) but
 # may also be a `./spec/...rb:LINE` location string or a Regexp
-# matched against either.
+# matched against either. `engine:` is optional; when set, the entry
+# is honoured only when `CSIM_JS_ENGINE` matches (`v8` or `quickjs`),
+# so engine-divergent tests don't flip-to-FIXED on the other side.
 #
 # Cleared 2026-05-15 — the previous list was from v2 era and many
 # entries had since started passing on v3. Re-populate with entries
@@ -139,3 +141,24 @@
     using `getBoundingClientRect` to compute placement. v3's
     zero-geometry stub causes Tippy to bail before appending —
     `#tippy-1` never appears in the DOM.
+
+# ── QuickJS-only: brittle wall-clock timing ──
+- test: "HasOneField omits parent record hides the belongs_to field pointing back to the parent on the embedded show page"
+  engine: quickjs
+  reason: |
+    `scroll_to first_tab_group` runs Capybara finds that call
+    `Browser#tick_real_time`. Step is `max(wall_elapsed, 10ms)` —
+    wall_elapsed per Ruby call is larger on QuickJS's interpreter
+    than on V8's JIT, so each tick advances more virtual time.
+    Enough virtual time elapses that Turbo's lazy
+    `<turbo-frame id="has_one_field_show_fish" loading="lazy">`
+    completes its load + FrameRenderer.render before `click_tab`
+    runs, and the loaded frame body contains a nested
+    `[data-controller="tabs"]` whose `tabSwitcher` lands as a
+    second match (ambiguous). V8 happens to match Cuprite's
+    cadence so the frame stays a "Loading fish" placeholder until
+    click_tab runs — but that's coincidence, not correctness.
+    Tried `step = next_timer_delta` (engine-deterministic) — broke
+    11 wait-window tests because "wait short, don't fire long
+    timer" depends on the wall-clock cadence. No clean driver-side
+    fix without Capybara exposing remaining-wait to drivers.

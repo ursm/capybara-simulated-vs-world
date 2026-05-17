@@ -83,11 +83,20 @@ yaml_loaded =
 # Split entries into a String-keyed hash (O(1) hit per spec) and a
 # Regexp-only array (still scanned linearly, much shorter than the
 # full list for Avo-scale suites).
+#
+# Entries can carry an optional `engine:` key (`v8` / `quickjs`) to
+# pend only when CSIM_JS_ENGINE matches. Engine-mismatched entries are
+# dropped at load time so they neither pend nor flip-to-FIXED on the
+# other engine. Used for divergences that are genuine but narrow
+# enough not to warrant a driver-side fix (e.g. brittle Cuprite-shape
+# tests that happen to pass on V8's wall-clock cadence).
+active_engine = ENV.fetch('CSIM_JS_ENGINE', 'v8')
 CSIM_STRING_FAILURES = {}
 CSIM_REGEXP_FAILURES = []
 (yaml_loaded || []).each {|entry|
   raise "csim_rspec: expected-failure entry must be a hash, got #{entry.inspect}" unless entry.is_a?(Hash)
   h = entry.transform_keys(&:to_s)
+  next if h['engine'] && h['engine'] != active_engine
   rec = {matcher: h.fetch('test'), reason: h.fetch('reason'), skip: h.fetch('skip', false)}
   case rec[:matcher]
   when String then CSIM_STRING_FAILURES[rec[:matcher]] = rec

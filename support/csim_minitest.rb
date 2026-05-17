@@ -101,11 +101,18 @@ require 'minitest'
 # Split entries into a String-keyed hash (O(1) hit per test) and a
 # Regexp-only array (still scanned linearly, much shorter than the
 # full list).
+#
+# Entries can carry an optional `engine:` key (`v8` / `quickjs`) to
+# pend only when CSIM_JS_ENGINE matches. Engine-mismatched entries are
+# dropped at load time so they neither pend nor flip-to-FIXED on the
+# other engine.
+active_engine = ENV.fetch('CSIM_JS_ENGINE', 'v8')
 CSIM_STRING_FAILURES = {}
 CSIM_REGEXP_FAILURES = []
 (YAML.load_file(list_path, permitted_classes: [Regexp]) || []).each {|entry|
   raise "csim_minitest: expected-failure entry must be a hash, got #{entry.inspect}" unless entry.is_a?(Hash)
   h = entry.transform_keys(&:to_s)
+  next if h['engine'] && h['engine'] != active_engine
   rec = {matcher: h.fetch('test'), reason: h.fetch('reason')}
   case rec[:matcher]
   when String then CSIM_STRING_FAILURES[rec[:matcher]] = rec
