@@ -8,19 +8,19 @@
 # The middleware is idempotent (no-op if already wrapped) so any path that
 # touches the app multiple times only counts once.
 
-# Lock in Bundler-resolved gems before requiring capybara. Without this,
-# under `CSIM_DRIVER=real` (where csim_rspec/csim_minitest return early
-# and skip their own `require 'bundler/setup'`), `require 'capybara'`
-# can grab a system-installed copy whose classes differ from the
-# bundle's — our prepends then land on the wrong constant and the
-# middleware never fires.
-# Ruby 3.5 dropped `logger` from default gems; ActiveSupport
-# (LoggerThreadSafeLevel) explodes on require unless it's pre-loaded.
-# csim_rspec/csim_minitest pull capybara_simulated → transitively
-# logger before spec_helper runs, but under CSIM_DRIVER=real those
-# files return early and we're the first non-stdlib load — load logger
-# defensively so Forem's `require "active_support"` succeeds.
+# Ruby 3.5 dropped `logger` from default gems; ActiveSupport's
+# LoggerThreadSafeLevel explodes on require unless it's pre-loaded.
+# csim_rspec/csim_minitest pull capybara_simulated → transitively logger
+# before spec_helper runs, but under CSIM_DRIVER=real those files return
+# early and we're the first non-stdlib load — load logger defensively so
+# Forem's `require "active_support"` succeeds.
 require 'logger'
+
+# Lock in Bundler-resolved gems before requiring capybara. Under
+# CSIM_DRIVER=real csim_rspec/csim_minitest return early and skip their
+# own bundler/setup, so without this `require 'capybara'` can grab a
+# system-installed copy whose classes differ from the bundle's — our
+# prepends then land on the wrong constant and the middleware never fires.
 require 'bundler/setup'
 require 'capybara'
 require 'capybara/server'
@@ -71,7 +71,6 @@ Capybara::Server.prepend(CsimRackTiming::AppArgWrap)
 # Only present when the host runs with CSIM_DRIVER=simulated (csim_rspec /
 # csim_minitest require the gem; Cuprite runs don't load it).
 Capybara::Simulated::Driver.prepend(CsimRackTiming::AppArgWrap) if defined?(Capybara::Simulated::Driver)
-
 
 # `warn` is silenced under RSpec's Warning filter; `$stderr.puts` always
 # reaches the terminal.
