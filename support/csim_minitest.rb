@@ -84,51 +84,21 @@ module CsimDrivenBy
 end
 ActionDispatch::SystemTestCase.singleton_class.prepend(CsimDrivenBy)
 
-# Expected-failure handling. The list is YAML; each entry is a hash
-# of `test:` (exact `Class#method` string or Regexp) plus `reason:`
-# (verbatim text surfaced in the skip message).
-#
-#   - test: "Class#method"
-#     reason: "why this is parked"
-#   - test: !ruby/regexp /Class#test_pattern/
-#     reason: "why this whole family is parked"
-list_path = ENV['CSIM_EXPECTED_FAILURES']
-return unless list_path && File.exist?(list_path)
-
-require 'yaml'
+# Expected-failure handling. Same YAML format as csim_rspec.rb's
+# (`{test:, reason:[, engine:]}`); `test:` is an exact `Class#method`
+# string or a Regexp matched against the same.
 require 'minitest'
+require_relative 'csim_expected_failures'
 
-# Split entries into a String-keyed hash (O(1) hit per test) and a
-# Regexp-only array (still scanned linearly, much shorter than the
-# full list).
-#
-# Entries can carry an optional `engine:` key (`v8` / `quickjs`) to
-# pend only when CSIM_JS_ENGINE matches. Engine-mismatched entries are
-# dropped at load time so they neither pend nor flip-to-FIXED on the
-# other engine.
-active_engine = ENV.fetch('CSIM_JS_ENGINE', 'v8')
-CSIM_STRING_FAILURES = {}
-CSIM_REGEXP_FAILURES = []
-(YAML.load_file(list_path, permitted_classes: [Regexp]) || []).each {|entry|
-  raise "csim_minitest: expected-failure entry must be a hash, got #{entry.inspect}" unless entry.is_a?(Hash)
-  h = entry.transform_keys(&:to_s)
-  next if h['engine'] && h['engine'] != active_engine
-  rec = {matcher: h.fetch('test'), reason: h.fetch('reason')}
-  case rec[:matcher]
-  when String then CSIM_STRING_FAILURES[rec[:matcher]] = rec
-  when Regexp then CSIM_REGEXP_FAILURES << rec
-  else raise "csim_minitest: matcher must be String or Regexp, got #{rec[:matcher].inspect}"
-  end
-}
-CSIM_STRING_FAILURES.freeze
-CSIM_REGEXP_FAILURES.freeze
+CSIM_STRING_FAILURES, CSIM_REGEXP_FAILURES, _ =
+  CsimExpectedFailures.load(ENV['CSIM_EXPECTED_FAILURES'], source: 'csim_minitest')
 
 # Run each test through, then re-classify the result against the
 # expected-failure list. Listed failure → swap to Skip ("expected
 # failure"). Listed pass → swap to a synthetic failure so the run
 # is visibly not-green ("listed but passed — update the list"). Real
 # pass / real failure pass through unchanged.
-module CsimExpectedFailures
+module CsimMinitestPend
   def run
     super.tap do |result|
       desc = "#{self.class.name}##{name}"
@@ -148,4 +118,4 @@ module CsimExpectedFailures
   end
 end
 
-Minitest::Test.prepend(CsimExpectedFailures)
+Minitest::Test.prepend(CsimMinitestPend)
