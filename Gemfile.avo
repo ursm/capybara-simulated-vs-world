@@ -1,5 +1,5 @@
 # Run Avo's bundle in *our* gem set: load upstream's Gemfile verbatim,
-# then layer capybara-simulated and the quickjs source branch on top.
+# then layer capybara-simulated on top.
 # Activated via `BUNDLE_GEMFILE=Gemfile.avo`.
 # Avo's CI runs against the Appraisal-generated gemfile, NOT the
 # top-level `apps/avo/Gemfile`. The two diverge on at least
@@ -9,8 +9,6 @@
 eval_gemfile File.expand_path('apps/avo/gemfiles/rails_8.0_ruby_3.3.gemfile', __dir__)
 
 group :test do
-  gem 'mini_racer'
   gem 'capybara-simulated',
       path: File.expand_path('../capybara-simulated', __dir__)
-  gem 'quickjs', '0.17.0.pre'
 end

@@ -1,12 +1,10 @@
 # Run Redmine's bundle in *our* gem set: load upstream's Gemfile
-# verbatim, then layer capybara-simulated and the quickjs source
-# branch on top. Activated via `BUNDLE_GEMFILE=Gemfile.redmine`.
+# verbatim, then layer capybara-simulated on top.
+# Activated via `BUNDLE_GEMFILE=Gemfile.redmine`.
 eval_gemfile File.expand_path('apps/redmine/Gemfile', __dir__)
 
 group :test do
-  gem 'mini_racer'
   gem 'capybara-simulated',
       path: File.expand_path('../capybara-simulated', __dir__)
-  gem 'quickjs', '0.17.0.pre'
   gem 'stackprof'
 end

@@ -1,19 +1,14 @@
 # Preloaded via `RUBYOPT='-r<this-file>'`. Two responsibilities:
 #
 # 1. Override `ActionDispatch::SystemTestCase.driven_by` to route to
-#    `:simulated` (or `:simulated_v3` — the v3 PoC driver) when
-#    CSIM_DRIVER selects one, without patching the host app's
-#    `application_system_test_case.rb`.
+#    `:simulated` when CSIM_DRIVER selects it, without patching the
+#    host app's `application_system_test_case.rb`.
 # 2. Skip examples whose `<class>#<method>` matches an entry in the
 #    expected-failures list at `CSIM_EXPECTED_FAILURES`. Track
 #    actually-passing skips and fail the run when the list grows
 #    stale.
 
-CSIM_DRIVER_NAME = case ENV['CSIM_DRIVER']
-                   when 'simulated'    then :simulated
-                   when 'simulated_v3' then :simulated_v3
-                   end
-return unless CSIM_DRIVER_NAME
+return unless ENV['CSIM_DRIVER'] == 'simulated'
 
 # Bundler activates the gem set BEFORE exec'ing ruby, so $LOAD_PATH is
 # already wired up by the time RUBYOPT runs us — but the released
@@ -25,67 +20,6 @@ return unless CSIM_DRIVER_NAME
 require 'bundler/setup'
 require 'capybara/simulated'
 require 'action_dispatch/system_test_case'
-
-# `CSIM_JS_ENGINE={quickjs,v8,none}` picks the runtime; unset = auto-
-# detect (quickjs preferred, then v8, then none).
-js_engine = ENV['CSIM_JS_ENGINE']&.to_sym
-
-# `CSIM_QUICKJS_FEATURES=intl,file,…` re-registers `:simulated` with
-# extra Quickjs polyfills layered onto the gem's lean default. See
-# csim_rspec.rb for the rationale (Avo / Forem opt-ins). Features only
-# apply to the QuickJS runtime — V8 / none ignore the array.
-features =
-  if (extra = ENV['CSIM_QUICKJS_FEATURES']) && !extra.empty? && (js_engine.nil? || js_engine == :quickjs)
-    require 'quickjs'
-    extra.split(',').map {|n| Quickjs.const_get("POLYFILL_#{n.strip.upcase}") }
-  else
-    []
-  end
-
-if (!features.empty? || js_engine) && CSIM_DRIVER_NAME == :simulated
-  Capybara.register_driver :simulated do |app|
-    Capybara::Simulated::Driver.new(app, features: features, js_engine: js_engine)
-  end
-end
-
-# Opt-in IPC trace for the V8 runtime — wraps every attached host fn
-# with a counter and dumps the distribution at exit. Useful to compare
-# IPC volume across changes; mini_racer's rendezvous overhead per call
-# is the dominant cost of the V8 backend on DOM-heavy suites.
-if ENV['CSIM_V8_IPC_TRACE'] == '1' && js_engine == :v8
-  require 'capybara/simulated/v8_runtime'
-  $csim_ipc_counts = Hash.new(0)
-  $csim_ipc_dom_op = Hash.new(0)
-  $csim_ipc_total  = 0
-  $csim_ipc_start  = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-  Capybara::Simulated::V8Runtime.class_eval do
-    alias_method :_attach_orig_ipc, :attach_host_fns
-    define_method(:attach_host_fns) do |c|
-      orig_attach = c.method(:attach)
-      c.define_singleton_method(:attach) do |name, fn|
-        orig_attach.call(name, ->(*a) {
-          $csim_ipc_total += 1
-          $csim_ipc_counts[name] += 1
-          $csim_ipc_dom_op[a[1].to_s] += 1 if name == '__dom'
-          fn.call(*a)
-        })
-      end
-      _attach_orig_ipc(c)
-    end
-  end
-  at_exit do
-    elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - $csim_ipc_start
-    warn ''
-    warn '=== CSIM_V8_IPC_TRACE ==='
-    warn 'wall: %.2fs, total: %d' % [elapsed, $csim_ipc_total]
-    warn 'by host fn:'
-    $csim_ipc_counts.sort_by {|_, v| -v }.each {|n, c| warn '  %-32s %d' % [n, c] }
-    if $csim_ipc_dom_op.any?
-      warn 'top __dom ops:'
-      $csim_ipc_dom_op.sort_by {|_, v| -v }.first(15).each {|op, c| warn '  %-32s %d' % [op, c] }
-    end
-  end
-end
 
 # Capybara polls find/has_? via `synchronize`, sleeping
 # `default_retry_interval` (10 ms) between retries when `driver.wait?`
@@ -138,7 +72,7 @@ end
 
 module CsimDrivenBy
   def driven_by(_driver, **_options, &_block)
-    super(CSIM_DRIVER_NAME)
+    super(:simulated)
     # Hosts often configure the real-browser download directory through
     # driver options that the simulated driver doesn't read. Mirror it
     # onto `Capybara.save_path` so attachment responses land where the

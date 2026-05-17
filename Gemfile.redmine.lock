@@ -3,8 +3,8 @@ PATH
   specs:
     capybara-simulated (0.0.7)
       capybara (>= 3.37)
+      mini_racer (>= 0.18)
       nokogiri (>= 1.18)
-      p_css (>= 0.2.0.beta1)
       rack (>= 2.2)
 
 GEM
@@ -259,16 +259,6 @@ GEM
       snaky_hash (~> 2.0, >= 2.0.3)
       version_gem (~> 1.1, >= 1.1.9)
     ostruct (0.6.3)
-    p_css (0.2.0.beta1)
-      rb_sys (~> 0.9)
-    p_css (0.2.0.beta1-aarch64-linux)
-      rb_sys (~> 0.9)
-    p_css (0.2.0.beta1-arm64-darwin)
-      rb_sys (~> 0.9)
-    p_css (0.2.0.beta1-x86_64-darwin)
-      rb_sys (~> 0.9)
-    p_css (0.2.0.beta1-x86_64-linux)
-      rb_sys (~> 0.9)
     parallel (2.1.0)
     parser (3.3.11.1)
       ast (~> 2.4.1)
@@ -287,9 +277,6 @@ GEM
     public_suffix (7.0.5)
     puma (8.0.1)
       nio4r (~> 2.0)
-    quickjs (0.17.0.pre)
-      json
-      securerandom
     racc (1.8.1)
     rack (3.2.6)
     rack-session (2.1.2)
@@ -331,12 +318,9 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.4.2)
-    rake-compiler-dock (1.12.0)
     rb-fsevent (0.11.2)
     rb-inotify (0.11.1)
       ffi (~> 1.0)
-    rb_sys (0.9.128)
-      rake-compiler-dock (= 1.12.0)
     rbpdf (1.21.4)
       htmlentities
       rbpdf-font (~> 1.19.0)
@@ -481,7 +465,6 @@ DEPENDENCIES
   marcel
   mini_magick (~> 5.2.0)
   mini_mime (~> 1.1.0)
-  mini_racer
   mocha (>= 2.0.1)
   net-imap (~> 0.6.1)
   net-ldap (~> 0.20.0)
@@ -492,7 +475,6 @@ DEPENDENCIES
   ostruct
   propshaft (~> 1.3.0)
   puma
-  quickjs (= 0.17.0.pre)
   rack (>= 3.1.3)
   rails (= 8.1.3)
   rails-dom-testing (>= 2.3.0)
@@ -627,11 +609,6 @@ CHECKSUMS
   nokogiri (1.19.3-x86_64-linux-musl) sha256=248c906d2166eca5efb56d52fdee5f9a1f51d69a72e2b64fdac647b4ce39ea3f
   oauth2 (2.0.18) sha256=bacf11e470dfb963f17348666d0a75c7b29ca65bc48fd47be9057cf91a403287
   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
-  p_css (0.2.0.beta1) sha256=05c8e543ddaa7e96dc7d91e93af952b1a007929f6cd29db665559c2211f0cfd8
-  p_css (0.2.0.beta1-aarch64-linux) sha256=b68ea3925eb4cf77d82bd9dcc1c33e5da147e6230f2a94700eca4c6ea8d3101e
-  p_css (0.2.0.beta1-arm64-darwin) sha256=bd07d32319fe7863f1fa65b549dd0c7ca0786dbcb3973a53ae4c4e39a6aec25a
-  p_css (0.2.0.beta1-x86_64-darwin) sha256=8a703d4339ef5c5cf4df46b6b434e91e74ca143a9f8debe4269151014fffcd3c
-  p_css (0.2.0.beta1-x86_64-linux) sha256=1c7729e36ae535d9cd7c86daacdd1de9cce8a939b5360b599e69ba3264661091
   parallel (2.1.0) sha256=b35258865c2e31134c5ecb708beaaf6772adf9d5efae28e93e99260877b09356
   parser (3.3.11.1) sha256=d17ace7aabe3e72c3cc94043714be27cc6f852f104d81aa284c2281aecc65d54
   pp (0.6.3) sha256=2951d514450b93ccfeb1df7d021cae0da16e0a7f95ee1e2273719669d0ab9df6
@@ -641,7 +618,6 @@ CHECKSUMS
   psych (5.3.1) sha256=eb7a57cef10c9d70173ff74e739d843ac3b2c019a003de48447b2963d81b1974
   public_suffix (7.0.5) sha256=1a8bb08f1bbea19228d3bed6e5ed908d1cb4f7c2726d18bd9cadf60bc676f623
   puma (8.0.1) sha256=7b94e50c07655718c1fb8ae41a11fc06c7d61293208b3aa608ff71a46d3ad37c
-  quickjs (0.17.0.pre) sha256=a53d0fc8f6ac4077c4229971c4c6108f00e83469701a8f6f5071071c980c7a5a
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rack (3.2.6) sha256=5ed78e1f73b2e25679bec7d45ee2d4483cc4146eb1be0264fc4d94cb5ef212c2
   rack-session (2.1.2) sha256=595434f8c0c3473ae7d7ac56ecda6cc6dfd9d37c0b2b5255330aa1576967ffe8
@@ -653,10 +629,8 @@ CHECKSUMS
   railties (8.1.3) sha256=913eb0e0cb520aac687ffd74916bd726d48fa21f47833c6292576ef6a286de22
   rainbow (3.1.1) sha256=039491aa3a89f42efa1d6dec2fc4e62ede96eb6acd95e52f1ad581182b79bc6a
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
-  rake-compiler-dock (1.12.0) sha256=f13205c2738f3d2053afcd03491a9e4541b22a59a0bfc53fc8bc883bd8188023
   rb-fsevent (0.11.2) sha256=43900b972e7301d6570f64b850a5aa67833ee7d87b458ee92805d56b7318aefe
   rb-inotify (0.11.1) sha256=a0a700441239b0ff18eb65e3866236cd78613d6b9f78fea1f9ac47a85e47be6e
-  rb_sys (0.9.128) sha256=9ab81f4d6d4e1895de18762232362d1264475aa7035756b50441e442130538fd
   rbpdf (1.21.4) sha256=8f281d03d04c71d061fa165eeb63bff0497c56ff12de0efe6bd9e5048d7de0c5
   rbpdf-font (1.19.1) sha256=3b3498ea4f9e71bea0f7a069408d50c3c4e85b1aa496e22f2ee8b84d28c8b45f
   rdoc (7.2.0) sha256=8650f76cd4009c3b54955eb5d7e3a075c60a57276766ebf36f9085e8c9f23192

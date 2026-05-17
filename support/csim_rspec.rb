@@ -7,14 +7,15 @@
 # 2. Skip examples whose `<class>#<method>`-shaped description matches
 #    an entry in the expected-failures list at `CSIM_EXPECTED_FAILURES`.
 
-CSIM_DRIVER_NAME = case ENV['CSIM_DRIVER']
-                   when 'simulated'    then :simulated
-                   when 'simulated_v3' then :simulated_v3
-                   end
-return unless CSIM_DRIVER_NAME
+return unless ENV['CSIM_DRIVER'] == 'simulated'
 
-# Same lock-in dance as csim_minitest.rb — force the Gemfile-resolved
-# (path) capybara-simulated to be the one we end up requiring.
+# Bundler activates the gem set BEFORE exec'ing ruby, so $LOAD_PATH is
+# already wired up by the time RUBYOPT runs us — but the released
+# capybara-simulated 0.0.7 vs the local path version both ship a
+# version.rb with the same constant, and requiring without a fresh
+# Bundler.require chain double-loads the path-version on top of the
+# released-gem one. Forcing `bundler/setup` first locks in the
+# Gemfile-resolved version (the local path) before the require.
 require 'bundler/setup'
 
 # Rails 7.0's `active_support/logger_thread_safe_level.rb` references
@@ -26,29 +27,6 @@ require 'bundler/setup'
 
 require 'capybara/simulated'
 require 'action_dispatch/system_test_case'
-
-# `CSIM_JS_ENGINE={quickjs,v8,none}` picks the runtime; unset = auto-
-# detect (quickjs preferred, then v8, then none).
-js_engine = ENV['CSIM_JS_ENGINE']&.to_sym
-
-# Apps whose JS bundle reaches for `Intl.DateTimeFormat` / `NumberFormat`
-# during module init (Avo's flatpickr / luxon, Forem's various date
-# libs, …) opt in via `CSIM_QUICKJS_FEATURES=intl,file,…`. Resolved to
-# `Quickjs::POLYFILL_<NAME>` constants only when the active runtime is
-# QuickJS — V8 / none ignore the array.
-features =
-  if (extra = ENV['CSIM_QUICKJS_FEATURES']) && !extra.empty? && (js_engine.nil? || js_engine == :quickjs)
-    require 'quickjs'
-    extra.split(',').map {|n| Quickjs.const_get("POLYFILL_#{n.strip.upcase}") }
-  else
-    []
-  end
-
-if (!features.empty? || js_engine) && CSIM_DRIVER_NAME == :simulated
-  Capybara.register_driver :simulated do |app|
-    Capybara::Simulated::Driver.new(app, features: features, js_engine: js_engine)
-  end
-end
 
 module CsimDrivenBy
   # Only intercept calls that asked for a real-browser driver. Hosts
@@ -77,7 +55,7 @@ module CsimDrivenBy
 
     # Important: return the result of `super` so rspec-rails'
     # `driven_by(...).tap(&:use)` can chain off the registration.
-    super(CSIM_DRIVER_NAME)
+    super(:simulated)
   end
 end
 ActionDispatch::SystemTestCase.singleton_class.prepend(CsimDrivenBy)
@@ -152,7 +130,7 @@ if (trace_dir = ENV['CSIM_TRACE_DIR']) && !trace_dir.empty?
 
   RSpec.configure do |config|
     config.prepend_after(:each, type: :system) do |example|
-      drv = CSIM_DRIVER_NAME == :simulated_v3 ? Capybara::Simulated::V3Driver.current : Capybara::Simulated::Driver.current
+      drv = Capybara::Simulated::Driver.current
       next unless drv&.tracing?
       drv.current_trace.metadata.merge!(
         title:     example.full_description,
