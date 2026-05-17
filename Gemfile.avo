@@ -16,4 +16,5 @@ group :test do
   # neither as a hard dependency.
   gem 'mini_racer'
   gem 'quickjs', github: 'ursm/quickjs.rb', branch: 'drain-microtasks-api', submodules: true
+  gem 'stackprof'
 end
