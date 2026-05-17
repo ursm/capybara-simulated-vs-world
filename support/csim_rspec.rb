@@ -80,11 +80,23 @@ yaml_loaded =
     YAML.unsafe_load_file(list_path)
   end
 
-CSIM_EXPECTED_FAILURES = (yaml_loaded || []).map {|entry|
+# Split entries into a String-keyed hash (O(1) hit per spec) and a
+# Regexp-only array (still scanned linearly, much shorter than the
+# full list for Avo-scale suites).
+CSIM_STRING_FAILURES = {}
+CSIM_REGEXP_FAILURES = []
+(yaml_loaded || []).each {|entry|
   raise "csim_rspec: expected-failure entry must be a hash, got #{entry.inspect}" unless entry.is_a?(Hash)
   h = entry.transform_keys(&:to_s)
-  {matcher: h.fetch('test'), reason: h.fetch('reason'), skip: h.fetch('skip', false)}
-}.freeze
+  rec = {matcher: h.fetch('test'), reason: h.fetch('reason'), skip: h.fetch('skip', false)}
+  case rec[:matcher]
+  when String then CSIM_STRING_FAILURES[rec[:matcher]] = rec
+  when Regexp then CSIM_REGEXP_FAILURES << rec
+  else raise "csim_rspec: matcher must be String or Regexp, got #{rec[:matcher].inspect}"
+  end
+}
+CSIM_STRING_FAILURES.freeze
+CSIM_REGEXP_FAILURES.freeze
 
 # `pending` (not `skip`): if the example unexpectedly passes, RSpec
 # fails it as "FIXED — the test passed; remove `pending` from it",
@@ -102,13 +114,8 @@ RSpec.configure do |config|
   config.before(:each) do |example|
     desc = example.full_description
     loc  = example.location
-    matched = CSIM_EXPECTED_FAILURES.find {|entry|
-      m = entry[:matcher]
-      case m
-      when Regexp then m.match?(desc) || m.match?(loc)
-      when String then m == desc || m == loc
-      end
-    }
+    matched = CSIM_STRING_FAILURES[desc] || CSIM_STRING_FAILURES[loc] ||
+              CSIM_REGEXP_FAILURES.find {|entry| entry[:matcher].match?(desc) || entry[:matcher].match?(loc) }
     next unless matched
     if matched[:skip]
       skip("expected failure (#{matched[:reason]})")

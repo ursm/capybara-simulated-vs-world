@@ -98,11 +98,23 @@ return unless list_path && File.exist?(list_path)
 require 'yaml'
 require 'minitest'
 
-CSIM_EXPECTED_FAILURES = (YAML.load_file(list_path, permitted_classes: [Regexp]) || []).map {|entry|
+# Split entries into a String-keyed hash (O(1) hit per test) and a
+# Regexp-only array (still scanned linearly, much shorter than the
+# full list).
+CSIM_STRING_FAILURES = {}
+CSIM_REGEXP_FAILURES = []
+(YAML.load_file(list_path, permitted_classes: [Regexp]) || []).each {|entry|
   raise "csim_minitest: expected-failure entry must be a hash, got #{entry.inspect}" unless entry.is_a?(Hash)
   h = entry.transform_keys(&:to_s)
-  {matcher: h.fetch('test'), reason: h.fetch('reason')}
-}.freeze
+  rec = {matcher: h.fetch('test'), reason: h.fetch('reason')}
+  case rec[:matcher]
+  when String then CSIM_STRING_FAILURES[rec[:matcher]] = rec
+  when Regexp then CSIM_REGEXP_FAILURES << rec
+  else raise "csim_minitest: matcher must be String or Regexp, got #{rec[:matcher].inspect}"
+  end
+}
+CSIM_STRING_FAILURES.freeze
+CSIM_REGEXP_FAILURES.freeze
 
 # Run each test through, then re-classify the result against the
 # expected-failure list. Listed failure → swap to Skip ("expected
@@ -113,13 +125,8 @@ module CsimExpectedFailures
   def run
     super.tap do |result|
       desc = "#{self.class.name}##{name}"
-      matched = CSIM_EXPECTED_FAILURES.find {|entry|
-        m = entry[:matcher]
-        case m
-        when Regexp then m.match?(desc)
-        when String then m == desc
-        end
-      }
+      matched = CSIM_STRING_FAILURES[desc] ||
+                CSIM_REGEXP_FAILURES.find {|entry| entry[:matcher].match?(desc) }
       next unless matched
 
       if result.failures.any? {|f| !f.is_a?(Minitest::Skip) }
