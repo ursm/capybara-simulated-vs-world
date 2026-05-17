@@ -15,5 +15,5 @@ group :test do
   # `CSIM_JS_ENGINE=v8|quickjs`. capybara-simulated.gemspec lists
   # neither as a hard dependency.
   gem 'mini_racer'
-  gem 'quickjs', '0.17.0.pre'
+  gem 'quickjs', github: 'ursm/quickjs.rb', branch: 'drain-microtasks-api', submodules: true
 end
