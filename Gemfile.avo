@@ -11,4 +11,9 @@ eval_gemfile File.expand_path('apps/avo/gemfiles/rails_8.0_ruby_3.3.gemfile', __
 group :test do
   gem 'capybara-simulated',
       path: File.expand_path('../capybara-simulated', __dir__)
+  # Both JS engines installed so the suite can exercise either via
+  # `CSIM_JS_ENGINE=v8|quickjs`. capybara-simulated.gemspec lists
+  # neither as a hard dependency.
+  gem 'mini_racer'
+  gem 'quickjs', '0.17.0.pre'
 end
