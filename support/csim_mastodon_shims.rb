@@ -44,7 +44,17 @@ module CsimMastodonViewport
   # `before(:each, :js)` (which flips `driven_by`) registers later
   # in the load order, so it wins over our before-hook. Hooking
   # initialize directly sidesteps the ordering question.
+  #
+  # `Browser#reset!` clears the viewport between tests (so a prior
+  # test's `driver.resize(425, …)` doesn't leak), so re-apply on
+  # reset too — otherwise the viewport default kicks back to 1024
+  # for the second `:js` test onward and the side panel goes hidden.
   def initialize(*a, **kw)
+    super
+    browser.set_viewport(1280, 720)
+  end
+
+  def reset!
     super
     browser.set_viewport(1280, 720)
   end
