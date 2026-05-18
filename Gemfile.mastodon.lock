@@ -9,8 +9,8 @@ GIT
 
 GIT
   remote: https://github.com/ursm/quickjs.rb.git
-  revision: 7e8422e9d2a94f3405b0d30efa58299394995440
-  branch: drain-microtasks-api
+  revision: d64b654d0d89af09a735d7396c3a8367cf98c230
+  branch: combined-pr-40-and-42
   submodules: true
   specs:
     quickjs (0.17.0.pre)
