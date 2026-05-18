@@ -7,31 +7,52 @@
 # so engine-divergent tests don't flip-to-FIXED on the other side.
 #
 # Last verified against Mastodon on 2026-05-19.
+#
+# Mastodon's `:js` + `:streaming` system suite splits cleanly along
+# engine lines: the React mount + react-router redirect chain only
+# evaluates correctly under QuickJS's native ESM; Tesseract.js's
+# wasm OCR only runs under V8. Run with both engines for full
+# coverage:
+#   CSIM_JS_ENGINE=quickjs bin/run-mastodon spec/system --tag js --tag streaming
+#   CSIM_JS_ENGINE=v8      bin/run-mastodon spec/system --tag js --tag streaming
 
-# ── React mount aborts under live-import gap ──────────────────────
+# ── React mount aborts under V8's live-import Proxy ───────────────
 #
-# All four expect `visit '/'` (unsigned-in) to mount the React SPA
-# and reach the React-Router `<Redirect from='/'>` chain. The mount
-# trips on React-DOM's `useState`'s `typeof a === 'function' && (a
-# = a())` lazy-init: an initial_state import (`auto_play_gif` etc.)
-# whose meta key is absent at test time is `undefined`, but
-# `__csim_liveImport`'s function-target Proxy reports `typeof ===
-# 'function'`. Calling the Proxy then triggers `Reflect.apply(undefined,
-# …)` → "Function.prototype.apply was called on null", aborting the
-# whole mount before any redirect runs.
+# All four `home_spec` / `unlogged_spec` cases expect `visit '/'`
+# (unsigned-in) to mount the React SPA and reach React-Router's
+# `<Redirect from='/'>`. Under V8, the mount trips on React-DOM's
+# `useState`'s `typeof a === 'function' && (a = a())` lazy-init: an
+# `initial_state` import (`auto_play_gif` etc.) whose meta key is
+# absent at test time is `undefined`, but `__csim_liveImport`'s
+# function-target Proxy reports `typeof === 'function'`. Calling
+# that Proxy then triggers `Reflect.apply(undefined, …)` →
+# "Function.prototype.apply was called on null".
 #
-# Same shape under both engines (QuickJS uses native ESM but the
-# same React-DOM call-site crashes when the export is undefined).
-# A naive fix that returns `undefined` directly for finalized-but-
-# nullish exports breaks Mastodon's compose form chain in unrelated
-# ways (the broader live-binding contract assumes a Proxy survives
-# transient-undefined windows). Needs a deeper distinction between
-# "permanent undefined" and "transient undefined".
+# QuickJS uses native ESM, so its imports return `undefined`
+# directly with no Proxy in between — these tests pass cleanly
+# there. A V8-side fix would need to distinguish "permanent
+# undefined" from "transient undefined" without breaking Vite's
+# hoisted-`var X` lazy-binding pattern (which is what the current
+# Proxy is designed for).
 - test: "Home page when not signed in when the landing page is set to about visits the root path and is redirected to the about page"
-  reason: "React mount aborts on undefined initial_state export via Proxy lazy-init; see lists/mastodon.yml header"
+  engine: v8
+  reason: "React mount aborts under V8 live-import Proxy lazy-init; QuickJS native ESM passes. See lists/mastodon.yml header."
 - test: "Home page when not signed in when the landing page is set to trends visits the root path and is redirected to the trends page"
+  engine: v8
   reason: "same root cause as the `about` landing-page test"
 - test: "Home page when not signed in when the landing page is set to local_feed visits the root path and is redirected to the local live feed page"
+  engine: v8
   reason: "same root cause as the `about` landing-page test"
 - test: "UnloggedBrowsing loads the home page"
+  engine: v8
   reason: "same root cause — React mount aborts before `.columns-area__panels__main` renders"
+
+# ── OCR needs WebAssembly (V8 only) ───────────────────────────────
+- test: "OCR can recognize text in a media attachment"
+  engine: quickjs
+  reason: |
+    Tesseract.js's wasm runtime needs `new WebAssembly.Module` /
+    `new WebAssembly.Instance`. The bundled QuickJS has no native
+    WebAssembly support; the V8 path works because bridge.js
+    monkey-patches `WebAssembly.instantiate` to a sync Module +
+    Instance pair wrapped in `Promise.resolve().then(...)`.
