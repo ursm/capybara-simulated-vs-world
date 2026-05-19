@@ -4,8 +4,11 @@
 eval_gemfile File.expand_path('apps/mastodon/Gemfile', __dir__)
 
 group :test do
-  gem 'capybara-simulated',
-      path: File.expand_path('../capybara-simulated', __dir__)
+  if (csim_path = ENV['CAPYBARA_SIMULATED_PATH'])
+    gem 'capybara-simulated', path: File.expand_path(csim_path, __dir__)
+  else
+    gem 'capybara-simulated', github: 'ursm/capybara-simulated'
+  end
   # Both JS engines installed so the suite can exercise either via
   # `CSIM_JS_ENGINE=v8|quickjs`. capybara-simulated.gemspec lists
   # neither as a hard dependency.

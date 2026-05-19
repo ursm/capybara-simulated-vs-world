@@ -4,8 +4,11 @@
 eval_gemfile File.expand_path('apps/discourse/Gemfile', __dir__)
 
 group :test do
-  gem 'capybara-simulated',
-      path: File.expand_path('../capybara-simulated', __dir__)
+  if (csim_path = ENV['CAPYBARA_SIMULATED_PATH'])
+    gem 'capybara-simulated', path: File.expand_path(csim_path, __dir__)
+  else
+    gem 'capybara-simulated', github: 'ursm/capybara-simulated'
+  end
   # `mini_racer` is already listed in the upstream Gemfile (Discourse
   # uses it for theme transpilation), so we don't re-declare it here.
   # Pull in QuickJS so `CSIM_JS_ENGINE=quickjs` works too.

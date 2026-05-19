@@ -19,21 +19,6 @@ specific API leak (`page.driver.browser.action`,
 it climbs, something regressed and the right move is a fix or a new
 list entry, not a hand-wave.
 
-| App | JS stack | Browser tests | csim passed | csim unsupported | csim failed | Pass rate |
-|---|---|---:|---:|---:|---:|---:|
-| [Redmine](apps/redmine) | jQuery 3.7 + jQuery UI 1.13 + Stimulus | 122 | 115 | 7 | 0 | 94.3% |
-| [Forem](apps/forem)¹ | Preact 10 + Stimulus + ahoy.js + Crayons | 192 | 191 | 1 | 0 | 99.5% |
-| [Avo](apps/avo) | Stimulus + flatpickr + CodeMirror + TipTap + Algolia autocomplete | 951 | 861 | 90 | 0 | 90.5% |
-
-¹ Forem's untagged system specs run under `:rack_test` (no JS); only
-the `:js`-tagged subset exercises capybara-simulated. The
-browser-tests count here is that subset, not the full `spec/system/`
-(436).
-
-Run-time / speedup columns are deliberately absent until the driver
-implementation settles — they'd churn with every cascade or visibility
-fix.
-
 ## Layout
 
 ```
@@ -94,6 +79,19 @@ Upstream changes would conflict every release, and we want the same
 source tree to still run cuprite / selenium when needed. The RUBYOPT
 preload pattern means switching driver is one env-var flip away,
 nothing in the submodule changes.
+
+## Working against a local capybara-simulated checkout
+
+The Gemfiles default to the `main` branch on GitHub. To point at a
+sibling working copy instead, set `CAPYBARA_SIMULATED_PATH` to the
+path before running:
+
+```sh
+CAPYBARA_SIMULATED_PATH=../capybara-simulated bin/run-discourse
+```
+
+The env var goes through `path:` so live edits to the gem reflect
+immediately — no need to push a commit per iteration.
 
 ## Per-app Ruby
 

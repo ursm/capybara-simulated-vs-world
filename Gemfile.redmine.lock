@@ -1,5 +1,6 @@
-PATH
-  remote: /home/ursm/Code/github.com/ursm/capybara-simulated
+GIT
+  remote: https://github.com/ursm/capybara-simulated.git
+  revision: 0a50949475f7d20fa7f9d058ff2a719c790e170a
   specs:
     capybara-simulated (0.0.7)
       capybara (>= 3.37)

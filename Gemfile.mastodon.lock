@@ -8,6 +8,15 @@ GIT
       jwt (~> 2.0)
 
 GIT
+  remote: https://github.com/ursm/capybara-simulated.git
+  revision: 0a50949475f7d20fa7f9d058ff2a719c790e170a
+  specs:
+    capybara-simulated (0.0.7)
+      capybara (>= 3.37)
+      nokogiri (>= 1.18)
+      rack (>= 2.2)
+
+GIT
   remote: https://github.com/ursm/quickjs.rb.git
   revision: e235500f4d97e247b1147c352e2844573f8c8c6a
   branch: combined-pr-40-and-42
@@ -16,14 +25,6 @@ GIT
     quickjs (0.17.0.pre)
       json
       securerandom
-
-PATH
-  remote: /home/ursm/Code/github.com/ursm/capybara-simulated
-  specs:
-    capybara-simulated (0.0.7)
-      capybara (>= 3.37)
-      nokogiri (>= 1.18)
-      rack (>= 2.2)
 
 GEM
   remote: https://rubygems.org/
