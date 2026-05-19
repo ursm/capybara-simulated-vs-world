@@ -9,7 +9,7 @@ GIT
 
 GIT
   remote: https://github.com/ursm/quickjs.rb.git
-  revision: d64b654d0d89af09a735d7396c3a8367cf98c230
+  revision: e235500f4d97e247b1147c352e2844573f8c8c6a
   branch: combined-pr-40-and-42
   submodules: true
   specs:

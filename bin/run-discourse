@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Run Discourse's RSpec system suite through capybara-simulated. Args
+# after the first are passed to `bin/rspec`.
+#
+#   bin/run-discourse
+#   bin/run-discourse spec/system/about_page_spec.rb
+#   bin/run-discourse spec/system/about_page_spec.rb:42
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+APP="$ROOT/apps/discourse"
+
+cd "$APP"
+
+# Discourse pins `ruby "~> 3.4"`; mise's prebuilt 3.4.x line works.
+RUBY_VERSION=3.4.6
+NODE_VERSION=24.15.0
+
+if command -v mise >/dev/null 2>&1; then
+  ruby_wrap() { mise exec "ruby@$RUBY_VERSION" -- "$@"; }
+  node_wrap() { mise exec "node@$NODE_VERSION" -- "$@"; }
+else
+  ruby_wrap() { "$@"; }
+  node_wrap() { "$@"; }
+fi
+
+# Point Bundler at our wrapper Gemfile *before* any `bundle exec`
+# step (asset build, rspec) so the upstream gem set + capybara-simulated
+# is what gets activated. Without this the asset build picks up the
+# ambient capybara-simulated dev Gemfile, which pins different openssl /
+# nokogiri versions and crashes "already activated" mid-precompile.
+export BUNDLE_GEMFILE="$ROOT/Gemfile.discourse"
+export CSIM_DRIVER="${CSIM_DRIVER:-simulated}"
+export CSIM_EXPECTED_FAILURES="${CSIM_EXPECTED_FAILURES-$ROOT/lists/discourse.yml}"
+
+# Discourse's `config/database.yml` reads `DISCOURSE_DEV_DB` /
+# `DISCOURSE_HOSTNAME` from env; default to local postgres so the
+# test DB is reachable.
+export DISCOURSE_HOSTNAME="${DISCOURSE_HOSTNAME:-localhost}"
+
+# Discourse's frontend is an Ember CLI app under `app/assets/javascripts/discourse`
+# plus several workspace packages; pnpm installs / builds them. Run once
+# on first invocation; the sentinel skips next time.
+if [ ! -e tmp/csim-assets-built ]; then
+  echo "==> Discourse JS bundle not built yet; running pnpm install + asset build (one-shot)"
+  node_wrap corepack enable
+  node_wrap corepack pnpm install --frozen-lockfile
+  RAILS_ENV=test ruby_wrap bundle exec rake assets:precompile
+  mkdir -p tmp && touch tmp/csim-assets-built
+fi
+
+# RUBYOPT only after the asset build so yarn-driven Ruby subshells
+# (tailwindcss-rails etc.) don't get csim_rspec wired against their
+# ambient Bundler.setup.
+export RUBYOPT="-r$ROOT/support/csim_rspec.rb ${RUBYOPT:-}"
+
+# Discourse's before-each calls `driven_by(:playwright_chrome)` or
+# `:playwright_mobile_chrome`; csim_rspec's `CsimDrivenBy` override
+# routes both to `:simulated`. Default to system specs.
+if [ "$#" -eq 0 ]; then
+  set -- spec/system
+fi
+
+if command -v mise >/dev/null 2>&1; then
+  exec mise exec "ruby@$RUBY_VERSION" -- bundle exec bin/rspec "$@"
+fi
+exec bundle exec bin/rspec "$@"

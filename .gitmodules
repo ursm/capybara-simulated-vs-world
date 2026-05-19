@@ -10,3 +10,6 @@
 [submodule "apps/mastodon"]
 	path = apps/mastodon
 	url = https://github.com/mastodon/mastodon.git
+[submodule "apps/discourse"]
+	path = apps/discourse
+	url = https://github.com/discourse/discourse.git

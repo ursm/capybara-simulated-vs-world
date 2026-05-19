@@ -36,7 +36,7 @@ module CsimDrivenBy
   # the tests never expected to fire (Datadog mocks, OmniAuth state,
   # etc.). Pass `:rack_test` straight through; only swap the real
   # browsers we'd substitute for.
-  REAL_BROWSER_DRIVERS = %i[selenium selenium_chrome selenium_chrome_headless better_cuprite cuprite apparition playwright].freeze
+  REAL_BROWSER_DRIVERS = %i[selenium selenium_chrome selenium_chrome_headless better_cuprite cuprite apparition playwright playwright_chrome playwright_mobile_chrome].freeze
 
   def driven_by(driver, **options, &block)
     return super unless REAL_BROWSER_DRIVERS.include?(driver)

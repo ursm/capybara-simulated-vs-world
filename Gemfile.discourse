@@ -1,0 +1,24 @@
+# Run Discourse's bundle in *our* gem set: load upstream's Gemfile
+# verbatim, then layer capybara-simulated on top.
+# Activated via `BUNDLE_GEMFILE=Gemfile.discourse`.
+eval_gemfile File.expand_path('apps/discourse/Gemfile', __dir__)
+
+group :test do
+  gem 'capybara-simulated',
+      path: File.expand_path('../capybara-simulated', __dir__)
+  # `mini_racer` is already listed in the upstream Gemfile (Discourse
+  # uses it for theme transpilation), so we don't re-declare it here.
+  # Pull in QuickJS so `CSIM_JS_ENGINE=quickjs` works too.
+  gem 'quickjs', github: 'ursm/quickjs.rb', branch: 'combined-pr-40-and-42', submodules: true
+end
+
+# Stdlib-extracted gems csim_rspec.rb requires defensively. Discourse
+# already lists `csv`; backfill the rest so they're loadable on Ruby
+# 3.4+ where they moved into bundled gems.
+gem 'base64'
+gem 'bigdecimal'
+gem 'drb'
+gem 'logger'
+gem 'mutex_m'
+gem 'observer'
+gem 'ostruct'
