@@ -1,0 +1,23 @@
+# Tests we don't expect capybara-simulated to satisfy. Each entry is
+# `{test:, reason:[, engine:]}`. `test:` is preferred as the RSpec
+# `full_description` (stable across upstream line-number moves) but
+# may also be a `./spec/...rb:LINE` location string or a Regexp
+# matched against either. `engine:` is optional; when set, the entry
+# is honoured only when `CSIM_JS_ENGINE` matches (`v8` or `quickjs`),
+# so engine-divergent tests don't flip-to-FIXED on the other side.
+
+# ── ProseMirror (rich) editor mode ────────────────────────────────
+# `with prosemirror editor` shared context sets
+# `composition_mode: :rich`; ProseMirror replaces the standard
+# `.d-editor-input` textarea with its own contenteditable surface
+# during init. The init chain hits Selection / Range / contenteditable
+# / IME / DOM observers in patterns we don't fully support today
+# (143 failures on the full run, all blocked at composer.focus).
+# Pending dedicated work on Selection API + contenteditable parity;
+# in the meantime the rest of the suite still exercises the simple
+# markdown composer.
+- test: !ruby/regexp '/\AComposer - ProseMirror - /'
+  reason: |
+    ProseMirror rich-editor init fails on our DOM today. Same shape
+    as Trix: needs a full contenteditable + Selection API parity
+    pass we haven't done yet.
