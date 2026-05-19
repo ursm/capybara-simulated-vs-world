@@ -55,6 +55,12 @@ fi
 # ambient Bundler.setup.
 export RUBYOPT="-r$ROOT/support/csim_rspec.rb ${RUBYOPT:-}"
 
+# Discourse triggers a V8 SEGV in mini_racer 0.21.0 (libv8-node 24.12.0.1)
+# under sustained Ember work — the unwinder reads a NULL wasm StackMemory
+# slot. QuickJS isn't affected. Default to QuickJS here until upstream
+# fixes the libv8 issue; override with CSIM_JS_ENGINE=v8 to force V8.
+export CSIM_JS_ENGINE="${CSIM_JS_ENGINE:-quickjs}"
+
 # Discourse's before-each calls `driven_by(:playwright_chrome)` or
 # `:playwright_mobile_chrome`; csim_rspec's `CsimDrivenBy` override
 # routes both to `:simulated`. Default to system specs.
