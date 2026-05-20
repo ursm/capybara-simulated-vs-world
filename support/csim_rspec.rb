@@ -106,6 +106,21 @@ RSpec.configure do |config|
   config.before(:suite) do
     require 'capybara'
     Capybara.javascript_driver = :simulated
+
+    # Discourse / Forem declare `gem 'multi_json'` before `gem 'oj'`,
+    # so Bundler loads MultiJson first and it picks `:json_gem` as its
+    # default adapter. JsonGem's `JSON.dump(hash)` does NOT recurse
+    # into ActiveModelSerializer instances held as Hash values — it
+    # falls back to `.to_s` on unknown classes — so Discourse's
+    # preloaded `currentUser.sidebar_sections[].links` ends up as
+    # `["#<SidebarUrlSerializer:0x...>", ...]` and the community
+    # sidebar section renders empty. Real-browser CI doesn't hit this
+    # because Bundler-with-Bootsnap warms the gem set differently.
+    #
+    # Force the Oj adapter when both gems are loaded — its `dump`
+    # defaults to `use_to_json: true`, so unknown classes route
+    # through AMS's `to_json` and nest correctly.
+    MultiJson.use(:oj) if defined?(::MultiJson) && defined?(::Oj)
   end
 end
 
