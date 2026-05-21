@@ -1,19 +1,10 @@
 GIT
-  remote: https://github.com/ursm/capybara-simulated.git
-  revision: 0a50949475f7d20fa7f9d058ff2a719c790e170a
-  specs:
-    capybara-simulated (0.0.7)
-      capybara (>= 3.37)
-      nokogiri (>= 1.18)
-      rack (>= 2.2)
-
-GIT
   remote: https://github.com/ursm/quickjs.rb.git
-  revision: d64b654d0d89af09a735d7396c3a8367cf98c230
-  branch: combined-pr-40-and-42
+  revision: 6eb39725491967c58e75d20af442830e4e9cfc19
+  branch: combined-pr-40-and-47
   submodules: true
   specs:
-    quickjs (0.17.0.pre)
+    quickjs (0.17.0)
       json
       securerandom
 
@@ -35,6 +26,13 @@ PATH
       turbo_power (>= 0.6.0)
       view_component (>= 3.7.0)
       zeitwerk (>= 2.6.12)
+
+PATH
+  remote: /home/ursm/Code/github.com/ursm/capybara-simulated
+  specs:
+    capybara-simulated (0.0.7)
+      capybara (>= 3.37)
+      rack (>= 2.2)
 
 PATH
   remote: apps/avo/pluggy
@@ -1020,7 +1018,7 @@ CHECKSUMS
   psych (3.3.4) sha256=f0aae8574d0c86b711472e6a57cc036655e2549f02390ca7266f3b6d1814d1a0
   public_suffix (7.0.5) sha256=1a8bb08f1bbea19228d3bed6e5ed908d1cb4f7c2726d18bd9cadf60bc676f623
   puma (6.6.1) sha256=b9b56e4a4ea75d1bfa6d9e1972ee2c9f43d0883f011826d914e8e37b3694ea1e
-  quickjs (0.17.0.pre)
+  quickjs (0.17.0)
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rack (3.2.6) sha256=5ed78e1f73b2e25679bec7d45ee2d4483cc4146eb1be0264fc4d94cb5ef212c2
   rack-session (2.1.2) sha256=595434f8c0c3473ae7d7ac56ecda6cc6dfd9d37c0b2b5255330aa1576967ffe8
