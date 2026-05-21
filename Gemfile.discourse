@@ -1,7 +1,16 @@
 # Run Discourse's bundle in *our* gem set: load upstream's Gemfile
 # verbatim, then layer capybara-simulated on top.
 # Activated via `BUNDLE_GEMFILE=Gemfile.discourse`.
-eval_gemfile File.expand_path('apps/discourse/Gemfile', __dir__)
+# Discourse upstream declares `gem "mini_racer"` (line 105 of its
+# Gemfile). To test the PR #416 branch (Sam Saffron's
+# `fix-single-threaded-v8-thread`, rubyjs/mini_racer#416) we need to
+# override the source. Bundler disallows re-declaring the gem with a
+# different source, so read the upstream Gemfile and skip its
+# mini_racer line before eval'ing the rest.
+discourse_gemfile = File.expand_path('apps/discourse/Gemfile', __dir__)
+discourse_gemfile_body =
+  File.read(discourse_gemfile).gsub(/^gem ["']mini_racer["'].*$/, '# mini_racer redeclared in vs-world Gemfile')
+eval discourse_gemfile_body, binding, discourse_gemfile
 
 group :test do
   if (csim_path = ENV['CAPYBARA_SIMULATED_PATH'])
@@ -9,8 +18,10 @@ group :test do
   else
     gem 'capybara-simulated', github: 'ursm/capybara-simulated'
   end
-  # `mini_racer` is already listed in the upstream Gemfile (Discourse
-  # uses it for theme transpilation), so we don't re-declare it here.
+  # Sam Saffron's PR #416 branch — single-threaded V8 dispatches now
+  # run on a reusable runner thread instead of the Ruby caller thread,
+  # which fixes the `wasm::StackMemory::jslimit()` SEGV (#415).
+  gem 'mini_racer', github: 'sam-saffron-jarvis/mini_racer', branch: 'fix-single-threaded-v8-thread'
   # Pull in QuickJS so `CSIM_JS_ENGINE=quickjs` works too.
   gem 'quickjs', github: 'ursm/quickjs.rb', branch: 'combined-pr-40-and-47', submodules: true
 end
