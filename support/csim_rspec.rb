@@ -121,6 +121,89 @@ RSpec.configure do |config|
     # defaults to `use_to_json: true`, so unknown classes route
     # through AMS's `to_json` and nest correctly.
     MultiJson.use(:oj) if defined?(::MultiJson) && defined?(::Oj)
+
+    # Discourse's spec/support/system_helpers.rb defines `locator(sel)`
+    # as a thin pass-through to `page.driver.with_playwright_page { |p|
+    # p.locator(sel) }`. Our driver's `with_playwright_page` is a
+    # graceful no-op (no yield), so the helper returns nil — and the
+    # select-kit page object then dereferences `expanded_component
+    # .locator(".select-kit-row[...]").click`, hitting `NoMethodError
+    # 'locator' for nil`. Re-implement the helper against Capybara so
+    # the same Playwright-shaped call sites work under the simulated
+    # driver. Only the lazy `Locator` surface select-kit / form-kit /
+    # date-picker call (`click`, `fill`, `first`, `count`, `press`,
+    # `text_content`, chained `locator(child)`) is shimmed — pages that
+    # reach for CDP / context APIs still take the `with_playwright_page
+    # = no-op` path and skip out.
+    if defined?(::SystemHelpers)
+      Capybara::Simulated.send(:remove_const, :Locator) if Capybara::Simulated.const_defined?(:Locator, false)
+      Capybara::Simulated.const_set(:Locator, Class.new {
+        def initialize(scope, selector)
+          @scope    = scope
+          @selector = selector
+        end
+
+        def locator(child)      = self.class.new(self, child)
+        def click               = node.click
+        def fill(value)         = node.set(value)
+        def hover               = node.hover
+        def first               = self
+        def count               = nodes.count
+        def press(key)          = node.send_keys(translate_key(key))
+        def text_content        = node.text
+        def visible?            = node.visible?
+        def disabled?           = node.disabled?
+        def get_attribute(name) = node[name]
+        def all                 = nodes
+
+        private
+
+        def node
+          base.find(@selector, visible: :all)
+        end
+
+        def nodes
+          base.all(@selector, visible: :all)
+        end
+
+        def base
+          @scope.is_a?(self.class) ? @scope.send(:node) : @scope
+        end
+
+        def translate_key(key)
+          case key.to_s
+          when 'Escape' then :escape
+          when 'Enter'  then :enter
+          when 'Tab'    then :tab
+          when 'Space'  then :space
+          when 'ArrowDown'  then :down
+          when 'ArrowUp'    then :up
+          when 'ArrowLeft'  then :left
+          when 'ArrowRight' then :right
+          when 'Backspace'  then :backspace
+          else key.to_s
+          end
+        end
+      })
+
+      # Playwright `Locator#all` returns an array of single-element
+      # locators; each supports `get_attribute(name)` / `text_content`
+      # / `click`. Capybara's `Node::Element#all` already returns an
+      # array — alias the two read accessors so Discourse's
+      # `.all.map { |row| row.get_attribute(...) }` pattern works
+      # without further wrapping.
+      Capybara::Node::Element.class_eval do
+        alias_method :get_attribute, :[] unless method_defined?(:get_attribute)
+        alias_method :text_content,  :text unless method_defined?(:text_content)
+      end
+
+      ::SystemHelpers.module_eval do
+        remove_method(:locator) if instance_method(:locator).owner == self rescue nil
+        define_method(:locator) do |selector, scope = nil|
+          Capybara::Simulated::Locator.new(scope || page, selector)
+        end
+      end
+    end
   end
 end
 
