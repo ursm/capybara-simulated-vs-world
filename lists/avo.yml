@@ -98,16 +98,16 @@
 
 # CodeMirror tests that exercise the contenteditable read-back
 # (`:47` "filled code editor", `:71` "displays the projects custom_css")
-# now pass via the per-char input pipeline (commit f6e4553) — the
-# remaining failures all require typing-into-the-CodeMirror-widget,
-# which routes through CodeMirror's measurement-based selection.
-- test: "CodeField without value edit change the projects custom_css code"
-  reason: "CodeMirror typing requires layout-engine cursor measurement"
+# now pass via the per-char input pipeline (commit f6e4553). Two more
+# (`CodeField without value` and `ResourceSidebars allow fields …`)
+# started passing once the click hit-test approximation retargets a
+# click on the `.CodeMirror` wrapper to the inner focusable textarea
+# — capybara's `find('.CodeMirror').click` then focuses the hidden
+# `<textarea>` and subsequent `type` keystrokes land where CodeMirror
+# expects them.
 - test: "CodeField with regular value edit change the projects custom_css code to another value"
   reason: "CodeMirror typing requires layout-engine cursor measurement"
 - test: "CodeField with pretty_generated option for a JSON code field correctly formats JSON code on create / edit and displays it in a pretty way on the show page"
-  reason: "CodeMirror typing requires layout-engine cursor measurement"
-- test: "ResourceSidebars allow fields to be edited on sidebar"
   reason: "CodeMirror typing requires layout-engine cursor measurement"
 
 # All Tagify cluster tests now pass — keyboard-default-action
