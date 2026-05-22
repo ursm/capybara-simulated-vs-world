@@ -21,3 +21,20 @@
     ProseMirror rich-editor init fails on our DOM today. Same shape
     as Trix: needs a full contenteditable + Selection API parity
     pass we haven't done yet.
+
+# ── Webpack-chunk dynamic imports ─────────────────────────────────
+# Discourse's frontend is fully chunked via webpack — every route /
+# feature lives behind a `chunk.<hash>.d41d8cd9.js` file fetched on
+# demand by webpack's runtime when an `import(...)` resolves. Our
+# bridge's `__csim_dynamicImport` resolves bare specifiers against
+# the import map but doesn't know how to make webpack's chunk
+# loader fetch and parse a chunk file. Features that live in a
+# split chunk (dev-tools, table-builder, security-keys / passkeys,
+# admin form templates' object editor) can't initialize. Block via
+# regex so unrelated upstream renames don't drift the entry.
+- test: !ruby/regexp '/\ADiscourse dev tools /'
+  reason: |
+    Dev-tools entrypoint is a webpack split chunk
+    (`discourse/static/dev-tools/entrypoint`); `enableDevTools()` →
+    reload → `import(...)` chain stalls at chunk fetch. Needs a
+    webpack chunk-loader shim in the bridge.

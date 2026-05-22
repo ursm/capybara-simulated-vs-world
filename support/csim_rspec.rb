@@ -53,10 +53,22 @@ module CsimDrivenBy
     ].compact.first
     Capybara.save_path = Object.const_get(download_const).to_s if download_const
 
+    # Discourse tags `describe "...", mobile: true` so its rails_helper
+    # asks for `:playwright_mobile_chrome` — a driver registered with
+    # `viewport: { width: 390, height: 664 }`. Both desktop and mobile
+    # route through us to `:simulated`, so without this hint the
+    # viewport stays 1024×768 and `matchMedia('(max-width: 700px)')`-
+    # shaped sidebar / hamburger branches never trip. The simulated
+    # driver picks it up from Capybara::Simulated.next_driver_viewport
+    # when its Capybara.register_driver block fires.
+    Capybara::Simulated.next_driver_viewport = MOBILE_DRIVER_VIEWPORTS[driver]
+
     # Important: return the result of `super` so rspec-rails'
     # `driven_by(...).tap(&:use)` can chain off the registration.
     super(:simulated)
   end
+
+  MOBILE_DRIVER_VIEWPORTS = {playwright_mobile_chrome: [390, 664]}.freeze
 end
 ActionDispatch::SystemTestCase.singleton_class.prepend(CsimDrivenBy)
 
@@ -106,6 +118,20 @@ RSpec.configure do |config|
   config.before(:suite) do
     require 'capybara'
     Capybara.javascript_driver = :simulated
+
+    # `capybara/rails` (required by Discourse's rails_helper.rb)
+    # assigns `Capybara.app` to a `Rack::URLMap` (the return value of
+    # `Rack::Builder#to_app`). Rails' `system_test_case.rb` re-runs
+    # `start_application` to set it back to a `Rack::Builder` — but
+    # only on first load, and we load `system_test_case` ourselves
+    # early (to prepend CsimDrivenBy), so the second load is a no-op
+    # and Capybara.app stays as the URLMap. Discourse's
+    # `set_subfolder` helper calls `Capybara.app.map(...)`, which only
+    # works on a Builder. Re-run start_application here so the helper
+    # works under simulated like it does under real-browser CI.
+    if defined?(::ActionDispatch::SystemTestCase) && Capybara.app.is_a?(::Rack::URLMap)
+      ::ActionDispatch::SystemTestCase.start_application
+    end
 
     # Discourse / Forem declare `gem 'multi_json'` before `gem 'oj'`,
     # so Bundler loads MultiJson first and it picks `:json_gem` as its
