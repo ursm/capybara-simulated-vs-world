@@ -42,11 +42,25 @@ export DISCOURSE_HOSTNAME="${DISCOURSE_HOSTNAME:-localhost}"
 # Discourse's frontend is an Ember CLI app under `app/assets/javascripts/discourse`
 # plus several workspace packages; pnpm installs / builds them. Run once
 # on first invocation; the sentinel skips next time.
+#
+# Upstream `lib/tasks/assets.rake` hardcodes `EMBER_ENV=production` for
+# the JS build, which strips `data-test-*` attributes via
+# ember-test-selectors. Discourse system specs query those selectors
+# (`[data-test-email-log-row-id]` etc.), so we run the JS build
+# directly with `EMBER_ENV=test` *first*, then call rake with
+# `SKIP_EMBER_CLI_COMPILE=1` so it picks up the prebuilt JS and only
+# does the Rails-side CSS / Sprockets work.
 if [ ! -e tmp/csim-assets-built ]; then
   echo "==> Discourse JS bundle not built yet; running pnpm install + asset build (one-shot)"
   node_wrap corepack enable
   node_wrap corepack pnpm install --frozen-lockfile
-  RAILS_ENV=test ruby_wrap bundle exec rake assets:precompile
+  # Run the Ember build directly with EMBER_ENV=test so
+  # ember-test-selectors preserves `data-test-*` attributes — upstream
+  # `lib/tasks/assets.rake` hardcodes production. Then call rake with
+  # `SKIP_EMBER_CLI_COMPILE=1` so the Rails-side CSS / Sprockets work
+  # runs over the test-env JS dist we just produced.
+  ( cd frontend/discourse && EMBER_ENV=test CI=1 node_wrap pnpm ember build )
+  RAILS_ENV=test SKIP_EMBER_CLI_COMPILE=1 ruby_wrap bundle exec rake assets:precompile
   mkdir -p tmp && touch tmp/csim-assets-built
 fi
 
