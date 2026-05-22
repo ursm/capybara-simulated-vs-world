@@ -54,21 +54,31 @@ module CsimDrivenBy
     Capybara.save_path = Object.const_get(download_const).to_s if download_const
 
     # Discourse tags `describe "...", mobile: true` so its rails_helper
-    # asks for `:playwright_mobile_chrome` — a driver registered with
-    # `viewport: { width: 390, height: 664 }`. Both desktop and mobile
-    # route through us to `:simulated`, so without this hint the
-    # viewport stays 1024×768 and `matchMedia('(max-width: 700px)')`-
-    # shaped sidebar / hamburger branches never trip. The simulated
-    # driver picks it up from Capybara::Simulated.next_driver_viewport
-    # when its Capybara.register_driver block fires.
-    Capybara::Simulated.next_driver_viewport = MOBILE_DRIVER_VIEWPORTS[driver]
+    # asks for `:playwright_mobile_chrome` — registered with both an
+    # iPhone viewport and User-Agent. Both signals matter: viewport
+    # drives `matchMedia('(max-width: 700px)')` branches; UA drives
+    # Discourse's server-side rendering when `viewport_based_mobile_
+    # mode = false`. Without UA the latter path renders desktop HTML
+    # despite a 390px viewport, and `.mobile-view` is missing on the
+    # page. Stash both for the simulated driver to pick up on build.
+    if (cfg = MOBILE_DRIVER_CONFIG[driver])
+      Capybara::Simulated.next_driver_viewport   = cfg[:viewport]
+      Capybara::Simulated.next_driver_user_agent = cfg[:user_agent]
+    end
 
     # Important: return the result of `super` so rspec-rails'
     # `driven_by(...).tap(&:use)` can chain off the registration.
     super(:simulated)
   end
 
-  MOBILE_DRIVER_VIEWPORTS = {playwright_mobile_chrome: [390, 664]}.freeze
+  MOBILE_DRIVER_CONFIG = {
+    playwright_mobile_chrome: {
+      viewport:   [390, 664],
+      user_agent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) ' \
+                  'AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 ' \
+                  'Mobile/15E148 Safari/604.1'
+    }
+  }.freeze
 end
 ActionDispatch::SystemTestCase.singleton_class.prepend(CsimDrivenBy)
 
