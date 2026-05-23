@@ -131,6 +131,13 @@ RSpec.configure do |config|
               CSIM_REGEXP_FAILURES.find {|entry| entry[:matcher].match?(desc) || entry[:matcher].match?(loc) }
     next unless matched
     if matched[:skip]
+      # Discourse's `after(:each)` hook does `page.execute_script(...)`
+      # even on skipped examples. Without an explicit current_driver
+      # the hook constructs the host's configured driver (Playwright)
+      # and crashes on the missing Chromium download. Pinning to
+      # `:simulated` keeps the hook's lazy `page` reference on our
+      # in-process driver.
+      Capybara.current_driver = :simulated if defined?(Capybara) && Capybara.drivers.key?(:simulated)
       skip("expected failure (#{matched[:reason]})")
     else
       pending("expected failure (#{matched[:reason]})")
