@@ -7,29 +7,14 @@
 # so engine-divergent tests don't flip-to-FIXED on the other side.
 
 # ── ProseMirror (rich) editor mode ────────────────────────────────
-# `with prosemirror editor` shared context sets
-# `composition_mode: :rich`; ProseMirror replaces the standard
-# `.d-editor-input` textarea with its own contenteditable surface
-# during init. The init chain hits Selection / Range / contenteditable
-# / IME / DOM observers in patterns we don't fully support today.
-# Container-only specs (`Composer - ProseMirror - Container`) pass
-# now that we have full localStorage parity; the editor-body specs
-# (Links, Lists, Tables, Marks, …) still need a contenteditable +
-# Selection API parity pass.
-- test: !ruby/regexp '/\AComposer - ProseMirror - (?!Container)/'
-  reason: |
-    ProseMirror rich-editor init fails on our DOM today. Same shape
-    as Trix: needs a full contenteditable + Selection API parity
-    pass we haven't done yet. `Container` subset doesn't drive the
-    editor body and works.
-# Three Container specs open the editor body and hit the same
-# blocker:
-- test: 'Composer - ProseMirror - Container saves the user''s rich editor preference and remembers it when reopening the composer'
-  reason: 'Opens the ProseMirror editor — same blocker as the editor-body specs.'
-- test: 'Composer - ProseMirror - Container saves the old keyValueStore editor preference to the database'
-  reason: 'Opens the ProseMirror editor.'
-- test: 'Composer - ProseMirror - Container handles uploads and disables the editor toggle while uploading'
-  reason: 'Opens the ProseMirror editor.'
+# `with prosemirror editor` shared context sets composition_mode: :rich;
+# ProseMirror replaces the standard `.d-editor-input` textarea with
+# its own contenteditable surface during init. We have basic init
+# parity now (Image global, contenteditable, Selection API, IME)
+# — most editor-body specs that touch ProseMirror's keyboard /
+# selection / paste paths actually work. Specific specs that still
+# fail are listed individually based on the actual failure surface
+# (see narrow regex / one-off entries when the bg sweep names them).
 
 # ── Layout-engine dependence ──────────────────────────────────────
 # We don't run a layout engine: no `getBoundingClientRect` truths,
