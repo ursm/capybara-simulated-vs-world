@@ -22,3 +22,88 @@
     as Trix: needs a full contenteditable + Selection API parity
     pass we haven't done yet. `Container` subset doesn't drive the
     editor body and works.
+
+# ── Layout-engine dependence ──────────────────────────────────────
+# We don't run a layout engine: no `getBoundingClientRect` truths,
+# no viewport-clip visibility, no scroll positions, no element
+# dimensions. Tests that gate on any of these can't pass here and
+# never will without bringing in a full layout/render pipeline.
+# Each entry below is documented with the layout property it depends
+# on; if Discourse refactors the test to a non-layout signal, the
+# entry should drop.
+
+# Photoswipe lightbox: full image preview overlay positioned with
+# computed dimensions, click-to-close via backdrop coordinates.
+- test: !ruby/regexp '/\ALightbox \| Photoswipe /'
+  reason: |
+    Photoswipe overlay positioning + tap-to-close needs real layout
+    (getBoundingClientRect, getComputedStyle on the dimmed
+    container, click coordinates within image bounds).
+
+# Glimmer Header scroll / size measurements:
+- test: 'Glimmer Header sets header''s height css property'
+  reason: 'Reads header.offsetHeight to set a CSS custom property.'
+- test: 'Glimmer Header mobile topic-info only shows when scrolled down'
+  reason: 'Scroll position drives visibility.'
+- test: 'Glimmer Header mobile topic-info shows when navigating direct to a later post'
+  reason: 'Scroll position drives visibility.'
+- test: 'Glimmer Header mobile topic-info shows when jumping from OP to much later post'
+  reason: 'Scroll position drives visibility.'
+- test: 'Glimmer Header moves focus between tabs using arrow keys'
+  reason: 'Tab visibility depends on horizontal-overflow width.'
+
+# Topic list focus restoration: walks scroll position to refocus the
+# last-clicked topic row after a back navigation.
+- test: !ruby/regexp '/\ATopic list refocusses /'
+  reason: 'Scroll position + element bounds for focus restoration.'
+- test: 'Topic list does not refocus topic when visiting via something other than topic list'
+  reason: 'Same scroll-based focus-restoration mechanism.'
+
+# Post stream / nested view cloaking — cloak/uncloak based on
+# IntersectionObserver against the scroll viewport.
+- test: !ruby/regexp '/\APost stream when scrolling /'
+  reason: 'IntersectionObserver against scroll viewport.'
+- test: !ruby/regexp '/\ANested view cloaking with many root posts /'
+  reason: 'IntersectionObserver against scroll viewport.'
+
+# Welcome banner / Header Search responsiveness — scroll handlers
+# that hide one search element and show another.
+- test: !ruby/regexp '/\AWelcome banner when enabled when using search_(field|icon) search_experience hides /'
+  reason: 'Scroll handler swaps banner ↔ header search visibility.'
+- test: !ruby/regexp '/\AHeader Search - Responsive Behavior /'
+  reason: 'Same scroll + viewport-width responsive swap.'
+
+# Embed mode floating timeline button — appears when the topic
+# footer is below the viewport (scroll position).
+- test: !ruby/regexp '/\AEmbed mode .* floating timeline button|\AEmbed mode .* opens the timeline when clicking the floating timeline/'
+  reason: 'Visibility tied to scroll position relative to footer.'
+
+# Misc single layout-dep specs:
+- test: 'Topic page when triple clicking to select a paragraph select the last paragraph'
+  reason: 'Triple-click word/sentence range needs layout for line wraps.'
+- test: 'capabilities service viewport helpers works'
+  reason: 'Reads getComputedStyle on viewport-bound CSS custom props.'
+- test: 'User preferences | Navigation menu when visiting the user''s preferences page should allow the user to scroll the horizontal navigation menu when window width is narrow'
+  reason: 'Horizontal scroll mechanics.'
+- test: 'Ember route-scroll-manager service scrolls to top when navigating to new routes, and remembers scroll position when going back'
+  reason: 'Scroll position memory.'
+- test: 'Post small actions applies search highlight decorations'
+  reason: 'Highlight position depends on offsetTop measurements.'
+- test: 'Simplified Category Creation General Tab does not show expand toggle for short descriptions'
+  reason: 'Toggle visibility gated on description scrollHeight.'
+- test: 'Composer focuses the reply button when tabbing out of both editor modes'
+  reason: 'Tabbing order through ProseMirror contenteditable.'
+- test: !ruby/regexp '/\AImage Carousel /'
+  reason: 'ProseMirror image carousel needs editor body parity.'
+- test: 'Composer Form Template Validations shows an error when an input doesn''t satisfy the min length expected'
+  reason: 'Tooltip positioned via getBoundingClientRect.'
+- test: 'Network Disconnected NetworkConnectivity service adds class to DOM and displays offline indicator'
+  reason: 'Requires CDP Network.emulateNetworkConditions to flip navigator.onLine.'
+
+# ── PostgreSQL row-lock flakiness ─────────────────────────────────
+# `group_moderator_self_lockout_spec` tests modify the same group
+# row under a transactional fixture; the deadlock surfaces under
+# parallel/repeat runs in any driver. Not specific to capybara-
+# simulated — Discourse's own playwright CI hits this on retry too.
+- test: !ruby/regexp '/\AGroup moderator self-lockout warning /'
+  reason: 'PG row-lock deadlock under repeated test setup, not driver.'
