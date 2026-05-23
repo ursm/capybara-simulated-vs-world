@@ -58,12 +58,15 @@ module CsimDrivenBy
     # iPhone viewport and User-Agent. Both signals matter: viewport
     # drives `matchMedia('(max-width: 700px)')` branches; UA drives
     # Discourse's server-side rendering when `viewport_based_mobile_
-    # mode = false`. Without UA the latter path renders desktop HTML
-    # despite a 390px viewport, and `.mobile-view` is missing on the
-    # page. Stash both for the simulated driver to pick up on build.
+    # mode = false`. Route to a separate `:simulated_mobile` driver
+    # name (registered lazily below) so Capybara's session pool keeps
+    # a dedicated Browser instance with sticky mobile defaults; if we
+    # shared `:simulated` with desktop tests, the pool would reuse
+    # whichever Driver was constructed first and the second-shape
+    # test would see the wrong viewport.
     if (cfg = MOBILE_DRIVER_CONFIG[driver])
-      Capybara::Simulated.next_driver_viewport   = cfg[:viewport]
-      Capybara::Simulated.next_driver_user_agent = cfg[:user_agent]
+      Capybara::Simulated.ensure_mobile_driver_registered(cfg)
+      return super(:simulated_mobile)
     end
 
     # Important: return the result of `super` so rspec-rails'
@@ -81,6 +84,23 @@ module CsimDrivenBy
   }.freeze
 end
 ActionDispatch::SystemTestCase.singleton_class.prepend(CsimDrivenBy)
+
+module Capybara::Simulated
+  class << self
+    def ensure_mobile_driver_registered(cfg)
+      return if @mobile_driver_registered
+      @mobile_driver_registered = true
+      ::Capybara.register_driver :simulated_mobile do |app|
+        ::Capybara::Simulated::Driver.new(
+          app,
+          js_engine:  ENV['CSIM_JS_ENGINE']&.to_sym,
+          viewport:   cfg[:viewport],
+          user_agent: cfg[:user_agent]
+        )
+      end
+    end
+  end
+end
 
 # Expected-failure handling. Same YAML format as csim_minitest.rb's
 # (`{test:, reason:[, engine:][, skip:]}`); `test:` matches against
