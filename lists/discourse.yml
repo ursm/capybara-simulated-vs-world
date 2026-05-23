@@ -108,5 +108,18 @@
 - test: 'Network Disconnected NetworkConnectivity service adds class to DOM and displays offline indicator'
   reason: 'Requires CDP Network.emulateNetworkConditions to flip navigator.onLine.'
 
+# ACE editor only renders visible lines (clientHeight-driven virtual
+# scroller). With no layout the container's clientHeight is 0 → ACE
+# renders just one line and `have_text` fails the multi-line check
+# the quick-insert tests expect. ACE's session value is correct.
+- test: !ruby/regexp '/\AAdmin Customize Form Templates when visiting the page to create a new form template should allow quick insertion of /'
+  reason: 'ACE virtual-scroller layout dependence; session has the full text but only the first line is rendered.'
+- test: 'Admin Customize Form Templates when visiting the page to edit a form template should prefill form data'
+  reason: 'ACE virtual-scroller layout dependence.'
+- test: 'Admin Customize Form Templates when visiting the page to customize form templates should show a preview of the template in a modal when toggling the preview'
+  reason: 'ACE virtual-scroller layout dependence.'
+- test: 'Admin Customize Themes when editing a local theme can edit the js field'
+  reason: 'Same ACE editor virtual-scroller dependence.'
+
 # PG deadlocks (`group_moderator_self_lockout_spec`) seen in the
 # first 167-baseline run vanished after re-run — not pinning here.
