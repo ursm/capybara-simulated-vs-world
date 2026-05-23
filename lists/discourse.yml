@@ -11,30 +11,14 @@
 # `composition_mode: :rich`; ProseMirror replaces the standard
 # `.d-editor-input` textarea with its own contenteditable surface
 # during init. The init chain hits Selection / Range / contenteditable
-# / IME / DOM observers in patterns we don't fully support today
-# (143 failures on the full run, all blocked at composer.focus).
-# Pending dedicated work on Selection API + contenteditable parity;
-# in the meantime the rest of the suite still exercises the simple
-# markdown composer.
-- test: !ruby/regexp '/\AComposer - ProseMirror - /'
+# / IME / DOM observers in patterns we don't fully support today.
+# Container-only specs (`Composer - ProseMirror - Container`) pass
+# now that we have full localStorage parity; the editor-body specs
+# (Links, Lists, Tables, Marks, …) still need a contenteditable +
+# Selection API parity pass.
+- test: !ruby/regexp '/\AComposer - ProseMirror - (?!Container)/'
   reason: |
     ProseMirror rich-editor init fails on our DOM today. Same shape
     as Trix: needs a full contenteditable + Selection API parity
-    pass we haven't done yet.
-
-# ── Webpack-chunk dynamic imports ─────────────────────────────────
-# Discourse's frontend is fully chunked via webpack — every route /
-# feature lives behind a `chunk.<hash>.d41d8cd9.js` file fetched on
-# demand by webpack's runtime when an `import(...)` resolves. Our
-# bridge's `__csim_dynamicImport` resolves bare specifiers against
-# the import map but doesn't know how to make webpack's chunk
-# loader fetch and parse a chunk file. Features that live in a
-# split chunk (dev-tools, table-builder, security-keys / passkeys,
-# admin form templates' object editor) can't initialize. Block via
-# regex so unrelated upstream renames don't drift the entry.
-- test: !ruby/regexp '/\ADiscourse dev tools /'
-  reason: |
-    Dev-tools entrypoint is a webpack split chunk
-    (`discourse/static/dev-tools/entrypoint`); `enableDevTools()` →
-    reload → `import(...)` chain stalls at chunk fetch. Needs a
-    webpack chunk-loader shim in the bridge.
+    pass we haven't done yet. `Container` subset doesn't drive the
+    editor body and works.
