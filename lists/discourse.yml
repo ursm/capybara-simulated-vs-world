@@ -22,6 +22,14 @@
     as Trix: needs a full contenteditable + Selection API parity
     pass we haven't done yet. `Container` subset doesn't drive the
     editor body and works.
+# Three Container specs open the editor body and hit the same
+# blocker:
+- test: 'Composer - ProseMirror - Container saves the user''s rich editor preference and remembers it when reopening the composer'
+  reason: 'Opens the ProseMirror editor — same blocker as the editor-body specs.'
+- test: 'Composer - ProseMirror - Container saves the old keyValueStore editor preference to the database'
+  reason: 'Opens the ProseMirror editor.'
+- test: 'Composer - ProseMirror - Container handles uploads and disables the editor toggle while uploading'
+  reason: 'Opens the ProseMirror editor.'
 
 # ── Layout-engine dependence ──────────────────────────────────────
 # We don't run a layout engine: no `getBoundingClientRect` truths,
