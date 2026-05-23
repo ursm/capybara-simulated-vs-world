@@ -137,7 +137,7 @@ RSpec.configure do |config|
       # and crashes on the missing Chromium download. Pinning to
       # `:simulated` keeps the hook's lazy `page` reference on our
       # in-process driver.
-      Capybara.current_driver = :simulated if defined?(Capybara) && Capybara.drivers.key?(:simulated)
+      Capybara.current_driver = :simulated if Capybara.drivers.key?(:simulated)
       skip("expected failure (#{matched[:reason]})")
     else
       pending("expected failure (#{matched[:reason]})")
