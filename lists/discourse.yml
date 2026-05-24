@@ -18,24 +18,47 @@
 # a longer per-call timeout budget or lighter ProseMirror init. Mark
 # editor-body specs as expected-failing until that's done; Container
 # subset that doesn't open the rich editor stays unconstrained.
-- test: !ruby/regexp '/\AComposer - ProseMirror - (?!Container)/'
-  reason: |
-    ProseMirror editor body opens after history_go-defer + Image
-    fix, but a subset of these specs trigger a Ruby-side polling
-    loop that doesn't yield to Capybara's per-find timeout — they'd
-    stall the whole suite at one example. The per-example
-    `Timeout::timeout` in csim_rspec.rb's around-hook converts the
-    stall into a per-test Timeout::Error, so we can stay on
-    `pending` (body runs, FIXED-detection retained when a spec
-    actually passes).
-# Three Container specs open the editor body and hit the same
-# blocker:
-- test: 'Composer - ProseMirror - Container saves the user''s rich editor preference and remembers it when reopening the composer'
-  reason: 'Opens the ProseMirror editor — same Ruby-side stall pattern.'
-- test: 'Composer - ProseMirror - Container saves the old keyValueStore editor preference to the database'
-  reason: 'Opens the ProseMirror editor.'
+# Remaining real PM failures after the contenteditable
+# caret-move + hit-test no-retarget fixes. Each entry is a specific
+# test that either depends on real layout (toolbar positioning,
+# image scaling) or hits a remaining driver gap (paste-of-multiple-
+# data-URIs, ordered-list `n.` input rule, code-block split round
+# trips). The big catch-all regex was removed because the editor
+# now boots and most specs pass.
+- test: 'Composer - ProseMirror - Code formatting code formatting with round-trip conversion converts multiple paragraphs to code block and back preserving structure'
+  reason: 'Round-trip code-block ↔ paragraph split loses trailing soft-break spaces; needs softbreak whitespace fidelity.'
+- test: 'Composer - ProseMirror - Code formatting code formatting when inside code block converts code block back to single paragraph'
+  reason: 'Same softbreak-whitespace gap as the round-trip case.'
 - test: 'Composer - ProseMirror - Container handles uploads and disables the editor toggle while uploading'
-  reason: 'Opens the ProseMirror editor.'
+  reason: 'In-progress-upload UI gated on upload-progress events that the test infra does not emit incrementally.'
+- test: 'Composer - ProseMirror - Input rules supports n. to create an ordered list'
+  reason: 'Numbered-list input rule reads cursor column position that needs layout.'
+- test: 'Composer - ProseMirror - Pasting content handles multiple data URI images pasted simultaneously'
+  reason: 'Multiple data-URI clipboard payload needs an async upload chain we do not emulate.'
+- test: 'Composer - ProseMirror - Pasting content respects existing marks when pasting a url over a selection'
+  reason: 'Selection-over-url paste preserves marks via DOM range-replace branches we have not wired.'
+- test: 'Composer - ProseMirror - Pasting content ignores text/html content if Files are present'
+  reason: 'Paste discrimination between text/html and clipboard Files needs richer DataTransfer ordering.'
+- test: 'Composer - ProseMirror - Onebox Toolbar with show preview on link toolbar re-oneboxes a full onebox when clicking show preview'
+  reason: 'Link-toolbar show-preview button positioning needs layout.'
+- test: 'Composer - ProseMirror - Onebox Toolbar with show preview on link toolbar re-oneboxes an inline onebox when clicking show preview'
+  reason: 'Same as above.'
+- test: 'Composer - ProseMirror - Onebox Toolbar with inline onebox removes inline preview and converts to plain link'
+  reason: 'Inline-onebox toolbar interactions depend on cursor-position layout.'
+- test: 'Composer - ProseMirror - Onebox Toolbar with inline onebox shows toolbar when selecting an inline onebox'
+  reason: 'Toolbar visibility derived from getBoundingClientRect of the selection.'
+- test: 'Composer - ProseMirror - Toolbar heading toolbar updates toolbar active state and icon based on current heading level'
+  reason: 'Toolbar floating panel selection-rect positioning needs layout.'
+- test: 'Composer - ProseMirror - Toolbar toolbar state updates updates the toolbar state following the cursor position'
+  reason: 'Same — cursor-rect derived UI.'
+- test: 'Composer - ProseMirror - Images image lightbox navigates between images using prev/next buttons'
+  reason: 'Photoswipe lightbox navigation needs real layout (see Photoswipe entries below).'
+- test: 'Composer - ProseMirror - Images image toolbar sets width and height attributes when scaling external images'
+  reason: 'Image scale-handles read getBoundingClientRect on the IMG.'
+- test: 'Composer - ProseMirror - Keyboard shortcuts supports Ctrl + M to toggle between rich and markdown editors'
+  reason: 'Rich↔markdown editor toggle re-mounts the composer; remount sequencing has a remaining driver gap.'
+- test: 'Composer - ProseMirror - Keyboard shortcuts adds a new paragraph when ENTER is pressed after an image'
+  reason: 'Image-trailing Enter relies on PM-side rAF that does not drain before assertion.'
 
 # ── Layout-engine dependence ──────────────────────────────────────
 # We don't run a layout engine: no `getBoundingClientRect` truths,
