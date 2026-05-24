@@ -105,10 +105,6 @@
 # — capybara's `find('.CodeMirror').click` then focuses the hidden
 # `<textarea>` and subsequent `type` keystrokes land where CodeMirror
 # expects them.
-- test: "CodeField with regular value edit change the projects custom_css code to another value"
-  reason: "CodeMirror typing requires layout-engine cursor measurement"
-- test: "CodeField with pretty_generated option for a JSON code field correctly formats JSON code on create / edit and displays it in a pretty way on the show page"
-  reason: "CodeMirror typing requires layout-engine cursor measurement"
 
 # All Tagify cluster tests now pass — keyboard-default-action
 # deferral via setTimeout(0) lets Tagify's `beforeKeyDown(e).then(()
