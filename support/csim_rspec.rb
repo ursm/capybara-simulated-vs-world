@@ -144,6 +144,24 @@ RSpec.configure do |config|
     end
   end
 
+  # Per-example wall-clock cap. Capybara's own `default_max_wait_time`
+  # bounds any single `find` / `has_?`, but a test that retries in a
+  # tight loop (or hits a Ruby-side polling chain that doesn't yield
+  # to Capybara's timeout) can stall the whole suite at one example.
+  # Wrapping the example body in `Timeout::timeout` converts that
+  # stall into a per-example failure so the run still completes.
+  # `CSIM_EXAMPLE_TIMEOUT_S=0` disables; default 120 s is well above
+  # the slowest legitimate Discourse system spec.
+  require 'timeout'
+  EXAMPLE_TIMEOUT_S = (ENV['CSIM_EXAMPLE_TIMEOUT_S'] || '120').to_i
+  if EXAMPLE_TIMEOUT_S > 0
+    config.around(:each) do |example|
+      Timeout.timeout(EXAMPLE_TIMEOUT_S, nil, "csim example timeout after #{EXAMPLE_TIMEOUT_S}s") do
+        example.run
+      end
+    end
+  end
+
   # Mastodon's `spec/support/capybara.rb` sets
   # `Capybara.javascript_driver = :playwright` at load time, and the
   # first `before(:each, :js)` hook that touches

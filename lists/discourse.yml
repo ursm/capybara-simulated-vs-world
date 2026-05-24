@@ -19,27 +19,23 @@
 # editor-body specs as expected-failing until that's done; Container
 # subset that doesn't open the rich editor stays unconstrained.
 - test: !ruby/regexp '/\AComposer - ProseMirror - (?!Container)/'
-  skip: true
   reason: |
-    ProseMirror editor body opens but a subset of its specs trigger
-    a Ruby-side hang in the full suite (post-history_go-defer fix
-    that eliminated the prior ScriptTerminatedError class). The
-    hang is in a Ruby polling loop or thread-wait that mini_racer's
-    Context-level timeout doesn't reach (verified: enabling
-    CSIM_V8_CALL_TIMEOUT_MS=60000 doesn't prevent the futex_do_wait
-    stall). Skip body execution until per-example Ruby Timeout is
-    wired up; FIXED-detection is lost on these entries until then.
+    ProseMirror editor body opens after history_go-defer + Image
+    fix, but a subset of these specs trigger a Ruby-side polling
+    loop that doesn't yield to Capybara's per-find timeout — they'd
+    stall the whole suite at one example. The per-example
+    `Timeout::timeout` in csim_rspec.rb's around-hook converts the
+    stall into a per-test Timeout::Error, so we can stay on
+    `pending` (body runs, FIXED-detection retained when a spec
+    actually passes).
 # Three Container specs open the editor body and hit the same
 # blocker:
 - test: 'Composer - ProseMirror - Container saves the user''s rich editor preference and remembers it when reopening the composer'
-  skip: true
-  reason: 'Opens the ProseMirror editor — same hang risk.'
+  reason: 'Opens the ProseMirror editor — same Ruby-side stall pattern.'
 - test: 'Composer - ProseMirror - Container saves the old keyValueStore editor preference to the database'
-  skip: true
-  reason: 'Opens the ProseMirror editor — same hang risk.'
+  reason: 'Opens the ProseMirror editor.'
 - test: 'Composer - ProseMirror - Container handles uploads and disables the editor toggle while uploading'
-  skip: true
-  reason: 'Opens the ProseMirror editor — same hang risk.'
+  reason: 'Opens the ProseMirror editor.'
 
 # ── Layout-engine dependence ──────────────────────────────────────
 # We don't run a layout engine: no `getBoundingClientRect` truths,
