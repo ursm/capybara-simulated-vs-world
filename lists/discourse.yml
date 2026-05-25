@@ -96,7 +96,7 @@
 # that hide one search element and show another.
 - test: !ruby/regexp '/\AWelcome banner when enabled when using search_(field|icon) search_experience hides /'
   reason: 'Scroll handler swaps banner ↔ header search visibility.'
-- test: !ruby/regexp '/\AHeader Search - Responsive Behavior when welcome banner is enabled appears (based on scroll|when search banner is not enabled & shows)/'
+- test: !ruby/regexp '/\AHeader Search - Responsive Behavior when welcome banner is enabled appears based on scroll/'
   reason: 'Same scroll + viewport-width responsive swap.'
 
 # Embed mode floating timeline button — appears when the topic
