@@ -25,10 +25,8 @@
 # data-URIs, ordered-list `n.` input rule, code-block split round
 # trips). The big catch-all regex was removed because the editor
 # now boots and most specs pass.
-- test: 'Composer - ProseMirror - Code formatting code formatting with round-trip conversion converts multiple paragraphs to code block and back preserving structure'
-  reason: 'Round-trip code-block ↔ paragraph split loses trailing soft-break spaces; needs softbreak whitespace fidelity.'
 - test: 'Composer - ProseMirror - Code formatting code formatting when inside code block converts code block back to single paragraph'
-  reason: 'Same softbreak-whitespace gap as the round-trip case.'
+  reason: 'Markdown code-fence ```…``` typing leaves the closing ``` inside the code block instead of closing it; the subsequent toggle-back-to-paragraph no-ops. Separate input-rule gap, not the round-trip whitespace issue.'
 - test: 'Composer - ProseMirror - Container handles uploads and disables the editor toggle while uploading'
   reason: 'In-progress-upload UI gated on upload-progress events that the test infra does not emit incrementally.'
 - test: 'Composer - ProseMirror - Onebox Toolbar with show preview on link toolbar re-oneboxes a full onebox when clicking show preview'
