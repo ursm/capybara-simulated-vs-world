@@ -160,10 +160,3 @@
   reason: 'Same scroll-driven IntersectionObserver dependence.'
 
 
-# Topic-list j-key "first visible" navigation reads `getBoundingClientRect`
-# to pick the topmost in-viewport row; with no layout every rect is zero,
-# so `_moveSelection` falls back to the LAST article and the subsequent
-# `x` toggle checks the wrong row.
-- test: 'Topic bulk select when closing works with keyboard shortcuts'
-  reason: 'j-shortcut "first visible row" needs getBoundingClientRect; without layout the fallback selects the last article instead of row 1.'
-
