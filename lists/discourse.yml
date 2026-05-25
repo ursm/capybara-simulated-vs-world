@@ -192,9 +192,3 @@
 - test: 'Uploading files in the composer when video thumbnails are enabled generates a topic preview thumbnail from the video'
   reason: 'Same — video frame decode.'
 
-# media-optimization-worker pipes uploads through a Web Worker that
-# uses WASM-backed mozjpeg / oxipng to re-encode + resize images.
-# Our Worker isolate (worker_per_isolate memory) doesn't ship those
-# codecs and the worker's `Imager` global doesn't initialise.
-- test: !ruby/regexp '/\AComposer image optimization for uploads using media-optimization-worker (jpeg|png) images/'
-  reason: 'media-optimization-worker needs WASM mozjpeg/oxipng codecs in the Worker isolate.'
