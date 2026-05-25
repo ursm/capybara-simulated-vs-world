@@ -149,18 +149,22 @@
 # PG deadlocks (`group_moderator_self_lockout_spec`) seen in the
 # first 167-baseline run vanished after re-run — not pinning here.
 
-# Welcome-banner SearchMenu (only — `search_icon`/`search_field`
-# variants pass): Slash-to-open works; Escape-to-close stalls
-# because the SearchMenu's `@tracked menuPanelOpen = false`
-# mutation inside `close()` doesn't re-render under Glimmer in our
-# env (verified: keydown reaches input, blur fires, but the
-# conditional MenuPanel stays in DOM). Search-icon's standalone
-# SearchMenu instance does close correctly. Needs Glimmer runloop
-# investigation we haven't done.
+# Search-menu slash shortcut focus race: `/` correctly reaches ItsATrap
+# → toggleSearch → `header:keyboard-trigger` → HeaderSearch's
+# focusSearchInput focuses `#header-search-input`. But the same trigger
+# also fires header.gjs's `toggleSearchMenu` (sets `search.visible =
+# true`), which schedules a rerender that mounts SearchMenuWrapper.
+# Its did-insert auto-focuses `#icon-search-input`, overriding the
+# earlier focus. In real Chrome the rerender lands on the next
+# animation frame *after* Capybara's focus assertion polls, so the
+# autofocus race is invisible. We treat rAF as a microtask
+# (`feedback_raf_as_microtask`) to unblock Turbo, so the autofocus
+# fires synchronously and always wins — proper fix needs a deferred
+# rAF without regressing Turbo.
 - test: !ruby/regexp '/\ASearch \| Shortcuts for variations of search input when search_experience is search_(field|icon) when enable_welcome_banner is true /'
-  reason: 'Welcome-banner SearchMenu close on Escape stalls; tracked mutation does not re-render.'
+  reason: 'rAF-as-microtask: SearchMenuWrapper did-insert autofocus runs before Capybara polls, overriding focusSearchInput.'
 - test: 'Search | Shortcuts for variations of search input when search_experience is search_field when enable_welcome_banner is false displays and focuses header search when / is pressed and hides it when Escape is pressed'
-  reason: 'Focuses the wrong search input (icon variant gets focused instead of header) — Discourse `search.siteSettings.search_experience` returns the default rather than the per-test theme override.'
+  reason: 'Same rAF-as-microtask autofocus race as above.'
 
 
 # Topic-list j-key "first visible" navigation reads `getBoundingClientRect`
