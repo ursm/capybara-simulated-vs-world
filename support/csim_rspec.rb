@@ -297,7 +297,7 @@ RSpec.configure do |config|
       # attestation, ECDSA-signed assertion — so security-key /
       # passkey flows can run without a real WebAuthn-capable browser.
       if defined?(::PageObjects::CDP)
-        slow_upload_shim = Module.new {
+        cdp_shim = Module.new {
           def with_slow_upload
             page.execute_script('globalThis.__csimSlowUploadActive = true')
             begin
@@ -306,8 +306,17 @@ RSpec.configure do |config|
               page.execute_script('globalThis.__csimSlowUploadActive = false; globalThis.__csimDrainSlowUploads();')
             end
           end
+
+          def with_network_disconnected
+            page.execute_script('__csimSetOnline(false)')
+            begin
+              yield
+            ensure
+              page.execute_script('__csimSetOnline(true)')
+            end
+          end
         }
-        ::PageObjects::CDP.prepend(slow_upload_shim)
+        ::PageObjects::CDP.prepend(cdp_shim)
       end
 
       if defined?(::SystemHelpers)

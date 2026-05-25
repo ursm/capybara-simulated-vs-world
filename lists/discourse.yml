@@ -124,8 +124,6 @@
   reason: 'Keyboard nav within rich-editor inline-component selection.'
 - test: 'Composer Form Template Validations shows an error when an input doesn''t satisfy the min length expected'
   reason: 'Tooltip positioned via getBoundingClientRect.'
-- test: 'Network Disconnected NetworkConnectivity service adds class to DOM and displays offline indicator'
-  reason: 'Requires CDP Network.emulateNetworkConditions to flip navigator.onLine.'
 - test: 'Group activity when on the posts activity page loads and paginates the results by chronology'
   reason: 'Infinite-scroll pagination needs scroll-position observers.'
 - test: !ruby/regexp '/\Aglimmer topic list /'
@@ -163,6 +161,16 @@
   reason: 'Welcome-banner SearchMenu close on Escape stalls; tracked mutation does not re-render.'
 - test: 'Search | Shortcuts for variations of search input when search_experience is search_field when enable_welcome_banner is false displays and focuses header search when / is pressed and hides it when Escape is pressed'
   reason: 'Search-menu close on Escape stalls in this variant too.'
+
+# search_icon variant: `/` keypress doesn't mount the search-icon
+# input — the icon's `@tracked` open-state doesn't trigger the
+# template re-render that exposes `#icon-search-input` under our
+# Glimmer runloop. The header-search-icon trigger mechanism differs
+# from the field variant; needs the same Glimmer-runloop investigation.
+- test: 'Search | Shortcuts for variations of search input when search_experience is search_icon when enable_welcome_banner is false displays and focuses search icon search when / is pressed and hides it when Escape is pressed'
+  reason: 'search_icon variant: slash keymap fires but tracked-state re-render doesn''t mount the icon input under Glimmer.'
+- test: 'Search | Shortcuts for variations of search input when search_experience is search_icon when enable_welcome_banner is false when within a topic with 20+ posts opens search on first press of /, and closes when Escape is pressed'
+  reason: 'Same search_icon mount-on-tracked-flip gap as above.'
 
 # Topic-list j-key "first visible" navigation reads `getBoundingClientRect`
 # to pick the topmost in-viewport row; with no layout every rect is zero,
