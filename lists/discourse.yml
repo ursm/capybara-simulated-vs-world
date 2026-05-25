@@ -198,11 +198,3 @@
 # codecs and the worker's `Imager` global doesn't initialise.
 - test: !ruby/regexp '/\AComposer image optimization for uploads using media-optimization-worker (jpeg|png) images/'
   reason: 'media-optimization-worker needs WASM mozjpeg/oxipng codecs in the Worker isolate.'
-
-# Theme qunit runs an entire Ember/QUnit test harness inside the
-# page. The host gem boots QUnit + the theme's test bundle; we'd
-# need the full QUnit DOM + assertion-failure observers to surface
-# the inner pass/fail to the system spec. Out of scope for an
-# in-process driver.
-- test: 'Theme qunit testing lists themes and can run tests by id, name and url'
-  reason: 'Runs an in-page QUnit test harness; needs QUnit DOM + assertion observers.'
