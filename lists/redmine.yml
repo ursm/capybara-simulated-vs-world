@@ -4,10 +4,6 @@
 #
 # Last verified against Redmine 8dfb83b3d on 2026-05-08.
 
-- test: "GanttsTest#test_progress_line_toggle_draws_zigzag_line"
-  reason: "Gantt chart draws SVG paths from layout-derived coordinates; needs a real layout engine"
-- test: "GanttsTest#test_related_issues_toggle_displays_and_hides_relation_arrows"
-  reason: "same as above — relation arrows are SVG paths over computed bbox positions"
 - test: "GanttsTest#test_selected_columns_can_be_resized_by_dragging"
   reason: "uses Capybara::Node#drag_to with builder.action(:button_down/up); driver lacks Capybara action-chain API"
 

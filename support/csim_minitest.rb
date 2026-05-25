@@ -110,9 +110,15 @@ module CsimMinitestPend
         result.failures.clear
         result.failures << Minitest::Skip.new("expected failure (#{matched[:reason]})")
       elsif result.passed?
-        result.failures << Minitest::Assertion.new(
+        ex = Minitest::Assertion.new(
           "listed in expected_failures but passed — drop it from the list:\n  #{matched[:matcher].inspect}"
         )
+        # Synthetic failures need an explicit backtrace — Rails'
+        # BacktraceCleaner#filter_backtrace nil-crashes inside
+        # Minitest::Result#to_s otherwise, masking which test was
+        # unblocked.
+        ex.set_backtrace(caller)
+        result.failures << ex
       end
     end
   end
