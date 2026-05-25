@@ -149,22 +149,19 @@
 # PG deadlocks (`group_moderator_self_lockout_spec`) seen in the
 # first 167-baseline run vanished after re-run — not pinning here.
 
-# Search-menu slash shortcut focus race: `/` correctly reaches ItsATrap
-# → toggleSearch → `header:keyboard-trigger` → HeaderSearch's
-# focusSearchInput focuses `#header-search-input`. But the same trigger
-# also fires header.gjs's `toggleSearchMenu` (sets `search.visible =
-# true`), which schedules a rerender that mounts SearchMenuWrapper.
-# Its did-insert auto-focuses `#icon-search-input`, overriding the
-# earlier focus. In real Chrome the rerender lands on the next
-# animation frame *after* Capybara's focus assertion polls, so the
-# autofocus race is invisible. We treat rAF as a microtask
-# (`feedback_raf_as_microtask`) to unblock Turbo, so the autofocus
-# fires synchronously and always wins — proper fix needs a deferred
-# rAF without regressing Turbo.
-- test: !ruby/regexp '/\ASearch \| Shortcuts for variations of search input when search_experience is search_(field|icon) when enable_welcome_banner is true /'
-  reason: 'rAF-as-microtask: SearchMenuWrapper did-insert autofocus runs before Capybara polls, overriding focusSearchInput.'
-- test: 'Search | Shortcuts for variations of search input when search_experience is search_field when enable_welcome_banner is false displays and focuses header search when / is pressed and hides it when Escape is pressed'
-  reason: 'Same rAF-as-microtask autofocus race as above.'
+# Search-menu slash shortcut: the remaining two use `fake_scroll_down_long`
+# + IntersectionObserver to flip `Search#welcomeBannerSearchInViewport`
+# before `/`. Without a layout/scroll pipeline, the IntersectionObserver
+# never fires the out-of-viewport callback, so `headerKeyboardTrigger`
+# keeps seeing `welcomeBannerSearchInViewport === true` and skips
+# `toggleSearchMenu`. The other three (`enable_welcome_banner=false` and
+# the in-viewport `enable_welcome_banner=true` cases) pass now that
+# `focus()` respects display:none and `keyup` retargets to the active
+# element after a keydown handler blurs.
+- test: 'Search | Shortcuts for variations of search input when search_experience is search_field when enable_welcome_banner is true when welcome banner is not in the viewport displays and focuses header search when / is pressed and hides it when Escape is pressed'
+  reason: 'Needs real scroll + IntersectionObserver-against-viewport for welcomeBannerSearchInViewport to flip.'
+- test: 'Search | Shortcuts for variations of search input when search_experience is search_icon when enable_welcome_banner is true when welcome banner is not in the viewport displays and focuses search icon search when / is pressed and hides it when Escape is pressed'
+  reason: 'Same scroll-driven IntersectionObserver dependence.'
 
 
 # Topic-list j-key "first visible" navigation reads `getBoundingClientRect`
