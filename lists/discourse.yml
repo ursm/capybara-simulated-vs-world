@@ -171,9 +171,3 @@
 - test: 'Topic bulk select when closing works with keyboard shortcuts'
   reason: 'j-shortcut "first visible row" needs getBoundingClientRect; without layout the fallback selects the last article instead of row 1.'
 
-# `/admin/config/flags/settings` route renders the application shell but
-# the settings outlet stays empty (`.setting-label` count = 0, no `<main>`).
-# Route loads but the lazy admin-flag-settings template doesn't mount —
-# likely a Glimmer-runloop or async route-hook gap we haven't traced.
-- test: 'Admin Flags Page has settings tab'
-  reason: 'Settings tab navigates but template content stays unmounted; needs Glimmer/admin-route investigation.'
