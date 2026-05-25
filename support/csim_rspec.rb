@@ -284,6 +284,25 @@ RSpec.configure do |config|
           Capybara::Simulated::Locator.new(scope || page, selector)
         end
       end
+
+      # `PageObjects::CDP#with_slow_upload` uses Playwright CDP to
+      # throttle the network so the test can observe the in-progress
+      # upload UI. We have no real network — park the upload XHR's
+      # response side instead, so `#file-uploading` stays in the DOM
+      # long enough for the assertion to catch it.
+      if defined?(::PageObjects::CDP)
+        slow_upload_shim = Module.new {
+          def with_slow_upload
+            page.execute_script('globalThis.__csimSlowUploadActive = true')
+            begin
+              yield
+            ensure
+              page.execute_script('globalThis.__csimSlowUploadActive = false; globalThis.__csimDrainSlowUploads();')
+            end
+          end
+        }
+        ::PageObjects::CDP.prepend(slow_upload_shim)
+      end
     end
   end
 end
