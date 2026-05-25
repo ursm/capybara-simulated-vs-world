@@ -1,12 +1,4 @@
 GIT
-  remote: https://github.com/sam-saffron-jarvis/mini_racer.git
-  revision: 25ba0c0d78c0f0a548d63f62d445e6885982d3cf
-  branch: fix-single-threaded-v8-thread
-  specs:
-    mini_racer (0.21.0)
-      libv8-node (~> 24.12.0.1)
-
-GIT
   remote: https://github.com/ursm/quickjs.rb.git
   revision: 6eb39725491967c58e75d20af442830e4e9cfc19
   branch: combined-pr-40-and-47
@@ -324,6 +316,8 @@ GEM
       mime-types-data (~> 3.2025, >= 3.2025.0507)
     mime-types-data (3.2026.0414)
     mini_mime (1.1.5)
+    mini_racer (0.21.1)
+      libv8-node (~> 24.12.0.1)
     mini_scheduler (0.20.0)
       sidekiq (>= 6.5, < 9.0)
     mini_sql (1.6.0)
@@ -856,7 +850,7 @@ DEPENDENCIES
   message_bus
   messageformat-wrapper
   mini_mime
-  mini_racer!
+  mini_racer
   mini_scheduler
   mini_sql
   mini_suffix
