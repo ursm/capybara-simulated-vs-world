@@ -182,3 +182,27 @@
 # IntersectionObserver.
 - test: 'Editing sidebar tags navigation loads more tags when the user scrolls views the last tag in the modal and there is more tags to load'
   reason: 'Scroll-position-driven pagination needs a layout engine.'
+
+# Video frame extraction needs a layout-aware <video> + canvas
+# `drawImage(video, ...)` path with real decoded frames. Our canvas
+# stack (canvas_image_stack memory) decodes still images via vips
+# but doesn't decode video frames.
+- test: 'Uploading files in the composer when video thumbnails are enabled generates a thumbnail from the video'
+  reason: 'Video frame extraction requires a real video decoder.'
+- test: 'Uploading files in the composer when video thumbnails are enabled generates a topic preview thumbnail from the video'
+  reason: 'Same — video frame decode.'
+
+# media-optimization-worker pipes uploads through a Web Worker that
+# uses WASM-backed mozjpeg / oxipng to re-encode + resize images.
+# Our Worker isolate (worker_per_isolate memory) doesn't ship those
+# codecs and the worker's `Imager` global doesn't initialise.
+- test: !ruby/regexp '/\AComposer image optimization for uploads using media-optimization-worker (jpeg|png) images/'
+  reason: 'media-optimization-worker needs WASM mozjpeg/oxipng codecs in the Worker isolate.'
+
+# Theme qunit runs an entire Ember/QUnit test harness inside the
+# page. The host gem boots QUnit + the theme's test bundle; we'd
+# need the full QUnit DOM + assertion-failure observers to surface
+# the inner pass/fail to the system spec. Out of scope for an
+# in-process driver.
+- test: 'Theme qunit testing lists themes and can run tests by id, name and url'
+  reason: 'Runs an in-page QUnit test harness; needs QUnit DOM + assertion observers.'
