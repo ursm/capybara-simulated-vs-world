@@ -171,3 +171,8 @@
 # Playwright's Context#add_cookies. Same Playwright-only API.
 - test: !ruby/regexp '/\ASocial authentication when (desktop|mobile) when user exists with Facebook removes destination_url cookie if present after setting up redirect\z/'
   reason: '`page.driver.with_playwright_page` is Playwright-only; cookie injection path unavailable.'
+
+# `page.driver.with_playwright_page { |page| page.route(...) }`
+# intercepts CDN requests; only Playwright supports the route API.
+- test: !ruby/regexp '/\Ascript encoding (without|with) s3 assets loads JS chunks with the (\.js|\.br\.js) extension\z/'
+  reason: 'CDN request interception via Playwright Page#route; our driver runs Rack in-process and never issues real HTTP.'
