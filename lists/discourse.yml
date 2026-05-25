@@ -160,3 +160,14 @@
   reason: 'Same scroll-driven IntersectionObserver dependence.'
 
 
+
+# Playwright-only test infrastructure — uses `$playwright_logger` (a
+# Discourse playwright-driver global) to grep for browser console
+# output. Our driver doesn't expose this.
+- test: 'JS Deprecation Handling emits ember-this-fallback deprecation for theme .hbs connectors using property fallback'
+  reason: '`$playwright_logger.logs` is Playwright-specific; our driver does not register the global.'
+
+# Cookie injection via `page.driver.with_playwright_page` — uses
+# Playwright's Context#add_cookies. Same Playwright-only API.
+- test: !ruby/regexp '/\ASocial authentication when (desktop|mobile) when user exists with Facebook removes destination_url cookie if present after setting up redirect\z/'
+  reason: '`page.driver.with_playwright_page` is Playwright-only; cookie injection path unavailable.'
