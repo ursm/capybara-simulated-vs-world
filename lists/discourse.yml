@@ -183,12 +183,17 @@
 - test: 'Editing sidebar tags navigation loads more tags when the user scrolls views the last tag in the modal and there is more tags to load'
   reason: 'Scroll-position-driven pagination needs a layout engine.'
 
-# Video frame extraction needs a layout-aware <video> + canvas
-# `drawImage(video, ...)` path with real decoded frames. Our canvas
-# stack (canvas_image_stack memory) decodes still images via vips
-# but doesn't decode video frames.
+# Thumbnail extraction uses `video.src = blob` → wait for
+# `loadedmetadata` → set `currentTime` → wait for `seeked` →
+# `canvas.drawImage(video, …)` → upload. Our `HTMLVideoElement`
+# is aliased to plain Element with no `load`/`play`/`canPlayType`
+# methods, no `duration`/`currentTime`/`readyState`/`paused`
+# properties, and no loadedmetadata/seeked events. Stubbing
+# enough of the surface to let the chain reach a dummy
+# `drawImage(video)` capture would unblock these — currently
+# parked as a real driver gap, not strictly out-of-scope.
 - test: 'Uploading files in the composer when video thumbnails are enabled generates a thumbnail from the video'
-  reason: 'Video frame extraction requires a real video decoder.'
+  reason: 'HTMLVideoElement API surface not implemented; loadedmetadata/seeked never fire, drawImage(video) has no source frame.'
 - test: 'Uploading files in the composer when video thumbnails are enabled generates a topic preview thumbnail from the video'
-  reason: 'Same — video frame decode.'
+  reason: 'Same — HTMLVideoElement surface missing.'
 
