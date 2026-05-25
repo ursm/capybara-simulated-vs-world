@@ -47,10 +47,6 @@
   reason: 'Photoswipe lightbox navigation needs real layout (see Photoswipe entries below).'
 - test: 'Composer - ProseMirror - Images image toolbar sets width and height attributes when scaling external images'
   reason: 'Image scale-handles read getBoundingClientRect on the IMG.'
-- test: 'Composer - ProseMirror - Keyboard shortcuts supports Ctrl + M to toggle between rich and markdown editors'
-  reason: 'Rich↔markdown editor toggle re-mounts the composer; remount sequencing has a remaining driver gap.'
-- test: 'Composer - ProseMirror - Keyboard shortcuts adds a new paragraph when ENTER is pressed after an image'
-  reason: 'Image-trailing Enter relies on PM-side rAF that does not drain before assertion.'
 
 # ── Layout-engine dependence ──────────────────────────────────────
 # We don't run a layout engine: no `getBoundingClientRect` truths,
