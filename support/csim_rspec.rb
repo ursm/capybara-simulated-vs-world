@@ -141,6 +141,27 @@ RSpec.configure do |config|
       skip("expected failure (#{matched[:reason]})")
     else
       pending("expected failure (#{matched[:reason]})")
+      # Discourse's `CapybaraTimeoutExtension` (rails_helper.rb) stashes
+      # any Capybara default_max_wait_time exhaustion in
+      # `example.metadata[:_capybara_timeout_exception]` during the body
+      # and re-raises it in `after(:each)` if `example.exception.nil?`.
+      # RSpec's `pending` consumes the body's expected failure → exception
+      # becomes nil → the timeout extension fires and reports the test as
+      # a genuine failure even though it correctly went pending. Tag the
+      # metadata path that triggers the re-raise so listed-pending tests
+      # stay clean in suite output.
+      example.metadata[:_skip_capybara_timeout_recheck] = true
+    end
+  end
+
+  # `prepend_after` so this runs BEFORE Discourse's
+  # `CapybaraTimeoutExtension` re-raise hook (RSpec runs after-hooks in
+  # reverse-definition order; Discourse's rails_helper.rb registers
+  # theirs later than our RUBYOPT-loaded file, so theirs would
+  # otherwise fire first).
+  config.prepend_after(:each, type: :system) do |example|
+    if example.metadata[:_skip_capybara_timeout_recheck]
+      example.metadata.delete(:_capybara_timeout_exception)
     end
   end
 
