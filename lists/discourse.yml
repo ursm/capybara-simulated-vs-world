@@ -176,3 +176,9 @@
 # intercepts CDN requests; only Playwright supports the route API.
 - test: !ruby/regexp '/\Ascript encoding (without|with) s3 assets loads JS chunks with the (\.js|\.br\.js) extension\z/'
   reason: 'CDN request interception via Playwright Page#route; our driver runs Rack in-process and never issues real HTTP.'
+
+# Scroll-triggered infinite scroll — modal loads next page when user
+# scrolls past the last visible item; needs real scroll position +
+# IntersectionObserver.
+- test: 'Editing sidebar tags navigation loads more tags when the user scrolls views the last tag in the modal and there is more tags to load'
+  reason: 'Scroll-position-driven pagination needs a layout engine.'
