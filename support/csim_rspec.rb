@@ -290,6 +290,12 @@ RSpec.configure do |config|
       # upload UI. We have no real network — park the upload XHR's
       # response side instead, so `#file-uploading` stays in the DOM
       # long enough for the assertion to catch it.
+      #
+      # `with_virtual_authenticator` (and the CDP `WebAuthn.*` messages
+      # it threads into the block) route into the Browser-side
+      # WebauthnState — ECDSA P-256 keys, COSE/CBOR-encoded
+      # attestation, ECDSA-signed assertion — so security-key /
+      # passkey flows can run without a real WebAuthn-capable browser.
       if defined?(::PageObjects::CDP)
         slow_upload_shim = Module.new {
           def with_slow_upload
@@ -303,6 +309,68 @@ RSpec.configure do |config|
         }
         ::PageObjects::CDP.prepend(slow_upload_shim)
       end
+
+      if defined?(::SystemHelpers)
+        webauthn_shim = Module.new {
+          def with_virtual_authenticator(options = {})
+            opts_json = ::JSON.dump(options)
+            handle = page.evaluate_script("__csimWebauthnAddVirtualAuthenticator(#{opts_json})")
+            begin
+              yield(Capybara::Simulated::CdpClientShim.new(page), handle)
+            ensure
+              page.execute_script("__csimWebauthnRemoveVirtualAuthenticator(#{::JSON.dump(handle)})")
+            end
+          end
+        }
+        ::SystemHelpers.prepend(webauthn_shim)
+      end
+
+      # Stand-in for the Playwright CDPClient that
+      # `cdp.with_virtual_authenticator` yields. Routes the
+      # `WebAuthn.*` messages tests send to the Browser-side
+      # `WebauthnState`; non-WebAuthn methods are a quiet no-op so
+      # unrelated CDP probes don't crash.
+      Capybara::Simulated.send(:remove_const, :CdpClientShim) if Capybara::Simulated.const_defined?(:CdpClientShim, false)
+      Capybara::Simulated.const_set(:CdpClientShim, Class.new {
+        def initialize(page) = (@page = page)
+
+        def send_message(method, params: nil)
+          h = (params || {}).each_with_object({}) {|(k, v), o| o[k.to_s] = v }
+          # Non-WebAuthn CDP messages are quiet no-ops — apps probe
+          # for unrelated capabilities (Network.enable, Page.*, …)
+          # and Discourse's CDP helpers don't care about the reply.
+          return nil unless method.to_s.start_with?('WebAuthn.')
+
+          case method.to_s
+          when 'WebAuthn.enable', 'WebAuthn.disable',
+               'WebAuthn.setAutomaticPresenceSimulation'
+            nil
+          when 'WebAuthn.addCredential'
+            @page.execute_script(
+              "__csimWebauthnAddCredential(#{::JSON.dump(h['authenticatorId'])}, #{::JSON.dump(h['credential'])})"
+            )
+          when 'WebAuthn.removeCredential'
+            @page.execute_script(
+              "__csimWebauthnRemoveCredential(#{::JSON.dump(h['authenticatorId'])}, #{::JSON.dump(h['credentialId'])})"
+            )
+          when 'WebAuthn.getCredentials'
+            return {'credentials' => @page.evaluate_script("__csimWebauthnGetCredentials(#{::JSON.dump(h['authenticatorId'])})")}
+          when 'WebAuthn.setUserVerified'
+            @page.execute_script(
+              "__csimWebauthnSetUserVerified(#{::JSON.dump(h['authenticatorId'])}, #{::JSON.dump(!!h['isUserVerified'])})"
+            )
+          when 'WebAuthn.clearCredentials'
+            (@page.evaluate_script("__csimWebauthnGetCredentials(#{::JSON.dump(h['authenticatorId'])})") || []).each do |c|
+              @page.execute_script(
+                "__csimWebauthnRemoveCredential(#{::JSON.dump(h['authenticatorId'])}, #{::JSON.dump(c['credentialId'])})"
+              )
+            end
+          else
+            raise ArgumentError, "Unknown WebAuthn CDP method: #{method}"
+          end
+          nil
+        end
+      })
     end
   end
 end
