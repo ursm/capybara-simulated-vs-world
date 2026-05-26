@@ -1,15 +1,6 @@
 GIT
-  remote: https://github.com/ursm/quickjs.rb.git
-  revision: 6eb39725491967c58e75d20af442830e4e9cfc19
-  branch: combined-pr-40-and-47
-  submodules: true
-  specs:
-    quickjs (0.17.0)
-      json
-      securerandom
-
-PATH
-  remote: /home/ursm/Code/github.com/ursm/capybara-simulated
+  remote: https://github.com/ursm/capybara-simulated.git
+  revision: 689f8f5efc3c12341b827406e34fa8933be3001c
   specs:
     capybara-simulated (0.0.7)
       capybara (>= 3.37)
@@ -467,6 +458,9 @@ GEM
     public_suffix (7.0.5)
     puma (8.0.1)
       nio4r (~> 2.0)
+    quickjs (0.18.0)
+      json
+      securerandom
     racc (1.8.1)
     rack (2.2.23)
     rack-mini-profiler (4.0.1)
@@ -640,6 +634,9 @@ GEM
     ruby-readability (0.7.3)
       guess_html_encoding (>= 0.0.4)
       nokogiri (>= 1.6.0)
+    ruby-vips (2.3.0)
+      ffi (~> 1.12)
+      logger
     ruby2_keywords (0.0.5)
     rubyzip (3.3.0)
     sanitize (7.0.0)
@@ -882,7 +879,7 @@ DEPENDENCIES
   propshaft
   pry-rails
   puma
-  quickjs!
+  quickjs (>= 0.18)
   rack (< 3)
   rack-mini-profiler
   rack-protection
@@ -917,6 +914,7 @@ DEPENDENCIES
   ruby-progressbar
   ruby-rc4
   ruby-readability
+  ruby-vips
   rubyzip
   sanitize
   sassc-embedded

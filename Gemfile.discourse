@@ -10,7 +10,12 @@ group :test do
     gem 'capybara-simulated', github: 'ursm/capybara-simulated'
   end
   # Pull in QuickJS so `CSIM_JS_ENGINE=quickjs` works too.
-  gem 'quickjs', github: 'ursm/quickjs.rb', branch: 'combined-pr-40-and-47', submodules: true
+  gem 'quickjs', '>= 0.18'
+  # Canvas / OffscreenCanvas image decode (drawImage(Blob)/createImageBitmap
+  # → libvips). Other apps (Avo / Forem / Mastodon) already pull this in
+  # transitively via ActiveStorage variants; Discourse doesn't, so its
+  # media-optimization-worker chain otherwise hit LoadError mid-flight.
+  gem 'ruby-vips'
 end
 
 # Stdlib-extracted gems csim_rspec.rb requires defensively. Discourse
