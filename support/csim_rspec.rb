@@ -18,6 +18,21 @@ return unless ENV['CSIM_DRIVER'] == 'simulated'
 # Gemfile-resolved version (the local path) before the require.
 require 'bundler/setup'
 
+# V8 platform flags must be set before any MiniRacer::Context is
+# constructed — once an isolate exists, set_flags! raises
+# PlatformAlreadyInitialized and the flag is silently lost. Discourse
+# autoloads `pretty_text` and other mini_racer-using libraries during
+# Rails boot, so the bump has to happen here in the RUBYOPT preload,
+# not in v8_runtime.rb's require-time block (which loads much later).
+# Default 4 GB matches Discourse's own testem `--max_old_space_size`;
+# CSIM_V8_MAX_OLD_SPACE_MB=0 disables the bump.
+begin
+  require 'mini_racer'
+  max_old_mb = (ENV['CSIM_V8_MAX_OLD_SPACE_MB'] || '4096').to_i
+  MiniRacer::Platform.set_flags!('max-old-space-size': max_old_mb) if max_old_mb > 0
+rescue LoadError, MiniRacer::PlatformAlreadyInitialized
+end
+
 # Rails 7.0's `active_support/logger_thread_safe_level.rb` references
 # `Logger::Severity` at load time without `require 'logger'`. On
 # Ruby 3.3+ that fails because Logger sits in a bundled gem now.
@@ -162,6 +177,20 @@ RSpec.configure do |config|
   config.prepend_after(:each, type: :system) do |example|
     if example.metadata[:_skip_capybara_timeout_recheck]
       example.metadata.delete(:_capybara_timeout_exception)
+    end
+  end
+
+  # `JsLocaleHelper.@loaded_translations` (the base YAML bundle that
+  # gets merged with TranslationOverride values in `output_MF` /
+  # `output_client_overrides`) auto-clears in development but not in
+  # test. Without clearing it between examples, a test that `fab!`s
+  # a TranslationOverride and then visits would see the previous
+  # test's bundle without the new override. Discourse's CI passes
+  # because each spec runs in a fresh process; our serial run needs
+  # the explicit clear.
+  config.before(:each) do
+    if Object.const_defined?(:JsLocaleHelper)
+      Object.const_get(:JsLocaleHelper).clear_cache!
     end
   end
 
