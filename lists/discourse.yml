@@ -199,16 +199,3 @@
 # positioning to draw outline tooltips around plugin-outlet anchors.
 - test: "Discourse dev tools plugin outlet debugging shows plugin outlet overlays with tooltips"
   reason: "Plugin-outlet debug overlays are layout-positioned (Floating UI); no layout = no positioning."
-
-# Upstream Discourse test/server mismatch: with `:monkey:` denied,
-# `Emoji.gsub_emoji_to_unicode` is invoked from `topics/show.html.erb`
-# on `"Time for :monkey: business"` and replaces the matched
-# `:monkey:` with `""` (since `Emoji.lookup_unicode("monkey")` returns
-# `""` for denied names and `"" || name` in Ruby still returns `""`).
-# Server then emits `<title>Time for  business - Discourse</title>`
-# (note the double space) and `page.title` reflects that; the spec
-# asserts a single space. Matches what an upstream real-browser run
-# would also see — Discourse server-rendered title is the load-bearing
-# value here, no JS path collapses the space afterwards.
-- test: 'Emoji deny list when visiting topics should remove denied emojis from page title, heading and body'
-  reason: 'Discourse server renders the topic <title> with a double space after stripping a denied emoji code, but the spec asserts single space. Upstream-side mismatch, not a driver gap.'
