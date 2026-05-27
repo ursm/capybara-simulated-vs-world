@@ -1,7 +1,28 @@
 # Run Discourse's bundle in *our* gem set: load upstream's Gemfile
 # verbatim, then layer capybara-simulated on top.
 # Activated via `BUNDLE_GEMFILE=Gemfile.discourse`.
+#
+# Discourse's own Gemfile declares `gem "mini_racer"`. We need to
+# replace it with the rubyjs/mini_racer#418 fork that exposes
+# `Context#perform_microtask_checkpoint` — see the
+# `dispatchEventForUserAction` rationale below. Bundler refuses two
+# `gem` declarations for the same name from different sources, so wrap
+# the upstream eval and drop the original declaration before adding
+# ours.
 eval_gemfile File.expand_path('apps/discourse/Gemfile', __dir__)
+dependencies.delete_if {|d| d.name == 'mini_racer' }
+
+# `Context#perform_microtask_checkpoint` (rubyjs/mini_racer#418). Lets
+# `dispatchEventForUserAction` drain V8's microtask queue between
+# listener invocations — required to match the HTML spec "clean up
+# after running script" microtask-checkpoint semantics that real
+# CDP-driven clicks rely on (Glimmer Backburner flushes its destructor
+# queue mid-bubble that way; without the checkpoint, parent click
+# listeners fire after the child handler tore down the ancestor's
+# `{{on}}` modifier in upstream behaviour but ours doesn't, leaking
+# `updateIndex(1)` into bubble paths that were supposed to skip it).
+# Pin to the PR head until upstream merges.
+gem 'mini_racer', git: 'https://github.com/ursm/mini_racer.git', branch: 'perform-microtask-checkpoint'
 
 group :test do
   if (csim_path = ENV['CAPYBARA_SIMULATED_PATH'])
