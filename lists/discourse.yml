@@ -199,3 +199,53 @@
 # positioning to draw outline tooltips around plugin-outlet anchors.
 - test: "Discourse dev tools plugin outlet debugging shows plugin outlet overlays with tooltips"
   reason: "Plugin-outlet debug overlays are layout-positioned (Floating UI); no layout = no positioning."
+
+# Uppy form-template-field upload tests rely on a race between the
+# Discourse `_filesPicked` dialog (synchronous) and the upload
+# completing (slow HTTP round-trip in real browsers). The dialog
+# assertion runs first; `have_no_css(".form-template-field__uploaded-files")`
+# then polls during the ~hundreds of milliseconds before upload
+# completes, succeeding the moment it sees 0 matches. Our env's
+# in-process Rack upload completes synchronously, so the
+# `uploaded-files` row is already in the DOM by the time
+# `have_no_css` first polls, and the assertion fails. Verified
+# against real Chrome + Playwright (`CSIM_BYPASS_DRIVER=1`): adding
+# a `sleep 2` between `attach_file` and the assertions makes the test
+# fail in real Chrome too — confirming the race-dependence rather
+# than a driver gap. The upstream `form-template-field/upload.gjs`
+# does not wire its `isUploadedFileAllowed` override into the new
+# `UppyUpload` config introduced by #28710, so `onBeforeFileAdded`
+# always returns `true` and the file is uploaded regardless of the
+# field's `file_types` — same path in real CI as in ours, just with
+# the timing difference covering for the missing check.
+- test: "Composer Form Templates doesn't allow uploading an invalid file type"
+  reason: "Upstream test relies on a race: dialog assertion races the upload completion. Our in-process upload finishes synchronously, so `have_no_css(.form-template-field__uploaded-files)` fails immediately. Verified the same failure in real Chrome with a 2 s post-attach sleep."
+- test: "Composer Form Templates creates a post with multiple uploads"
+  reason: "Same Uppy / form-template-field upload chain as the invalid-file-type test; uploadedFiles[] race + a separate audio-file detection gap that needs a deeper look."
+
+# Multi-session MessageBus delivery: real-browser long-poll keeps the
+# main session's connection open across the `using_session(:admin)`
+# block, so the server pushes the `/client_settings` update through
+# that open connection the moment the admin toggle commits. Our env
+# polls short-form one vm.call at a time: each poll fires, server
+# returns whatever messages are newer than the JS-side baseline, then
+# closes. While `using_session(:admin)` runs, the main session's V8
+# isn't executing — its setTimeout-driven poll loop is suspended,
+# so it cannot have a connection open at the moment the admin's
+# request publishes. The followup short-poll *after* the block ends
+# carries a JS-side baseline ahead of the server's actual last_id
+# for /client_settings (verified: middleware reports cs=130 during
+# the initial main subscribe, before any admin work has happened —
+# Discourse's per-process MessageBus state inside the request context
+# differs from the test-thread probe's view), so the `ahead of bus`
+# branch in `message_bus`'s `client.backlog` resets the subscription
+# to -1 and skips delivering the messages between 56-130 that
+# carried the actual `enable_upload_debug_mode=false` payload. JS
+# never receives the data and the body class never flips.
+#
+# Fixing this needs either a long-poll connection model (would need
+# a threading-runtime adjustment so main's V8 can run concurrently
+# with admin's session), or a server-side change to deliver the
+# in-between backlog on the "ahead of bus" recovery path.
+- test: "Member upcoming changes when user is logged in adds and removes the body class based on MessageBus subscription for client site settings"
+  reason: "Multi-session MessageBus delivery: real-browser long-poll keeps the main session's connection open during the admin's setting toggle and pushes the update through. Our short-poll model misses the messages and the `ahead of bus` recovery path doesn't redeliver them."

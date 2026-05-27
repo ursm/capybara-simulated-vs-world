@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ursm/capybara-simulated.git
-  revision: aee529b32aa91d495f708debf616c51e915f993b
+  revision: 7bad160e70fc6146ea0a463ed63e1beedd468d82
   specs:
     capybara-simulated (0.0.7)
       capybara (>= 3.37)
