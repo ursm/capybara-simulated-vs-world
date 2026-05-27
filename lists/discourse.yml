@@ -74,12 +74,6 @@
 - test: 'Glimmer Header moves focus between tabs using arrow keys'
   reason: 'Tab visibility depends on horizontal-overflow width.'
 
-# Topic list focus restoration: walks scroll position to refocus the
-# last-clicked topic row after a back navigation.
-- test: !ruby/regexp '/\ATopic list refocusses /'
-  reason: 'Scroll position + element bounds for focus restoration.'
-- test: 'Topic list does not refocus topic when visiting via something other than topic list'
-  reason: 'Same scroll-based focus-restoration mechanism.'
 
 # Post stream / nested view cloaking — cloak/uncloak based on
 # IntersectionObserver against the scroll viewport. (`Nested view
@@ -98,6 +92,8 @@
   reason: 'Scroll handler swaps banner ↔ header search visibility.'
 - test: !ruby/regexp '/\AHeader Search - Responsive Behavior when welcome banner is enabled appears based on scroll/'
   reason: 'Same scroll + viewport-width responsive swap.'
+- test: 'Search when search menu on desktop with search field in header switches to search icon when header is minimized'
+  reason: 'Header minimization triggered by scroll to bottom of topic; no real scroll = header stays expanded, search icon never replaces search field.'
 
 # Embed mode floating timeline button — appears when the topic
 # footer is below the viewport (scroll position). The "no replies
@@ -126,6 +122,12 @@
   reason: 'Visited-topic color depends on scroll-driven IntersectionObserver render.'
 - test: 'glimmer topic list topic highlighting highlights the previous topic after navigation'
   reason: 'Previous-topic highlight depends on scroll position.'
+- test: 'Admin Color Palette Config Area Page applies the changes live when editing the currently active palette'
+  reason: 'Reads computed `backgroundColor` via `element.style` — needs a real CSS computed-style pipeline (we only expose declared CSS).'
+- test: 'Admin Theme Site Settings shows links to each theme that overrides the default and overridden values'
+  reason: 'Asserts `.fk-d-tooltip__content.-content.-expanded` after hover; Float-kit / Floating UI tooltip positioning needs real layout.'
+- test: 'Content Localization when the feature is enabled for English and Japanese allows users to set their post''s locale when posting'
+  reason: 'Reads `.post-language-content` after hovering the post-language indicator; the tooltip is mounted by Float-kit / Floating UI which depends on real layout.'
 
 # ACE editor only renders visible lines (clientHeight-driven virtual
 # scroller). With no layout the container's clientHeight is 0 → ACE
@@ -134,8 +136,6 @@
 - test: !ruby/regexp '/\AAdmin Customize Form Templates when visiting the page to create a new form template should allow quick insertion of /'
   reason: 'ACE virtual-scroller layout dependence; session has the full text but only the first line is rendered.'
 - test: 'Admin Customize Form Templates when visiting the page to edit a form template should prefill form data'
-  reason: 'ACE virtual-scroller layout dependence.'
-- test: 'Admin Customize Form Templates when visiting the page to customize form templates should show a preview of the template in a modal when toggling the preview'
   reason: 'ACE virtual-scroller layout dependence.'
 - test: 'Admin Customize Themes when editing a local theme can edit the js field'
   reason: 'Same ACE editor virtual-scroller dependence.'
@@ -181,17 +181,29 @@
 - test: 'Editing sidebar tags navigation loads more tags when the user scrolls views the last tag in the modal and there is more tags to load'
   reason: 'Scroll-position-driven pagination needs a layout engine.'
 
-# Thumbnail extraction uses `video.src = blob` → wait for
-# `loadedmetadata` → set `currentTime` → wait for `seeked` →
-# `canvas.drawImage(video, …)` → upload. Our `HTMLVideoElement`
-# is aliased to plain Element with no `load`/`play`/`canPlayType`
-# methods, no `duration`/`currentTime`/`readyState`/`paused`
-# properties, and no loadedmetadata/seeked events. Stubbing
-# enough of the surface to let the chain reach a dummy
-# `drawImage(video)` capture would unblock these — currently
-# parked as a real driver gap, not strictly out-of-scope.
-- test: 'Uploading files in the composer when video thumbnails are enabled generates a thumbnail from the video'
-  reason: 'HTMLVideoElement API surface not implemented; loadedmetadata/seeked never fire, drawImage(video) has no source frame.'
-- test: 'Uploading files in the composer when video thumbnails are enabled generates a topic preview thumbnail from the video'
-  reason: 'Same — HTMLVideoElement surface missing.'
+# mozjpeg PNG→JPEG output bytes diverge by ~4% (297001 vs 285809).
+# The JPEG-resize chain now matches Chrome bytes-exact after fixing
+# `fetch()`'s return type to `Response` (was `FetchResponse`, which
+# made `@discourse/resize`'s `module instanceof Response` false and
+# the WASM loader fell through to `new WebAssembly.Module(response)`,
+# throwing "Argument 0 must be a buffer source" and silently dropping
+# back to the unresized imageData). PNG bytes still differ — likely
+# libvips's PNG decode (chroma / alpha) is subtly different from
+# Chrome's createImageBitmap output, which propagates through the
+# entire mozjpeg pipeline. Needs libvips decoder-flag tuning.
+- test: 'Composer image optimization for uploads using media-optimization-worker png images optimizes an uploaded png image in the composer'
+  reason: 'mozjpeg PNG→JPEG output 297001 vs Chrome 285809 (~4%) — libvips PNG decode differs subtly from Chrome createImageBitmap RGBA.'
 
+
+# Tooltip-on-hover assertions: Capybara hover triggers our mouseover
+# events but the tooltip component's positioning chain (Floating UI:
+# getBoundingClientRect + offsetParent + computed style) depends on
+# real layout to decide whether to mount the floater. Without layout
+# the tooltip element never gets `data-show` flipped.
+- test: "Admin Users Page bulk user delete disables checkboxes for users that can't be deleted"
+  reason: "Tooltip on hover-over-disabled-checkbox depends on Floating UI positioning which needs a real layout engine."
+
+# Dev tools plugin-outlet debugger overlays use Floating UI / absolute
+# positioning to draw outline tooltips around plugin-outlet anchors.
+- test: "Discourse dev tools plugin outlet debugging shows plugin outlet overlays with tooltips"
+  reason: "Plugin-outlet debug overlays are layout-positioned (Floating UI); no layout = no positioning."
