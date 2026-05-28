@@ -215,3 +215,17 @@
 - test: "Composer Form Templates creates a post with multiple uploads"
   reason: "Same Uppy / form-template-field upload chain as the invalid-file-type test; uploadedFiles[] race + a separate audio-file detection gap that needs a deeper look."
 
+# Visit-counter rollup: `fab!(:user_visit_*)` rows are inserted at
+# spec construction, but the `today` / `yesterday` counts come from
+# a memoized DailyVisits query that's cached per-process. Running the
+# spec standalone (or after another spec that already cached an empty
+# rollup for today's date) yields 0 / 0 instead of 2 / 1 — the
+# `today-count` matcher finds the element but the text is "0", not
+# the expected "2". Order-dependent at every prior driver baseline,
+# not introduced by our wall-sync model; reproducible standalone
+# against `4bf8be1` (bwgsck3lb code state) too. Likely an upstream
+# fixture-isolation bug.
+- test: 'Admin Dashboard General Tab when reporting_improvements is enabled displays correct visit counters combining desktop and mobile visits'
+  reason: 'Order-dependent: DailyVisits rollup is cached per-process; standalone the counter renders 0 instead of 2. Reproduces on the prior baseline (4bf8be1), so this is an upstream fixture-isolation issue, not the wall-sync clock model.'
+- test: 'Admin Dashboard General Tab when reporting_improvements is disabled displays correct visit counters'
+  reason: 'Same cached-rollup ordering issue as the reporting_improvements=true variant.'
