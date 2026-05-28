@@ -257,3 +257,24 @@
 # in-between backlog on the "ahead of bus" recovery path.
 - test: "Member upcoming changes when user is logged in adds and removes the body class based on MessageBus subscription for client site settings"
   reason: "Multi-session MessageBus delivery: real-browser long-poll keeps the main session's connection open during the admin's setting toggle and pushes the update through. Our short-poll model misses the messages and the `ahead of bus` recovery path doesn't redeliver them."
+
+# MessageBus `/client_settings` push-on-publish chain races test
+# polling. The Rack hijack hook (enabled for /message-bus/* polls
+# so admin_users_list_spec:37 sees its bulk-user-delete progress
+# messages) makes the long-poll deliver every server-side
+# `MessageBus.publish` synchronously inside the next settle drain.
+# Discourse's `onClientSettings` handler in
+# `subscribe-user-notifications.js` writes to the tracked
+# `siteSettings.{name}` slot, which re-renders any component
+# bound to that setting. The settings admin page binds every row
+# to its setting value, so the post-save publish re-renders the
+# row Capybara just found — StaleElement during `have_content`'s
+# poll, repeatedly, until timeout. Real browsers hit the same
+# chain but the Capybara/Playwright stale-handling retry settles
+# before our `have_content` does; matching that behaviour needs
+# either a Node#visible_text retry-on-stale wrap in the driver
+# or a debounce on the publish-delivery cadence.
+- test: 'Admin Site Setting Locales for locale enum allows selection of a different locale'
+  reason: 'MessageBus push-on-publish race: post-save `/client_settings` publish re-renders the setting row during `have_content` polling, repeatedly raising StaleElement.'
+- test: 'Admin Dashboard Redesign | Reports section lets admins customize the reports section via the manage-reports modal'
+  reason: 'Same MessageBus push-on-publish race during the modal-search → filter cycle.'
