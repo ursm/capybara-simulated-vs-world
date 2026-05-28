@@ -110,8 +110,6 @@
   reason: 'Horizontal scroll mechanics.'
 - test: 'Ember route-scroll-manager service scrolls to top when navigating to new routes, and remembers scroll position when going back'
   reason: 'Scroll position memory.'
-- test: 'Post small actions applies search highlight decorations'
-  reason: 'Highlight position depends on offsetTop measurements.'
 - test: 'Simplified Category Creation General Tab does not show expand toggle for short descriptions'
   reason: 'Toggle visibility gated on description scrollHeight.'
 - test: 'Group activity when on the posts activity page loads and paginates the results by chronology'
