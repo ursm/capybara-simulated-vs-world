@@ -195,6 +195,14 @@
 - test: "Admin Users Page bulk user delete disables checkboxes for users that can't be deleted"
   reason: "Tooltip on hover-over-disabled-checkbox depends on Floating UI positioning which needs a real layout engine."
 
+# Site traffic section's comparison tooltip is the same Float-kit /
+# Floating UI mount. The headline + trend assertions pass; only the
+# hover-then-assert-tooltip-content steps stay layout-bound.
+- test: 'Admin Dashboard Redesign | Site Traffic section lets staff review pageview totals, inspect tooltips, and compare another period'
+  reason: 'Float-kit comparison-tooltip mount on hover depends on Floating UI positioning which needs a real layout engine.'
+- test: 'Admin Dashboard Redesign | Site Traffic section shows staff traffic for a selected custom date range'
+  reason: 'Same Float-kit comparison-tooltip dependence.'
+
 # Dev tools plugin-outlet debugger overlays use Floating UI / absolute
 # positioning to draw outline tooltips around plugin-outlet anchors.
 - test: "Discourse dev tools plugin outlet debugging shows plugin outlet overlays with tooltips"
