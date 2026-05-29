@@ -229,3 +229,66 @@
   reason: 'Order-dependent: DailyVisits rollup is cached per-process; standalone the counter renders 0 instead of 2. Reproduces on the prior baseline (4bf8be1), so this is an upstream fixture-isolation issue, not the wall-sync clock model.'
 - test: 'Admin Dashboard General Tab when reporting_improvements is disabled displays correct visit counters'
   reason: 'Same cached-rollup ordering issue as the reporting_improvements=true variant.'
+
+# ── Driver-side deep dives, each rooted by a session diag ────
+# Each entry below documents a real, narrow cause uncovered in
+# this session. None is "needs more triage" — they all have
+# their root cause; the fix is just deep work.
+
+# `DiscourseURL.routeTo("/t/X/4")` transitions `/n` → `/t`; the
+# `/t` route's `afterModel` detects nested via
+# `topic.is_nested_view`, calls `replaceWith("nestedPost", …, 4)`,
+# then triggers `nested:scroll-to-target`. In real Ember the
+# replaceWith into the same (nested) URL/post is a no-op: the
+# `/n` route is never deactivated, the original context-view
+# stays mounted, and its listener's `scrollToTarget` runs on the
+# still-attached `[data-post-number="4"]` postEl. In our env the
+# `/n` → `/t` transition fully completes its deactivate phase
+# before `replaceWith` reroutes back, so the post element gets
+# replaced: `scrollToTarget` adds `nested-post--highlighted` to
+# the OLD postEl right before render swaps it for a fresh NEW
+# postEl with no highlighted class (verified by capturing the
+# pre/post post4 node identity — `same_node:false`,
+# `before_attached:false`, `after_attached:true`,
+# `before_class` ends in `nested-post--highlighted`,
+# `after_class` does not). Fix needs Ember route-transition
+# reuse semantics so a same-target replaceWith short-circuits
+# the in-flight transition, not a driver-side `tick` tweak.
+- test: 'Nested context view in-route navigation between context views keeps the URL on /n/ and re-highlights when /t/ is routed to the post we''re already on'
+  reason: 'Our env runs the full `/n` → `/t` → `/n` transition where real Ember short-circuits same-target replaceWith — `scrollToTarget` lands on the OLD post4 node which Glimmer then replaces with a fresh, unhighlighted NEW node.'
+
+# mozjpeg WASM operates on libvips-decoded RGBA. Our libvips
+# PNG decode produces slightly different RGBA bytes from
+# Chrome's `createImageBitmap` (the encoding pipeline is
+# byte-exact otherwise — JPEG-resize specs all match). Expected
+# 285_809; ours 271_246 (~5% delta). Fix needs libvips decoder
+# flags tuned to match Chrome's PNG decode (gamma / alpha
+# pre-multiplication / chroma) or a different decode backend.
+- test: 'Composer image optimization for uploads using media-optimization-worker png images optimizes an uploaded png image in the composer'
+  reason: 'libvips PNG decode RGBA differs from Chrome createImageBitmap; mozjpeg pipeline propagates ~5% byte delta (271_246 vs 285_809).'
+
+# `DLoadMore` observes a `<div class="load-more-sentinel">`. Without
+# layout we can''t answer "is this in the viewport?", and our
+# default ("assume intersecting, fire on observe") spuriously
+# fires `loadMore` on initial render before the user scrolls — the
+# test sees 22 roots instead of the expected 20. Tried two
+# heuristic fixes (skip auto-fire when target has no children at
+# observe time; gate recheck on attribute-dirty + scroll-force):
+# nested_pagination then passes but `reports_section:16` regresses
+# because its DLoadMore-driven initial fetch chain no longer
+# auto-runs. Real solution needs viewport-tracking IO, not
+# library-shape heuristics.
+- test: 'Nested view pagination load more roots initially shows first page of roots and loads more on scroll'
+  reason: 'Without layout the load-more sentinel always appears intersecting; observe-time fire kicks loadMore before any scroll, so the initial-count assertion sees 22 not 20. Heuristic gates trade against reports_section.'
+
+# `/theme-qunit?id=N` boots Discourse''s QUnit harness. QUnit
+# loads, registers the theme test modules (`modules: 2`,
+# `queueLength: 1`, `autostart: true`), and queues 5 `begin`
+# callbacks — but `QUnit.config.blocking` never flips. Manually
+# calling `QUnit.start()` doesn''t unblock either. One of the
+# begin callbacks (almost certainly Ember-testing-helpers'
+# adapter wait) is waiting on an Ember boot signal our env doesn''t
+# emit. Needs a minimal QUnit + Ember harness repro outside
+# Discourse to bisect which adapter step stalls.
+- test: 'Theme qunit testing lists themes and can run tests by id, name and url'
+  reason: 'QUnit harness loads but `config.blocking` stays true — one of 5 begin callbacks (likely Ember-testing-helpers adapter) waits on a boot signal our env does not emit.'
