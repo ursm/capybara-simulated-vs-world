@@ -15,6 +15,14 @@ GIT
       capybara (>= 3.37)
       rack (>= 2.2)
 
+GIT
+  remote: https://github.com/ursm/mini_racer.git
+  revision: 0329ecc1cf0a5d1582ded19259ae88ee4f5dd2fb
+  branch: feature/cached-data-411
+  specs:
+    mini_racer (0.21.1)
+      libv8-node (~> 24.12.0.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -488,8 +496,6 @@ GEM
       mime-types-data (~> 3.2025, >= 3.2025.0507)
     mime-types-data (3.2026.0414)
     mini_mime (1.1.5)
-    mini_racer (0.21.1)
-      libv8-node (~> 24.12.0.1)
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
@@ -1082,7 +1088,7 @@ DEPENDENCIES
   mario-redis-lock (~> 1.2)
   memory_profiler
   mime-types (~> 3.7.0)
-  mini_racer
+  mini_racer!
   mutex_m
   net-http (~> 0.6.0)
   net-ldap (~> 0.18)
@@ -1356,7 +1362,7 @@ CHECKSUMS
   mime-types (3.7.0) sha256=dcebf61c246f08e15a4de34e386ebe8233791e868564a470c3fe77c00eed5e56
   mime-types-data (3.2026.0414) sha256=461c4c655373a44bd6c5fe54bcf5b7776026ea96e808144b1ec465c4b99148cc
   mini_mime (1.1.5) sha256=8681b7e2e4215f2a159f9400b5816d85e9d8c6c6b491e96a12797e798f8bccef
-  mini_racer (0.21.1) sha256=18e8ea7b94b934be509616587164761b9453e24ae558db6a980f317751d6b1b0
+  mini_racer (0.21.1)
   minitest (6.0.6) sha256=153ea36d1d987a62942382b61075745042a2b3123b1cd48f4c3675af9cc7d6f1
   msgpack (1.8.0) sha256=e64ce0212000d016809f5048b48eb3a65ffb169db22238fb4b72472fecb2d732
   multi_json (1.21.1) sha256=e6126a31808e3b4d19f483c775ceac34df190dffa62adfb63a165ee14ba68080
