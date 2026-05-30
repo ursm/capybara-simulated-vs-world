@@ -69,8 +69,6 @@
   reason: 'Scroll position drives visibility.'
 - test: 'Glimmer Header mobile topic-info shows when navigating direct to a later post'
   reason: 'Scroll position drives visibility.'
-- test: 'Glimmer Header mobile topic-info shows when jumping from OP to much later post'
-  reason: 'Scroll position drives visibility.'
 - test: 'Glimmer Header moves focus between tabs using arrow keys'
   reason: 'Tab visibility depends on horizontal-overflow width.'
 
@@ -108,8 +106,6 @@
   reason: 'Triple-click word/sentence range needs layout for line wraps.'
 - test: 'User preferences | Navigation menu when visiting the user''s preferences page should allow the user to scroll the horizontal navigation menu when window width is narrow'
   reason: 'Horizontal scroll mechanics.'
-- test: 'Ember route-scroll-manager service scrolls to top when navigating to new routes, and remembers scroll position when going back'
-  reason: 'Scroll position memory.'
 - test: 'Simplified Category Creation General Tab does not show expand toggle for short descriptions'
   reason: 'Toggle visibility gated on description scrollHeight.'
 
