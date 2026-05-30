@@ -30,6 +30,33 @@ begin
   require 'mini_racer'
   max_old_mb = (ENV['CSIM_V8_MAX_OLD_SPACE_MB'] || '4096').to_i
   MiniRacer::Platform.set_flags!('max-old-space-size': max_old_mb) if max_old_mb > 0
+
+  # Discourse's `000-mini_racer.rb` initializer calls
+  # `MiniRacer::Platform.set_flags!(:single_threaded)` whenever
+  # `GlobalSetting.mini_racer_single_threaded` is truthy. In test
+  # mode Discourse forces a `BlankProvider`, ignoring the
+  # `DISCOURSE_MINI_RACER_SINGLE_THREADED=false` env override, so the
+  # production default of `true` always wins. `:single_threaded`
+  # makes V8 embed process-local state in `ScriptCompiler::
+  # CreateCodeCache` blobs, breaking cross-process bytecode reuse
+  # (verified: same source + warmup + Snapshot.dump/load → 0/3
+  # accept under `:single_threaded`, 3/3 accept without). Filter the
+  # flag at the mini_racer surface so the initializer becomes a
+  # no-op and our `V8Runtime.script_cache` works across processes.
+  if !ENV['CSIM_ALLOW_SINGLE_THREADED']
+    module CsimSingleThreadedFilter
+      def set_flags!(*args, **kw)
+        args = args.reject {|a| a == :single_threaded }
+        # Discourse's call is `set_flags!(:single_threaded)` — after
+        # filtering, no positional args and no kwargs remain. Skip the
+        # super so we don't re-init MiniRacer::Platform with empty
+        # args (which raises PlatformAlreadyInitialized once any
+        # Context exists).
+        super(*args, **kw) unless args.empty? && kw.empty?
+      end
+    end
+    MiniRacer::Platform.singleton_class.prepend(CsimSingleThreadedFilter)
+  end
 rescue LoadError, MiniRacer::PlatformAlreadyInitialized
 end
 

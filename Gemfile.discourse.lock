@@ -1,18 +1,17 @@
 GIT
-  remote: https://github.com/ursm/capybara-simulated.git
-  revision: 7bad160e70fc6146ea0a463ed63e1beedd468d82
+  remote: https://github.com/ursm/mini_racer.git
+  revision: 0329ecc1cf0a5d1582ded19259ae88ee4f5dd2fb
+  branch: feature/cached-data-411
+  specs:
+    mini_racer (0.21.1)
+      libv8-node (~> 24.12.0.1)
+
+PATH
+  remote: /home/ursm/Code/github.com/ursm/capybara-simulated
   specs:
     capybara-simulated (0.0.7)
       capybara (>= 3.37)
       rack (>= 2.2)
-
-GIT
-  remote: https://github.com/ursm/mini_racer.git
-  revision: b74d09975edacbb41e184092aa6ce95ed23f12c1
-  branch: perform-microtask-checkpoint
-  specs:
-    mini_racer (0.21.1)
-      libv8-node (~> 24.12.0.1)
 
 GEM
   remote: https://rubygems.org/
