@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ursm/mini_racer.git
-  revision: 0329ecc1cf0a5d1582ded19259ae88ee4f5dd2fb
-  branch: feature/cached-data-411
+  revision: d253006e9562ae70de81430f79b16c8b0e2c909f
+  branch: experimental/cached-data-and-module-api
   specs:
     mini_racer (0.21.1)
       libv8-node (~> 24.12.0.1)

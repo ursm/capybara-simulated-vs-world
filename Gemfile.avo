@@ -17,11 +17,12 @@ group :test do
   # Both JS engines installed so the suite can exercise either via
   # `CSIM_JS_ENGINE=v8|quickjs`. capybara-simulated.gemspec lists
   # neither as a hard dependency.
-  # `Context#compile` + `Script#cached_data` + `Snapshot.load`
-  # (rubyjs/mini_racer#413) drives `V8Runtime`'s cross-process
-  # bytecode cache; all csim apps share the branch so the cache
-  # lights up regardless of host.
-  gem 'mini_racer', git: 'https://github.com/ursm/mini_racer.git', branch: 'feature/cached-data-411'
+  # Carries `Context#compile` / `Script#cached_data` / `Snapshot.load`
+  # (cross-process bytecode cache) and `Context#compile_module` /
+  # `Module#instantiate` / `#evaluate` / `Context#dynamic_import_resolver=`
+  # (V8 native ES Module API). All csim apps share the branch so the
+  # cache + native-module path light up regardless of host.
+  gem 'mini_racer', git: 'https://github.com/ursm/mini_racer.git', branch: 'experimental/cached-data-and-module-api'
   gem 'quickjs', '>= 0.18'
   gem 'stackprof'
 end
