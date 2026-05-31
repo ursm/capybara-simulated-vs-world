@@ -18,7 +18,16 @@ cd "$APP"
 
 export BUNDLE_GEMFILE="$ROOT/Gemfile.forem"
 export RUBYOPT="-r$ROOT/support/csim_rspec.rb ${RUBYOPT:-}"
-export CSIM_DRIVER="${CSIM_DRIVER:-simulated}"
+
+# CSIM_DRIVER must be set explicitly. We learned the hard way that a
+# silent default makes "did I just compare simulated against itself?"
+# the most common perf-measurement bug (CSIM_DRIVER='' falls back via
+# bash :- to the default and you get sim-vs-sim instead of
+# sim-vs-real). Require the value at the runner boundary.
+if [ "${CSIM_DRIVER:-}" != "simulated" ] && [ "${CSIM_DRIVER:-}" != "real" ]; then
+  echo "error: CSIM_DRIVER must be 'simulated' or 'real'" >&2
+  exit 1
+fi
 export CSIM_EXPECTED_FAILURES="${CSIM_EXPECTED_FAILURES-$ROOT/lists/forem.yml}"
 
 # Forem reads `ApplicationConfig["APP_PROTOCOL"]` from the environment
