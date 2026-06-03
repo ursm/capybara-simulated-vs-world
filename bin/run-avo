@@ -13,10 +13,11 @@ APP="$ROOT/apps/avo"
 
 cd "$APP"
 
-# Per-app Ruby pin; mise's prebuilt 3.3.x line works fine for Avo's
-# `.ruby-version` of 3.3.1 (Avo's Gemfile doesn't pin exact like
-# Forem's does, so we don't need the strip-and-eval trick here).
-RUBY_VERSION=3.3.11
+# Per-app Ruby pin. Avo's `.ruby-version` is 3.3.1, but mise can't build
+# the 3.3.x line on this box, so we run on 3.4.9 — Avo's Gemfile doesn't
+# pin an exact Ruby (unlike Forem), so the newer line resolves fine and
+# we don't need the strip-and-eval trick here.
+RUBY_VERSION=3.4.9
 
 # Avo's dummy app's Sprockets manifest reaches up into the gem's
 # `app/assets/builds/`, which doesn't exist on a fresh clone — yarn
