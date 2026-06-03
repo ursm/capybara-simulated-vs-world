@@ -69,6 +69,8 @@
   reason: 'Scroll position drives visibility.'
 - test: 'Glimmer Header mobile topic-info shows when navigating direct to a later post'
   reason: 'Scroll position drives visibility.'
+- test: 'Glimmer Header mobile topic-info shows when jumping from OP to much later post'
+  reason: 'Header `topicInfoVisible` keys on `mainTopicTitleVisible`, an IntersectionObserver on the main topic title; no layout = no reliable in/out-of-viewport signal after the SPA jump, so login-button visibility is wrong.'
 - test: 'Glimmer Header moves focus between tabs using arrow keys'
   reason: 'Tab visibility depends on horizontal-overflow width.'
 
@@ -83,6 +85,32 @@
   reason: 'IntersectionObserver against scroll viewport.'
 - test: 'Nested view cloaking with many root posts uncloaks roots when scrolling to them'
   reason: 'IntersectionObserver against scroll viewport.'
+# Nested-view root pagination is a DLoadMore IntersectionObserver
+# sentinel; without layout it intersects eagerly and loads page 2 into
+# the initial render, so `initial_count` is 22 (page 1 + part of page 2)
+# instead of 20. Same class as the cloaking/load-more specs.
+- test: 'Nested view pagination load more roots initially shows first page of roots and loads more on scroll'
+  reason: 'DLoadMore IntersectionObserver loads page 2 eagerly without layout (initial_count 22 vs 20).'
+# `#main-container` is hidden by `{{#if postStream.firstPostNotLoaded}}`.
+# The post stream's load-above sentinel is an IntersectionObserver
+# (`prependMore`): without a layout engine it intersects eagerly and
+# keeps loading posts above the entry point, eventually pulling in
+# post_number 1 — so `firstPostPresent` becomes true and the content
+# above is no longer hidden. A real browser leaves the sentinel above
+# the viewport until you scroll up. Same class as the cloaking specs.
+- test: 'Post stream when hiding scrollable content hides and shows content above the post stream based on loaded posts'
+  reason: 'load-above IntersectionObserver sentinel over-loads posts (incl. post 1) without layout.'
+# Manage-reports modal infinite-scroll list. `DLoadMore` is an
+# IntersectionObserver sentinel: without a layout engine it "intersects"
+# eagerly and pre-loads page 2, and our in-process `rack_fetch` is
+# synchronous (no network latency) so the search refetch — which the
+# server (correctly) returns 0 results for, since it matches report
+# TITLE "Admin Logins" not the identifier "admin_logins" — lands before
+# Capybara's poll and clears the list. A real browser leaves the
+# pre-search list visible during ajax latency with the sentinel below
+# the fold. Same out-of-scope class as the post-stream IO specs above.
+- test: 'Admin Dashboard Redesign | Reports section lets admins customize the reports section via the manage-reports modal'
+  reason: 'DLoadMore IntersectionObserver + zero-latency fetch; needs layout + network timing.'
 
 # Welcome banner / Header Search responsiveness — scroll handlers
 # that hide one search element and show another.
@@ -181,35 +209,20 @@
 # the timing difference covering for the missing check.
 - test: "Composer Form Templates doesn't allow uploading an invalid file type"
   reason: "Upstream test relies on a race: dialog assertion races the upload completion. Our in-process upload finishes synchronously, so `have_no_css(.form-template-field__uploaded-files)` fails immediately. Verified the same failure in real Chrome with a 2 s post-attach sleep."
-- test: "Composer Form Templates creates a post with multiple uploads"
-  reason: "Same Uppy / form-template-field upload chain as the invalid-file-type test; uploadedFiles[] race + a separate audio-file detection gap that needs a deeper look."
+# (Removed 'creates a post with multiple uploads' — now PASSES; the
+# event-loop redesign's timing fixed the multi-upload/audio chain.)
 
 # ── Driver-side deep dives, each rooted by a session diag ────
 # Each entry below documents a real, narrow cause uncovered in
 # this session. None is "needs more triage" — they all have
 # their root cause; the fix is just deep work.
 
-# `DiscourseURL.routeTo("/t/X/4")` transitions `/n` → `/t`; the
-# `/t` route's `afterModel` detects nested via
-# `topic.is_nested_view`, calls `replaceWith("nestedPost", …, 4)`,
-# then triggers `nested:scroll-to-target`. In real Ember the
-# replaceWith into the same (nested) URL/post is a no-op: the
-# `/n` route is never deactivated, the original context-view
-# stays mounted, and its listener's `scrollToTarget` runs on the
-# still-attached `[data-post-number="4"]` postEl. In our env the
-# `/n` → `/t` transition fully completes its deactivate phase
-# before `replaceWith` reroutes back, so the post element gets
-# replaced: `scrollToTarget` adds `nested-post--highlighted` to
-# the OLD postEl right before render swaps it for a fresh NEW
-# postEl with no highlighted class (verified by capturing the
-# pre/post post4 node identity — `same_node:false`,
-# `before_attached:false`, `after_attached:true`,
-# `before_class` ends in `nested-post--highlighted`,
-# `after_class` does not). Fix needs Ember route-transition
-# reuse semantics so a same-target replaceWith short-circuits
-# the in-flight transition, not a driver-side `tick` tweak.
-- test: 'Nested context view in-route navigation between context views keeps the URL on /n/ and re-highlights when /t/ is routed to the post we''re already on'
-  reason: 'Our env runs the full `/n` → `/t` → `/n` transition where real Ember short-circuits same-target replaceWith — `scrollToTarget` lands on the OLD post4 node which Glimmer then replaces with a fresh, unhighlighted NEW node.'
+# (Removed 'Nested context view … re-highlights when /t/ is routed to
+# the post we're already on' — now PASSES. The same-target replaceWith
+# route-transition race the long note below described is no longer
+# observable; the event-loop redesign's timing changed the deactivate /
+# replaceWith / scrollToTarget interleave so the highlight lands on the
+# surviving post node. Re-list with a fresh diagnosis if it regresses.)
 
 # mozjpeg WASM operates on libvips-decoded RGBA. Our libvips
 # PNG decode produces slightly different RGBA bytes from
