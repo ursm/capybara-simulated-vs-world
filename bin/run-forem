@@ -17,6 +17,16 @@ APP="$ROOT/apps/forem"
 cd "$APP"
 
 export BUNDLE_GEMFILE="$ROOT/Gemfile.forem"
+
+# Default the capybara-simulated source to the local checkout so the Gemfile
+# matches the checked-in PATH lock. The real-driver path used to fall back to
+# `github:` (CAPYBARA_SIMULATED_PATH unset), which didn't match the PATH lock →
+# Bundler silently re-resolved, REWROTE the lock, and hit a pinned-Ruby default-gem
+# conflict (e.g. json 2.19.7 vs lock 2.19.5). Frozen makes any remaining Gemfile/
+# lock mismatch fail LOUD instead of churning the lock; run `bundle install` to
+# regenerate the lock when the gemspec deps legitimately change.
+export CAPYBARA_SIMULATED_PATH="${CAPYBARA_SIMULATED_PATH:-../capybara-simulated}"
+export BUNDLE_FROZEN=1
 export RUBYOPT="-r$ROOT/support/csim_rspec.rb ${RUBYOPT:-}"
 
 # CSIM_DRIVER must be set explicitly. We learned the hard way that a
