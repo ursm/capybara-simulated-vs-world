@@ -13,11 +13,12 @@ APP="$ROOT/apps/avo"
 
 cd "$APP"
 
-# Per-app Ruby pin. Avo's `.ruby-version` is 3.3.1, but mise can't build
-# the 3.3.x line on this box, so we run on 3.4.9 — Avo's Gemfile doesn't
-# pin an exact Ruby (unlike Forem), so the newer line resolves fine and
-# we don't need the strip-and-eval trick here.
-RUBY_VERSION=3.4.9
+# Per-app Ruby pin, matching Avo's `.ruby-version` (3.3.1) and its
+# Appraisal gemfile (rails_8.0_ruby_3.3). 3.3.x is now installed via mise
+# (3.3.11). Running on the 3.4 line broke instead: Ruby 3.4 dropped
+# mutex_m / observer / etc. from the default gems, and Avo's ruby_3.3
+# bundle doesn't carry them, so csim_rspec's stdlib `require`s LoadError'd.
+RUBY_VERSION=3.3.11
 
 # Avo's dummy app's Sprockets manifest reaches up into the gem's
 # `app/assets/builds/`, which doesn't exist on a fresh clone — yarn
@@ -64,11 +65,16 @@ export BUNDLE_GEMFILE="$ROOT/Gemfile.avo"
 # matches the checked-in PATH lock. The real-driver path used to fall back to
 # `github:` (CAPYBARA_SIMULATED_PATH unset), which didn't match the PATH lock →
 # Bundler silently re-resolved, REWROTE the lock, and hit a pinned-Ruby default-gem
-# conflict (e.g. json 2.19.7 vs lock 2.19.5). Frozen makes any remaining Gemfile/
-# lock mismatch fail LOUD instead of churning the lock; run `bundle install` to
-# regenerate the lock when the gemspec deps legitimately change.
+# conflict (e.g. json 2.19.7 vs lock 2.19.5). Always defaulting the PATH is what
+# actually prevents that churn (resolution then matches the lock byte-for-byte).
 export CAPYBARA_SIMULATED_PATH="${CAPYBARA_SIMULATED_PATH:-../capybara-simulated}"
-export BUNDLE_FROZEN=1
+# NOTE: BUNDLE_FROZEN is intentionally NOT set here (unlike the other runners).
+# Gemfile.avo `eval_gemfile`s Avo's Appraisal gemfile, whose `gemspec` directive
+# resolves to a path bundler 4.0 *serializes* as `apps/avo` but *frozen-checks*
+# as `..` — an internal inconsistency that makes `ensure_equivalent_gemfile_and_
+# lockfile` reject the lock no matter how it's regenerated. With the PATH default
+# above the resolution already matches the lock (verified: bundler/setup leaves
+# the lock unchanged), so frozen would only add a spurious failure here.
 export RUBYOPT="-r$ROOT/support/csim_rspec.rb ${RUBYOPT:-}"
 
 # CSIM_DRIVER must be set explicitly. We learned the hard way that a
