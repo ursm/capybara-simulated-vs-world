@@ -14,8 +14,8 @@ APP="$ROOT/apps/mastodon"
 cd "$APP"
 
 # Mastodon's `.ruby-version` pins 4.0.3 exactly; mise has it available.
-RUBY_VERSION=4.0.3
-NODE_VERSION=24.15.0
+RUBY_VERSION=3.4.7
+NODE_VERSION=24.10.0
 
 if command -v mise >/dev/null 2>&1; then
   ruby_wrap() { mise exec "ruby@$RUBY_VERSION" -- "$@"; }
@@ -34,7 +34,7 @@ if [ ! -e tmp/csim-assets-built ]; then
   echo "==> Mastodon JS bundle not built yet; running yarn + vite build (one-shot)"
   node_wrap corepack enable
   node_wrap corepack yarn install --immutable
-  RAILS_ENV=test DB_HOST=localhost DB_USER=postgres LOCAL_DOMAIN=cb.test \
+  RAILS_ENV=test DB_HOST=localhost DB_USER=postgres LOCAL_DOMAIN=localhost:3000 LOCAL_HTTPS=false \
     ruby_wrap bundle exec vite build
   mkdir -p tmp && touch tmp/csim-assets-built
 fi
@@ -72,7 +72,8 @@ export DB_USER="${DB_USER:-postgres}"
 # Mastodon hard-codes `cb.test` as the local domain in test setup
 # elsewhere; pin it here too so federation/URL helpers don't blow up
 # on a missing value.
-export LOCAL_DOMAIN="${LOCAL_DOMAIN:-cb.test}"
+export LOCAL_DOMAIN="${LOCAL_DOMAIN:-localhost:3000}"
+export LOCAL_HTTPS="${LOCAL_HTTPS:-false}"
 
 # Mastodon's spec_helper / capybara.rb defaults `Capybara.javascript_driver`
 # to `:playwright`. csim_rspec's `CsimDrivenBy` override picks it up
