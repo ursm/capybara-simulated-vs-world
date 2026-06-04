@@ -79,10 +79,12 @@ export LOCAL_HTTPS="${LOCAL_HTTPS:-false}"
 # to `:playwright`. csim_rspec's `CsimDrivenBy` override picks it up
 # (playwright is in `REAL_BROWSER_DRIVERS`) and routes to `:simulated`.
 
-# Default to JS-tagged system specs: Mastodon untagged system specs run
-# under :rack_test and never touch capybara-simulated.
+# Default to the JS-driven system specs: both `:js` and `:streaming` are
+# excluded by rails_helper unless opted in, and both drive a real JS browser
+# (so capybara-simulated stands in for it). Untagged system specs run under
+# :rack_test and never touch the driver, so they'd measure nothing here.
 if [ "$#" -eq 0 ]; then
-  set -- --tag js spec/system
+  set -- --tag js --tag streaming spec/system
 fi
 
 if command -v mise >/dev/null 2>&1; then
