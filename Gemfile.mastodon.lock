@@ -9,10 +9,10 @@ GIT
 
 GIT
   remote: https://github.com/ursm/mini_racer.git
-  revision: 6e1f5cb6ced5302cb6c9bd241c47244ed4aebf51
-  branch: experimental/cached-data-and-module-api
+  revision: 97657bf122073dfaebd83a6d37cd1e7bd0a4cc1d
+  branch: csim
   specs:
-    mini_racer (0.21.1)
+    mini_racer-csim (0.21.1)
       libv8-node (~> 24.12.0.1)
 
 PATH
@@ -1028,7 +1028,7 @@ DEPENDENCIES
   mario-redis-lock (~> 1.2)
   memory_profiler
   mime-types (~> 3.7.0)
-  mini_racer!
+  mini_racer-csim!
   mutex_m
   net-http (~> 0.6.0)
   net-ldap (~> 0.18)
