@@ -15,9 +15,9 @@ dependencies.delete_if {|d| d.name == 'mini_racer' }
 # Carries `Context#compile` / `Script#cached_data` / `Snapshot.load`
 # (cross-process bytecode cache) and `Context#compile_module` /
 # `Module#instantiate` / `#evaluate` / `Context#dynamic_import_resolver=`
-# (V8 native ES Module API). All csim apps share the branch so the
+# (V8 native ES Module API). All csim apps share this gem so the
 # cache + native-module path light up regardless of host.
-gem 'mini_racer-csim', github: 'ursm/mini_racer', branch: 'csim', require: 'mini_racer'
+gem 'mini_racer-csim', '>= 0.21.1'
 
 group :test do
   if (csim_path = ENV['CAPYBARA_SIMULATED_PATH'])

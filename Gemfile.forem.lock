@@ -6,14 +6,6 @@ GIT
     acts_as_follower (0.2.1)
       activerecord (>= 4.0)
 
-GIT
-  remote: https://github.com/ursm/mini_racer.git
-  revision: 97657bf122073dfaebd83a6d37cd1e7bd0a4cc1d
-  branch: csim
-  specs:
-    mini_racer-csim (0.21.1)
-      libv8-node (~> 24.12.0.1)
-
 PATH
   remote: /home/ursm/Code/github.com/ursm/capybara-simulated
   specs:
@@ -578,6 +570,8 @@ GEM
     mini_histogram (0.3.1)
     mini_magick (4.13.2)
     mini_mime (1.1.5)
+    mini_racer-csim (0.21.1.0)
+      libv8-node (~> 24.12.0.1)
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
@@ -1173,7 +1167,7 @@ DEPENDENCIES
   memory_profiler (~> 1.0)
   metainspector (~> 5.12)
   mini_magick (~> 4.13)
-  mini_racer-csim!
+  mini_racer-csim (>= 0.21.1)
   mutex_m
   nakayoshi_fork (~> 0.0.4)
   nokogiri (~> 1.18)
@@ -1471,7 +1465,7 @@ CHECKSUMS
   mini_histogram (0.3.1) sha256=6a114b504e4618b0e076cc672996036870f7cc6f16b8e5c25c0c637726d2dd94
   mini_magick (4.13.2) sha256=71d6258e0e8a3d04a9a0a09784d5d857b403a198a51dd4f882510435eb95ddd9
   mini_mime (1.1.5) sha256=8681b7e2e4215f2a159f9400b5816d85e9d8c6c6b491e96a12797e798f8bccef
-  mini_racer-csim (0.21.1)
+  mini_racer-csim (0.21.1.0) sha256=859c716997a4115d9a929cb34dbfedf076325e9a63392ca349cda7e1199f950c
   minitest (6.0.6) sha256=153ea36d1d987a62942382b61075745042a2b3123b1cd48f4c3675af9cc7d6f1
   modis (4.3.2) sha256=99a7f01c54e07ba9f06501f91474ae7fb31e72cbf7e220abe214db30fc23531b
   msgpack (1.8.0) sha256=e64ce0212000d016809f5048b48eb3a65ffb169db22238fb4b72472fecb2d732
