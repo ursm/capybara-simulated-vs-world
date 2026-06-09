@@ -4,13 +4,25 @@
 # may also be a `./spec/...rb:LINE` location string or a Regexp
 # matched against either.
 #
-# Last verified against Forem 99141cc1f on 2026-05-14
-# (capybara-simulated 0.0.7 / Ruby 3.3.11), `bin/run-forem`'s default
+# Last verified against Forem on 2026-06-09
+# (capybara-simulated local main / Ruby 4.0), `bin/run-forem`'s default
 # `--tag js spec/system` selector.
 #
-# Currently empty — every `:js`-tagged Forem system spec passes
-# under capybara-simulated. The previous lone entry (the ahoy
-# `tracks events` race) turned out to be driver spec-compliance
-# gaps, not a structural in-process limit; fixing
-# `navigator.sendBeacon`, `HTMLAnchorElement.toString`,
-# `Mozilla/5.0`-prefixed UA, and `REMOTE_ADDR` cleared it.
+# Classification convention (so failures don't need re-triage each run):
+#   OUT-OF-SCOPE — needs a real layout engine / async runtime / IDNA; a
+#                  failure here is NOT a driver bug (CLAUDE.md rule 1). Listed.
+#   DRIVER-GAP / FLAKY — NOT listed; those get fixed, not papered over.
+
+# ── OUT-OF-SCOPE (layout / off-screen visibility) ─────────────────
+- test: "Using the editor Viewing the editor renders the logo or Community name as expected"
+  reason: |
+    OUT-OF-SCOPE (layout). The editor page renders the site logo twice — the
+    page header's `.crayons-header .site-logo .truncate-at-2` and the editor
+    form's `.crayons-article-form__logo .truncate-at-2` (articles/_v2_form.html.erb)
+    — so `within(".truncate-at-2")` is ambiguous. The header copy is moved
+    off-screen by the form's inline style (`.crayons-header * { position:absolute;
+    left:-9999em }`, Forem PR #11701); verified in real Chrome the header span sits
+    at x=-319968 with visibility:visible. Distinguishing the on-screen logo from the
+    off-screen one needs viewport geometry (an explicit non-goal). The duplicate is
+    NOT a parser leak — a `<base>`/`data-site-logo` attribute carrying HTML stays a
+    string in our parser (verified). Will auto-flag FIXED if a layout model lands.
