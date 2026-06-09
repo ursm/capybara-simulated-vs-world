@@ -245,3 +245,25 @@
 # Discourse to bisect which adapter step stalls.
 - test: 'Theme qunit testing lists themes and can run tests by id, name and url'
   reason: 'QUnit harness loads but `config.blocking` stays true — one of 5 begin callbacks (likely Ember-testing-helpers adapter) waits on a boot signal our env does not emit.'
+
+# ── Cross-session MessageBus delivery needs a real async runtime ───
+# `member_upcoming_changes` (default session) `visit "/"`, then a
+# SEPARATE `using_session(:admin)` disables a setting (publishes on
+# `/client_settings`), and the default session must drop the body class.
+# For that, the default session's `/client_settings` long-poll must reach
+# its real server position (held at e.g. id 129) BEFORE the admin's
+# publish (id 130). It can't here: Discourse's Ember SPA only starts the
+# MessageBus poll during async app-init that the in-process LAZY virtual
+# clock doesn't drive at `visit` time, and the default session sits idle
+# during the `using_session` block. Traced (`client_settings=` lastId hook):
+# the default poll fires `-1 → 130` — its `poll(lastId=-1)` only runs
+# AFTER the publish, so `/__status` RESETS lastId to 130 without replaying
+# message 130 as a delivery → the disable is silently lost. Establishing
+# the subscription at `visit` requires advancing the clock to run Ember
+# init, which fires app `setTimeout(0)`s and breaks the lazy first-find
+# transient-state contract; forcing it still didn't establish the poll.
+# This is the real-async-runtime / full-SPA-settle territory that's out of
+# scope. (The find-tick delivery gate the investigation produced — a held
+# poll's delivery now reflects in find-polling — DID land upstream.)
+- test: 'Member upcoming changes when user is logged in adds and removes the body class based on MessageBus subscription for client site settings'
+  reason: 'Cross-session MessageBus delivery: the default session''s /client_settings long-poll can''t reach its real position before the using_session publish — Ember starts the poll during async init the lazy clock won''t drive at visit, and driving it breaks the first-find transient contract. Needs a real async runtime.'
