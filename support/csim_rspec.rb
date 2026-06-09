@@ -7,8 +7,6 @@
 # 2. Skip examples whose `<class>#<method>`-shaped description matches
 #    an entry in the expected-failures list at `CSIM_EXPECTED_FAILURES`.
 
-return unless ENV['CSIM_DRIVER'] == 'simulated'
-
 # Bundler activates the gem set BEFORE exec'ing ruby, so $LOAD_PATH is
 # already wired up by the time RUBYOPT runs us — but the released
 # capybara-simulated 0.0.7 vs the local path version both ship a
@@ -66,6 +64,12 @@ end
 # Same story for other stdlib-extracted classes Rails 7.0 grew up
 # expecting to be ambiently available.
 %w[base64 bigdecimal csv drb logger mutex_m observer ostruct].each {|name| require name }
+
+# The host-app boot fixes above (bundler/setup + mini_racer platform flags +
+# stdlib-compat requires) must run for BOTH drivers — real Discourse/Forem need them
+# for their own Rails boot, not just the simulated driver. Only the csim-driver-
+# specific setup below is gated behind the driver check.
+return unless ENV['CSIM_DRIVER'] == 'simulated'
 
 require 'capybara/simulated'
 require 'action_dispatch/system_test_case'
