@@ -211,17 +211,29 @@ RSpec.configure do |config|
     end
   end
 
-  # `JsLocaleHelper.@loaded_translations` (the base YAML bundle that
-  # gets merged with TranslationOverride values in `output_MF` /
-  # `output_client_overrides`) auto-clears in development but not in
-  # test. Without clearing it between examples, a test that `fab!`s
-  # a TranslationOverride and then visits would see the previous
-  # test's bundle without the new override. Discourse's CI passes
-  # because each spec runs in a fresh process; our serial run needs
-  # the explicit clear.
+  # Two Discourse class-level locale caches survive across examples in our
+  # serial in-process run (a fresh-process CI never sees them):
+  #
+  # 1. `JsLocaleHelper.@loaded_translations` — the base YAML bundle that
+  #    `output_MF` / `output_client_overrides` merge TranslationOverride
+  #    values into.
+  # 2. `ExtraLocalesController.@js_digests` — the compiled MF/overrides
+  #    bundle DIGEST, keyed per (site, bundle, locale). This is the
+  #    load-bearing one: the `/extra-locales/<digest>/<locale>/mf.js` URL the
+  #    page embeds comes from this cache, and `show` marks the response
+  #    `immutable_for(1.year)` when the digest matches. So a prior example
+  #    pins digest_A (no override); a later example that `fab!`s a
+  #    TranslationOverride re-emits the SAME digest_A URL, which our HTTP
+  #    asset cache then serves immutably without ever re-running `output_MF`
+  #    — the override never reaches the client (locale_spec messageformat
+  #    overrides). Discourse clears this via a TranslationOverride after-save
+  #    hook in production; the serial run needs the explicit clear.
   config.before(:each) do
     if Object.const_defined?(:JsLocaleHelper)
       Object.const_get(:JsLocaleHelper).clear_cache!
+    end
+    if Object.const_defined?(:ExtraLocalesController)
+      Object.const_get(:ExtraLocalesController).clear_cache!(all_sites: true)
     end
   end
 
