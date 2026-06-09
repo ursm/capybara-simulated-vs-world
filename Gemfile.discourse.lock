@@ -308,7 +308,7 @@ GEM
     mini_mime (1.1.5)
     mini_racer (0.21.1)
       libv8-node (~> 24.12.0.1)
-    mini_racer-csim (0.21.1.0)
+    mini_racer-csim (0.21.1.5)
       libv8-node (~> 24.12.0.1)
     mini_scheduler (0.20.0)
       sidekiq (>= 6.5, < 9.0)
