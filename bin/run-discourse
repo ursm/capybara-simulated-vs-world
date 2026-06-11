@@ -88,13 +88,8 @@ fi
 # ambient Bundler.setup.
 export RUBYOPT="-r$ROOT/support/csim_rspec.rb ${RUBYOPT:-}"
 
-# V8 was crashing in `wasm::StackMemory::jslimit()` (NULL deref at 0x68)
-# under sustained Ember work; mini_racer PR #416 (`fix-single-threaded-
-# v8-thread`, rubyjs/mini_racer#415) hoists the JS→Ruby callback path
-# off the Ruby caller thread and the SEGV is gone — 3/3 deterministic
-# repro on stock 0.21.0, 0/3 on the PR branch. Default to V8 now;
-# override with `CSIM_JS_ENGINE=quickjs` for the slower-but-fork-safe
-# QuickJS path.
+# Default to V8 (rusty_racer); override with `CSIM_JS_ENGINE=quickjs`
+# for the slower-but-fork-safe QuickJS path.
 export CSIM_JS_ENGINE="${CSIM_JS_ENGINE:-v8}"
 
 # Discourse's before-each calls `driven_by(:playwright_chrome)` or

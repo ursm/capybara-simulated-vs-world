@@ -1,23 +1,9 @@
 # Run Discourse's bundle in *our* gem set: load upstream's Gemfile
 # verbatim, then layer capybara-simulated on top.
 # Activated via `BUNDLE_GEMFILE=Gemfile.discourse`.
-#
-# Discourse's own Gemfile declares `gem "mini_racer"`. We need to
-# replace it with the rubyjs/mini_racer#418 fork that exposes
-# `Context#perform_microtask_checkpoint` — see the
-# `dispatchEventForUserAction` rationale below. Bundler refuses two
-# `gem` declarations for the same name from different sources, so wrap
-# the upstream eval and drop the original declaration before adding
-# ours.
+# (Discourse's own `gem "mini_racer"` stays as-is — that's its
+# server-side PrettyText engine, unrelated to csim's JS engine.)
 eval_gemfile File.expand_path('apps/discourse/Gemfile', __dir__)
-dependencies.delete_if {|d| d.name == 'mini_racer' }
-
-# Carries `Context#compile` / `Script#cached_data` / `Snapshot.load`
-# (cross-process bytecode cache) and `Context#compile_module` /
-# `Module#instantiate` / `#evaluate` / `Context#dynamic_import_resolver=`
-# (V8 native ES Module API). All csim apps share this gem so the
-# cache + native-module path light up regardless of host.
-gem 'mini_racer-csim', '>= 0.21.1'
 
 group :test do
   if (csim_path = ENV['CAPYBARA_SIMULATED_PATH'])
@@ -27,6 +13,7 @@ group :test do
   end
   # Pull in QuickJS so `CSIM_JS_ENGINE=quickjs` works too.
   gem 'quickjs', '>= 0.18'
+  gem 'rusty_racer', path: '/home/ursm/Code/github.com/ursm/rusty_racer'
   # Canvas / OffscreenCanvas image decode (drawImage(Blob)/createImageBitmap
   # → libvips). Other apps (Avo / Forem / Mastodon) already pull this in
   # transitively via ActiveStorage variants; Discourse doesn't, so its

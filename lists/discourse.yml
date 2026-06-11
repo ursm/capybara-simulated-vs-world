@@ -13,8 +13,8 @@
 # (`2620e7c`) unblocked init for most specs — they pass in isolation
 # (Container 3/3, links 1/3, keymap 7/17 FIXED individually). But in
 # the full Discourse suite the same specs trigger V8
-# `ScriptTerminatedError` (mini_racer kills long ProseMirror init
-# chains under suite-level memory / time pressure); they need either
+# `ScriptTerminatedError` (the call timeout kills long ProseMirror
+# init chains under suite-level memory / time pressure); they need either
 # a longer per-call timeout budget or lighter ProseMirror init. Mark
 # editor-body specs as expected-failing until that's done; Container
 # subset that doesn't open the rich editor stays unconstrained.

@@ -17,7 +17,7 @@ group :test do
   # `Module#instantiate` / `#evaluate` / `Context#dynamic_import_resolver=`
   # (V8 native ES Module API). All csim apps share the branch so the
   # cache + native-module path light up regardless of host.
-  gem 'mini_racer-csim', '>= 0.21.1'
   gem 'quickjs', '>= 0.18'
+  gem 'rusty_racer', path: '/home/ursm/Code/github.com/ursm/rusty_racer'
   gem 'stackprof'
 end
