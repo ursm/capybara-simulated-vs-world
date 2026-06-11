@@ -16,6 +16,37 @@
 # Gemfile-resolved version (the local path) before the require.
 require 'bundler/setup'
 
+# Discourse's `000-mini_racer.rb` initializer sets
+# `MiniRacer::Platform.set_flags!(:single_threaded)` for ITS OWN V8
+# (PrettyText / theme migrations) whenever
+# `GlobalSetting.mini_racer_single_threaded` is truthy — and in test mode
+# the BlankProvider forces the production default of true. That costs the
+# suite real wall: `lib/asset_processor.rb` calls
+# `v8.low_memory_notification` after every JS call when the flag is set
+# (a full GC-pressure notification — rbspy: ~5.6% of the about_page
+# sample), plus the single-threaded eval path itself. Filter the flag at
+# the MiniRacer surface so the initializer becomes a no-op. This tunes the
+# HOST app only (csim's own engine is rusty_racer, a separate platform)
+# and applies to both drivers, so csim-vs-real comparisons stay fair.
+# `CSIM_ALLOW_SINGLE_THREADED=1` restores upstream behaviour.
+begin
+  require 'mini_racer'
+  if !ENV['CSIM_ALLOW_SINGLE_THREADED']
+    module CsimSingleThreadedFilter
+      def set_flags!(*args, **kw)
+        args = args.reject {|a| a == :single_threaded }
+        # Discourse's call is `set_flags!(:single_threaded)` — after
+        # filtering, nothing remains; skip super so we don't re-init
+        # MiniRacer::Platform with empty args (raises
+        # PlatformAlreadyInitialized once any Context exists).
+        super(*args, **kw) unless args.empty? && kw.empty?
+      end
+    end
+    MiniRacer::Platform.singleton_class.prepend(CsimSingleThreadedFilter)
+  end
+rescue LoadError
+end
+
 # Rails 7.0's `active_support/logger_thread_safe_level.rb` references
 # `Logger::Severity` at load time without `require 'logger'`. On
 # Ruby 3.3+ that fails because Logger sits in a bundled gem now.
