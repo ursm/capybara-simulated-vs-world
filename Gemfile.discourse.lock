@@ -1,7 +1,7 @@
 PATH
   remote: /home/ursm/Code/github.com/ursm/capybara-simulated
   specs:
-    capybara-simulated (0.0.7)
+    capybara-simulated (0.1.0)
       capybara (>= 3.37)
       rack (>= 2.2)
 
