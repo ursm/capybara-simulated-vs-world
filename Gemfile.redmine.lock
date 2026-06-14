@@ -374,15 +374,15 @@ GEM
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
     rubyzip (3.2.2)
-    rusty_racer (0.1.4)
+    rusty_racer (0.1.5)
       rb_sys (~> 0.9)
-    rusty_racer (0.1.4-aarch64-linux)
+    rusty_racer (0.1.5-aarch64-linux)
       rb_sys (~> 0.9)
-    rusty_racer (0.1.4-arm64-darwin)
+    rusty_racer (0.1.5-arm64-darwin)
       rb_sys (~> 0.9)
-    rusty_racer (0.1.4-x86_64-darwin)
+    rusty_racer (0.1.5-x86_64-darwin)
       rb_sys (~> 0.9)
-    rusty_racer (0.1.4-x86_64-linux)
+    rusty_racer (0.1.5-x86_64-linux)
       rb_sys (~> 0.9)
     sanitize (7.0.0)
       crass (~> 1.0.2)
@@ -495,7 +495,7 @@ DEPENDENCIES
   rubocop-performance (~> 1.26.0)
   rubocop-rails (~> 2.33.4)
   rubyzip (~> 3.2.2)
-  rusty_racer (~> 0.1.4)
+  rusty_racer (~> 0.1.5)
   sanitize (~> 7.0)
   selenium-webdriver (>= 4.11.0)
   simplecov (~> 0.22.0)
@@ -654,11 +654,11 @@ CHECKSUMS
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
   ruby2_keywords (0.0.5) sha256=ffd13740c573b7301cf7a2e61fc857b2a8e3d3aff32545d6f8300d8bae10e3ef
   rubyzip (3.2.2) sha256=c0ed99385f0625415c8f05bcae33fe649ed2952894a95ff8b08f26ca57ea5b3c
-  rusty_racer (0.1.4) sha256=b31f76d15afef784cd5c21e8a0cf3cb35fe52d80fded1eeed0219b86aa2adf0a
-  rusty_racer (0.1.4-aarch64-linux) sha256=d3efa96cc031a1f518737e1435ac78a4056050583e600712ec70649b96d61583
-  rusty_racer (0.1.4-arm64-darwin) sha256=ebef19e7ed7d04df71a6c3e11a25d6bb11ed73f70d4632aeadaca03ab3d2dc40
-  rusty_racer (0.1.4-x86_64-darwin) sha256=4e045bffa27bfd7f25e06803a1b0b9045b1d3b85754bc5ea7ffcdead0301a283
-  rusty_racer (0.1.4-x86_64-linux) sha256=15c7f389832235fa735e087c163d1ed684f4eac5f443e863db0e2985ad6edc94
+  rusty_racer (0.1.5) sha256=a24c68965e084f3fd876b378128645b79c4cfd81a9ed04212bb8a46edcf353d7
+  rusty_racer (0.1.5-aarch64-linux) sha256=f12683efcc8a1a2e4445fb81ad5e1987925df9c699800f4e9c52b679ec3dd23a
+  rusty_racer (0.1.5-arm64-darwin) sha256=05e7c551148d4470da77617f9ae41da683366bbd82e60086526ccdae3c5c60a3
+  rusty_racer (0.1.5-x86_64-darwin) sha256=2274b6e5cc8c2de0b954534f438d979d2768619088b97431fecaeec2cac7bf3e
+  rusty_racer (0.1.5-x86_64-linux) sha256=1673dbe40b1886f151f7832aa57b6b5021dcaba137c5d8bbc8a7661ed9453b55
   sanitize (7.0.0) sha256=269d1b9d7326e69307723af5643ec032ff86ad616e72a3b36d301ac75a273984
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
   selenium-webdriver (4.43.0) sha256=a634377b964b701c6ac0a009ce3a08fa34ec1e1e7fe9a6d57e3088d14529a65c
