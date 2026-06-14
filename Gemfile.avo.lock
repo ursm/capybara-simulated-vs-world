@@ -619,7 +619,7 @@ GEM
       simplecov (>= 0.22.0)
       tty-which (~> 0.5.0)
       virtus (~> 2.0)
-    rusty_racer (0.1.3-x86_64-linux)
+    rusty_racer (0.1.4-x86_64-linux)
       rb_sys (~> 0.9)
     securerandom (0.4.1)
     sexp_processor (4.17.5)
@@ -816,7 +816,7 @@ DEPENDENCIES
   ruby-openai
   ruby-statistics (< 4)
   rubycritic
-  rusty_racer (~> 0.1.3)
+  rusty_racer (~> 0.1.4)
   simplecov
   simplecov-cobertura
   simplecov-lcov
@@ -1053,7 +1053,7 @@ CHECKSUMS
   ruby-vips (2.3.0) sha256=e685ec02c13969912debbd98019e50492e12989282da5f37d05f5471442f5374
   ruby_parser (3.22.0) sha256=1eb4937cd9eb220aa2d194e352a24dba90aef00751e24c8dfffdb14000f15d23
   rubycritic (5.0.0) sha256=7f3877556d7f52bf0980496b7c907a827a9592ba690b80a593403a60bd6cfb42
-  rusty_racer (0.1.3-x86_64-linux) sha256=820c1de8c17e137ee064677b2a732972cbbe07b847c0150d5cc7648f133f5d1a
+  rusty_racer (0.1.4-x86_64-linux) sha256=15c7f389832235fa735e087c163d1ed684f4eac5f443e863db0e2985ad6edc94
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
   sexp_processor (4.17.5) sha256=ae2b48ba98353d5d465ce8759836b7a05f2e12c5879fcd14d7815b026de32f0e
   simplecov (0.22.0) sha256=fe2622c7834ff23b98066bb0a854284b2729a569ac659f82621fc22ef36213a5
