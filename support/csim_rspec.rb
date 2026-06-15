@@ -466,28 +466,14 @@ RSpec.configure do |config|
   end
 end
 
-# Optional auto-trace hook. With `CSIM_TRACE_DIR=/path/to/dir`, the
-# driver auto-starts a trace on the first action of each system
-# example (`Browser#record_action`) and the after-hook below persists
-# it. Suites that want finer control leave the env var unset and call
-# `driver.start_tracing(...)` / `stop_tracing(...)` themselves — see
-# `Capybara::Simulated::Driver#start_tracing`.
-if (trace_dir = ENV['CSIM_TRACE_DIR']) && !trace_dir.empty?
-  require 'fileutils'
-  FileUtils.mkdir_p(trace_dir)
-
-  RSpec.configure do |config|
-    config.prepend_after(:each, type: :system) do |example|
-      drv = Capybara::Simulated::Driver.current
-      next unless drv&.tracing?
-      drv.current_trace.metadata.merge!(
-        title:     example.full_description,
-        file:      example.location,
-        outcome:   example.exception ? 'failed' : 'passed',
-        exception: example.exception&.message
-      )
-      slug = example.full_description.gsub(/[^A-Za-z0-9._-]+/, '_')[0, 200]
-      drv.stop_tracing(path: File.join(trace_dir, "#{slug}.json"))
-    end
-  end
+# Auto-trace file output (opt in with `CSIM_TRACE_DIR=/path/to/dir`).
+# The gem's RSpec integration reads that env var and installs the
+# per-example persistence hook itself — this used to be hand-rolled here
+# and called a `Driver.current` that never existed. `rescue LoadError`
+# tolerates an older capybara-simulated that predates the integration
+# file (its absence just means no auto-trace, as before).
+begin
+  require 'capybara/simulated/rspec'
+rescue LoadError
+  # capybara/simulated/rspec not available in this gem version
 end

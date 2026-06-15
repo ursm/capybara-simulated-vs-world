@@ -125,3 +125,13 @@ module CsimMinitestPend
 end
 
 Minitest::Test.prepend(CsimMinitestPend)
+
+# Auto-trace file output (opt in with `CSIM_TRACE_DIR=/path/to/dir`).
+# The gem's Minitest integration reads that env var and prepends the
+# per-test persistence hook itself. `rescue LoadError` tolerates an older
+# capybara-simulated that predates the integration file.
+begin
+  require 'capybara/simulated/minitest'
+rescue LoadError
+  # capybara/simulated/minitest not available in this gem version
+end
