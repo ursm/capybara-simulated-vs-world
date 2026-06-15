@@ -9,7 +9,7 @@ GIT
 PATH
   remote: /home/ursm/Code/github.com/ursm/capybara-simulated
   specs:
-    capybara-simulated (0.1.1)
+    capybara-simulated (0.4.0)
       capybara (>= 3.37)
       rack (>= 2.2)
 
@@ -1300,7 +1300,7 @@ CHECKSUMS
   bullet (7.2.0) sha256=3502c8a1b4f5db77fc8f6d3dd89a6a8c1a968219a45e12ae6cbaa9c09967ea89
   bundler-audit (0.9.3) sha256=81c8766c71e47d0d28a0f98c7eed028539f21a6ea3cd8f685eb6f42333c9b4e9
   capybara (3.37.1) sha256=4f7be2c32ca45368cfc66e9b2b60c3d334155c2f1e831c4f334b39e8aa39ae15
-  capybara-simulated (0.1.1)
+  capybara-simulated (0.4.0)
   carrierwave (2.2.6) sha256=cd9b6108fc7544e97e7fbcc561bd319a09f23c96816fdd0df8f2f45ffdc0dac3
   carrierwave-bombshelter (0.2.2) sha256=1b241cf284dc8946557e3e8742d18e8e838c8e515392b6873500533b04de269d
   cgi (0.3.7) sha256=0a18f23f329725de2f9ce601c82765585cc81fad92f30d70c9e672c7dbc451bd
