@@ -91,6 +91,15 @@
 # instead of 20. Same class as the cloaking/load-more specs.
 - test: 'Nested view pagination load more roots initially shows first page of roots and loads more on scroll'
   reason: 'DLoadMore IntersectionObserver loads page 2 eagerly without layout (initial_count 22 vs 20).'
+# Admin components config-area infinite-scroll: same class — a DLoadMore
+# IntersectionObserver against a `resize_window(height: 400)` viewport. Without
+# a layout/viewport-clip engine the in/out-of-viewport signal is unreliable, so
+# `have_exactly_n_components(4)` (PAGE_SIZE=4, pre-scroll) flips between 4 and 8.
+# FLAKY (not stable-fail), so `skip: true` rather than `pending` — a pending
+# entry would be flagged FIXED on the runs that happen to pass.
+- test: 'Admin Customize Themes Config Area Page when there are components installed loads more components when scrolling to the bottom'
+  reason: 'IntersectionObserver pagination against a resized viewport; flaky without a layout engine.'
+  skip: true
 # `#main-container` is hidden by `{{#if postStream.firstPostNotLoaded}}`.
 # The post stream's load-above sentinel is an IntersectionObserver
 # (`prependMore`): without a layout engine it intersects eagerly and
