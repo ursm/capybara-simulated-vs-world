@@ -71,8 +71,6 @@
   reason: 'Scroll position drives visibility.'
 - test: 'Glimmer Header mobile topic-info shows when jumping from OP to much later post'
   reason: 'Header `topicInfoVisible` keys on `mainTopicTitleVisible`, an IntersectionObserver on the main topic title; no layout = no reliable in/out-of-viewport signal after the SPA jump, so login-button visibility is wrong.'
-- test: 'Glimmer Header moves focus between tabs using arrow keys'
-  reason: 'Tab visibility depends on horizontal-overflow width.'
 
 
 # Post stream / nested view cloaking — cloak/uncloak based on
