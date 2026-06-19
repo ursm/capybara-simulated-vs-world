@@ -18,6 +18,6 @@ group :test do
   # (V8 native ES Module API). All csim apps share the branch so the
   # cache + native-module path light up regardless of host.
   gem 'quickjs', '>= 0.18'
-  gem 'rusty_racer', '~> 0.1.5'
+  gem 'rusty_racer', '~> 0.1.10'
   gem 'stackprof'
 end
