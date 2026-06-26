@@ -37,8 +37,6 @@
   reason: 'Toolbar floating panel selection-rect positioning needs layout.'
 - test: 'Composer - ProseMirror - Toolbar toolbar state updates updates the toolbar state following the cursor position'
   reason: 'Same — cursor-rect derived UI.'
-- test: 'Composer - ProseMirror - Images image lightbox navigates between images using prev/next buttons'
-  reason: 'Photoswipe lightbox navigation needs real layout (see Photoswipe entries below).'
 - test: 'Composer - ProseMirror - Images image toolbar sets width and height attributes when scaling external images'
   reason: 'Image scale-handles read getBoundingClientRect on the IMG.'
 
@@ -61,6 +59,34 @@
     Photoswipe overlay positioning + tap-to-close needs real layout
     (getBoundingClientRect, getComputedStyle on the dimmed
     container, click coordinates within image bounds).
+
+# IntersectionObserver infinite-scroll pagination: these assert an EXACT
+# item count on initial render (the load-more sentinel must be below the
+# fold so it does NOT fire until scrolled). Whether the sentinel is "in
+# the viewport" is viewport-clip visibility — the layout property we don't
+# model — so our IO fires it immediately and an extra page loads (20→40,
+# 1→2). user_notifications even comments "it immediately fires another
+# request". These can't hold without a layout/viewport pipeline.
+- test: 'Group activity when on the posts activity page loads and paginates the results by chronology'
+  reason: 'IntersectionObserver load-more sentinel fires on initial render (no viewport-clip); loads page 2 → 40 items not 20.'
+- test: 'User notifications infinite scrolling loads notifications progressively as user scrolls'
+  reason: 'Same — IO infinite-scroll fires before scroll without viewport-clip visibility.'
+
+# ── Video frame decoding (IN-SCOPE backlog, not a non-goal) ───────
+# With video_thumbnails_enabled, a video upload's completion handler
+# generates a poster thumbnail CLIENT-SIDE via drawImage(videoElement)
+# — which needs the uploaded webm/mp4 decoded to a frame. We don't yet
+# decode video, so the thumbnail step fails and the composer markup
+# stays stuck at "Uploading: …" (the `![video]` / .onebox-placeholder-
+# container never finalize). This is BUILDABLE (a video frame decoder,
+# like canvas=libvips / Streams=polyfill) = backlog, NOT rule-1 OUT;
+# drop these once drawImage-from-<video> is implemented.
+- test: 'Uploading files in the composer when video thumbnails are enabled generates a topic preview thumbnail from the video'
+  reason: 'Needs client-side video frame decode (drawImage(video)) for the poster thumbnail — in-scope backlog.'
+- test: 'Uploading files in the composer when video thumbnails are enabled generates a thumbnail from the video'
+  reason: 'Needs client-side video frame decode (drawImage(video)) — in-scope backlog.'
+- test: 'Uploading files in the composer when video thumbnails are enabled handles multiple video uploads'
+  reason: 'Needs client-side video frame decode (drawImage(video)) — in-scope backlog.'
 
 # Glimmer Header scroll / size measurements:
 - test: 'Glimmer Header sets header''s height css property'
