@@ -72,25 +72,6 @@
 - test: 'User notifications infinite scrolling loads notifications progressively as user scrolls'
   reason: 'Same — IO infinite-scroll fires before scroll without viewport-clip visibility.'
 
-# ── Video-thumbnail upload chain (IN-SCOPE backlog) ───────────────
-# NOT a video-decode gap: the decoder already works (ffprobe+ffmpeg via
-# __csim_decodeVideoFrame; video.videoWidth/canplaythrough fire, and
-# drawImage(video)+getImageData+canvas.toBlob produce a real PNG — all
-# verified). The chain sticks at Discourse's SECOND Uppy upload — the
-# poster thumbnail (an in-memory canvas blob) — which hangs in-process
-# (neither uploadDone nor upload-error fires), so generateVideoThumbnail's
-# callback never runs, the main video upload's markup stays "Uploading:…",
-# and .onebox-placeholder-container never appears. This is the in-process
-# Uppy upload-completion area (a 2nd, in-memory-blob upload; see
-# feedback_in_process_upload_race) = buildable backlog; drop once that
-# completes in-process.
-- test: 'Uploading files in the composer when video thumbnails are enabled generates a topic preview thumbnail from the video'
-  reason: 'In-process Uppy poster-thumbnail (2nd, in-memory-blob) upload never completes → callback/markup never finalize.'
-- test: 'Uploading files in the composer when video thumbnails are enabled generates a thumbnail from the video'
-  reason: 'In-process Uppy poster-thumbnail (2nd, in-memory-blob) upload never completes.'
-- test: 'Uploading files in the composer when video thumbnails are enabled handles multiple video uploads'
-  reason: 'In-process Uppy poster-thumbnail (2nd, in-memory-blob) upload never completes.'
-
 # Glimmer Header scroll / size measurements:
 - test: 'Glimmer Header sets header''s height css property'
   reason: 'Reads header.offsetHeight to set a CSS custom property.'
