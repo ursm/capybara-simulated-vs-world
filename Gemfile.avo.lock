@@ -20,7 +20,7 @@ PATH
 PATH
   remote: /home/ursm/Code/github.com/ursm/capybara-simulated
   specs:
-    capybara-simulated (0.5.0)
+    capybara-simulated (0.7.0)
       capybara (>= 3.37)
       rack (>= 2.2)
       uri-idna (~> 0.3)
@@ -882,7 +882,7 @@ CHECKSUMS
   bump (0.10.0) sha256=07929cf79031d2863f55e7b111e164566be10c43f8c42d67db7cb3b5745f0975
   bundler-integrity (1.0.9) sha256=1d33c3257e3a3c85eb0bcc7e29b54c8620fb220fc8ee1872676265fe586a1e20
   capybara (3.40.0) sha256=42dba720578ea1ca65fd7a41d163dd368502c191804558f6e0f71b391054aeef
-  capybara-simulated (0.5.0)
+  capybara-simulated (0.7.0)
   chartkick (5.2.1) sha256=2848d7de87189f30f28d077eb0bbdebc8a1f0f6f81de1ded95008fe564369949
   childprocess (5.1.0) sha256=9a8d484be2fd4096a0e90a0cd3e449a05bc3aa33f8ac9e4d6dcef6ac1455b6ec
   coercible (1.0.0) sha256=5081ad24352cc8435ce5472bc2faa30260c7ea7f2102cc6a9f167c4d9bffaadc

@@ -1,7 +1,7 @@
 PATH
   remote: /home/ursm/Code/github.com/ursm/capybara-simulated
   specs:
-    capybara-simulated (0.5.0)
+    capybara-simulated (0.7.0)
       capybara (>= 3.37)
       rack (>= 2.2)
       uri-idna (~> 0.3)
@@ -533,7 +533,7 @@ CHECKSUMS
   bundle-audit (0.2.0) sha256=cb499708f7fbc56d2d2e8bab09a1184f8f5b548bdbd628b757e5a1856874ca12
   bundler-audit (0.9.3) sha256=81c8766c71e47d0d28a0f98c7eed028539f21a6ea3cd8f685eb6f42333c9b4e9
   capybara (3.40.0) sha256=42dba720578ea1ca65fd7a41d163dd368502c191804558f6e0f71b391054aeef
-  capybara-simulated (0.5.0)
+  capybara-simulated (0.7.0)
   chunky_png (1.4.0) sha256=89d5b31b55c0cf4da3cf89a2b4ebc3178d8abe8cbaf116a1dba95668502fdcfe
   commonmarker (2.6.3-aarch64-linux) sha256=73795e80ab5ef1e4b5b83ada6f082bccb0ed7eae0b910232e13af1b2d71b14d6
   commonmarker (2.6.3-arm-linux) sha256=62b9f32d7d3f85d47988a4a98a2e66e60ca42b894687047db8332f1e80caff7b
