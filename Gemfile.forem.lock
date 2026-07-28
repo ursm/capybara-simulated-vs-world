@@ -696,9 +696,11 @@ GEM
       activesupport (>= 3.0.0)
     pundit-matchers (1.9.0)
       rspec-rails (>= 3.0.0)
-    quickjs (0.18.0)
+    quickjs (0.21.0)
       json
       securerandom
+    quickjs-polyfill-intl (0.2.0)
+      quickjs (>= 0.19.0)
     raabro (1.4.0)
     racc (1.8.1)
     rack (2.2.23)
@@ -894,7 +896,7 @@ GEM
       racc (~> 1.5)
       sexp_processor (~> 4.16)
     rubyzip (2.4.1)
-    rusty_racer (0.1.10-x86_64-linux)
+    rusty_racer (0.1.16-x86_64-linux)
       rb_sys (~> 0.9)
     s3_direct_upload (0.1.7)
       coffee-rails (>= 3.1)
@@ -1190,7 +1192,8 @@ DEPENDENCIES
   puma (~> 5.6.4)
   pundit (~> 2.2)
   pundit-matchers (~> 1.7)
-  quickjs (>= 0.18)
+  quickjs (>= 0.19)
+  quickjs-polyfill-intl
   rack-attack (~> 6.7.0)
   rack-cors (~> 1.1)
   rack-host-redirect (~> 1.3)
@@ -1219,7 +1222,7 @@ DEPENDENCIES
   rubocop-rspec (~> 2.12)
   ruby-prof (~> 1.4)
   rubyzip (~> 2.3)
-  rusty_racer (~> 0.1.10)
+  rusty_racer (~> 0.1.16)
   s3_direct_upload (~> 0.1)
   sassc-rails (~> 2.1.2)
   shoulda-matchers (~> 5.3)
@@ -1514,7 +1517,8 @@ CHECKSUMS
   puma (5.6.9) sha256=20701b2451080ec8d6d78d2e4b5a2913e6d0b865a51d704a4d60db8fd39a4228
   pundit (2.5.2) sha256=e374152baa24f90b630428293faf4b4c5468fc3cc010165f7d8fcb44ce108bbd
   pundit-matchers (1.9.0) sha256=b288163c08b7b49d40d264e44d542e4b27b4eaf289e4fb8d1e6be2226ebd6b4f
-  quickjs (0.18.0) sha256=340c8d4e7a648c2227d307807d8fab44fc98f751d707ea87052047a2f808cd42
+  quickjs (0.21.0) sha256=9a59b53dc8273aaac4667593ec2b2101463e3ea81f740fdff28c2529e9a013ea
+  quickjs-polyfill-intl (0.2.0) sha256=31b9d4e2dae2e933c9dd9fc7de1d295ec96e9915bb8aef47e633a7ae9d76f334
   raabro (1.4.0) sha256=d4fa9ff5172391edb92b242eed8be802d1934b1464061ae5e70d80962c5da882
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rack (2.2.23) sha256=a8fe9d7e07064770b8ec123663fded8a59ef7e2b6db5cda7173d45a5718ab69c
@@ -1585,7 +1589,7 @@ CHECKSUMS
   ruby2ruby (2.6.1) sha256=11fdbae0e5202cf6f5a1aeca6788d5ece4feda27d5bdeb8ca8835f8159fe1a00
   ruby_parser (3.22.0) sha256=1eb4937cd9eb220aa2d194e352a24dba90aef00751e24c8dfffdb14000f15d23
   rubyzip (2.4.1) sha256=8577c88edc1fde8935eb91064c5cb1aef9ad5494b940cf19c775ee833e075615
-  rusty_racer (0.1.10-x86_64-linux) sha256=0015da49a748797f3836d046ad9d758554cf21f7bec1ca11315fc93a285f382d
+  rusty_racer (0.1.16-x86_64-linux) sha256=f08df7644720630f138de10109677f7416cc3a60c90d3eb91cd95cd94be8eff9
   s3_direct_upload (0.1.7) sha256=667ae315903eab01d52e9f80a67984866baaa93237f35023fb99fbf7c5b39ec6
   safely_block (1.0.0) sha256=bea80e084e620adeada62fd98cf461bbb9888d40dc0f06d337df9d01e1a658e5
   sanitize (6.1.3) sha256=a42ce5f933d82765a8243599d5ab2e8867237e76cf5a699caaddfe60bb944152

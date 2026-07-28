@@ -470,9 +470,11 @@ GEM
     public_suffix (7.0.5)
     puma (6.6.1)
       nio4r (~> 2.0)
-    quickjs (0.18.0)
+    quickjs (0.21.0)
       json
       securerandom
+    quickjs-polyfill-intl (0.2.0)
+      quickjs (>= 0.19.0)
     racc (1.8.1)
     rack (3.2.6)
     rack-session (2.1.2)
@@ -620,7 +622,7 @@ GEM
       simplecov (>= 0.22.0)
       tty-which (~> 0.5.0)
       virtus (~> 2.0)
-    rusty_racer (0.1.14-x86_64-linux)
+    rusty_racer (0.1.16-x86_64-linux)
       rb_sys (~> 0.9)
     securerandom (0.4.1)
     sexp_processor (4.17.5)
@@ -805,7 +807,8 @@ DEPENDENCIES
   prefixed_ids
   psych (< 4)
   puma (~> 6.4)
-  quickjs (>= 0.18)
+  quickjs (>= 0.19)
+  quickjs-polyfill-intl
   rails (~> 8.0)
   rails-controller-testing
   ransack (>= 4.2.0)
@@ -818,7 +821,7 @@ DEPENDENCIES
   ruby-openai
   ruby-statistics (< 4)
   rubycritic
-  rusty_racer (~> 0.1.14)
+  rusty_racer (~> 0.1.16)
   simplecov
   simplecov-cobertura
   simplecov-lcov
@@ -1009,7 +1012,8 @@ CHECKSUMS
   psych (3.3.4) sha256=f0aae8574d0c86b711472e6a57cc036655e2549f02390ca7266f3b6d1814d1a0
   public_suffix (7.0.5) sha256=1a8bb08f1bbea19228d3bed6e5ed908d1cb4f7c2726d18bd9cadf60bc676f623
   puma (6.6.1) sha256=b9b56e4a4ea75d1bfa6d9e1972ee2c9f43d0883f011826d914e8e37b3694ea1e
-  quickjs (0.18.0) sha256=340c8d4e7a648c2227d307807d8fab44fc98f751d707ea87052047a2f808cd42
+  quickjs (0.21.0) sha256=9a59b53dc8273aaac4667593ec2b2101463e3ea81f740fdff28c2529e9a013ea
+  quickjs-polyfill-intl (0.2.0) sha256=31b9d4e2dae2e933c9dd9fc7de1d295ec96e9915bb8aef47e633a7ae9d76f334
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rack (3.2.6) sha256=5ed78e1f73b2e25679bec7d45ee2d4483cc4146eb1be0264fc4d94cb5ef212c2
   rack-session (2.1.2) sha256=595434f8c0c3473ae7d7ac56ecda6cc6dfd9d37c0b2b5255330aa1576967ffe8
@@ -1055,7 +1059,7 @@ CHECKSUMS
   ruby-vips (2.3.0) sha256=e685ec02c13969912debbd98019e50492e12989282da5f37d05f5471442f5374
   ruby_parser (3.22.0) sha256=1eb4937cd9eb220aa2d194e352a24dba90aef00751e24c8dfffdb14000f15d23
   rubycritic (5.0.0) sha256=7f3877556d7f52bf0980496b7c907a827a9592ba690b80a593403a60bd6cfb42
-  rusty_racer (0.1.14-x86_64-linux) sha256=b34fd91f77d531d745296c74cd58ee2443155c3b402c4c45ce1046421a454858
+  rusty_racer (0.1.16-x86_64-linux) sha256=f08df7644720630f138de10109677f7416cc3a60c90d3eb91cd95cd94be8eff9
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
   sexp_processor (4.17.5) sha256=ae2b48ba98353d5d465ce8759836b7a05f2e12c5879fcd14d7815b026de32f0e
   simplecov (0.22.0) sha256=fe2622c7834ff23b98066bb0a854284b2729a569ac659f82621fc22ef36213a5
