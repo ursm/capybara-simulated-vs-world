@@ -155,8 +155,8 @@
   reason: 'ACE virtual-scroller layout dependence; session has the full text but only the first line is rendered.'
 - test: 'Admin Customize Form Templates when visiting the page to edit a form template should prefill form data'
   reason: 'ACE virtual-scroller layout dependence.'
-- test: 'Admin Customize Themes when editing a local theme can edit the js field'
-  reason: 'Same ACE editor virtual-scroller dependence.'
+# ('Admin Customize Themes … can edit the js field' passed once the layout engine
+#  gave the editor a real clientHeight, so it is no longer listed.)
 
 # PG deadlocks (`group_moderator_self_lockout_spec`) seen in the
 # first 167-baseline run vanished after re-run — not pinning here.
