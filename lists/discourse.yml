@@ -64,8 +64,6 @@
 # the viewport" is viewport-clip visibility — the layout property we don't
 # model — so our IO fires it immediately and an extra page loads (20→40,
 # 1→2). It can't hold without a layout/viewport pipeline.
-- test: 'Group activity when on the posts activity page loads and paginates the results by chronology'
-  reason: 'IntersectionObserver load-more sentinel fires on initial render (no viewport-clip); loads page 2 → 40 items not 20.'
 
 # Glimmer Header scroll / size measurements:
 - test: 'Glimmer Header sets header''s height css property'
@@ -79,8 +77,6 @@
 # cloaking ... hides children when root is cloaked` checks the post-
 # initial-render state and passes; narrow to scroll-driven specs.)
 - test: !ruby/regexp '/\APost stream when scrolling /'
-  reason: 'IntersectionObserver against scroll viewport.'
-- test: 'Nested view cloaking with many root posts cloaks root subtrees far from the viewport'
   reason: 'IntersectionObserver against scroll viewport.'
 - test: 'Nested view cloaking with many root posts uncloaks roots when scrolling to them'
   reason: 'IntersectionObserver against scroll viewport.'
@@ -106,8 +102,8 @@
 # post_number 1 — so `firstPostPresent` becomes true and the content
 # above is no longer hidden. A real browser leaves the sentinel above
 # the viewport until you scroll up. Same class as the cloaking specs.
-- test: 'Post stream when hiding scrollable content hides and shows content above the post stream based on loaded posts'
-  reason: 'load-above IntersectionObserver sentinel over-loads posts (incl. post 1) without layout.'
+# (`hides and shows content above the post stream` passes now — the load-above sentinel only fires
+#  for content that is actually near the viewport, so post 1 is no longer over-loaded.)
 # Manage-reports modal infinite-scroll list. `DLoadMore` is an
 # IntersectionObserver sentinel: without a layout engine it "intersects"
 # eagerly and pre-loads page 2, and our in-process `rack_fetch` is
@@ -126,8 +122,6 @@
   reason: 'Scroll handler swaps banner ↔ header search visibility.'
 - test: !ruby/regexp '/\AHeader Search - Responsive Behavior when welcome banner is enabled appears based on scroll/'
   reason: 'Same scroll + viewport-width responsive swap.'
-- test: 'Search when search menu on desktop with search field in header switches to search icon when header is minimized'
-  reason: 'Header minimization triggered by scroll to bottom of topic; no real scroll = header stays expanded, search icon never replaces search field.'
 
 # Embed mode floating timeline button — appears when the topic
 # footer is below the viewport (scroll position). The "no replies
@@ -140,8 +134,6 @@
   reason: 'Triple-click word/sentence range needs layout for line wraps.'
 - test: 'User preferences | Navigation menu when visiting the user''s preferences page should allow the user to scroll the horizontal navigation menu when window width is narrow'
   reason: 'Horizontal scroll mechanics.'
-- test: 'Simplified Category Creation General Tab does not show expand toggle for short descriptions'
-  reason: 'Toggle visibility gated on description scrollHeight.'
 
 # ACE editor only renders visible lines (clientHeight-driven virtual
 # scroller). With no layout the container's clientHeight is 0 → ACE
