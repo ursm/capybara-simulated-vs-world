@@ -70,10 +70,8 @@
 # Glimmer Header scroll / size measurements:
 - test: 'Glimmer Header sets header''s height css property'
   reason: 'Reads header.offsetHeight to set a CSS custom property.'
-- test: 'Glimmer Header mobile topic-info only shows when scrolled down'
-  reason: 'Scroll position drives visibility.'
-- test: 'Glimmer Header mobile topic-info shows when navigating direct to a later post'
-  reason: 'Scroll position drives visibility.'
+# (Both `mobile topic-info` specs pass now that IntersectionObserver reports a target LEAVING the
+#  viewport — the header service keys the swap on exactly that — so they are no longer listed.)
 
 
 # Post stream / nested view cloaking — cloak/uncloak based on
@@ -134,10 +132,8 @@
 # Embed mode floating timeline button — appears when the topic
 # footer is below the viewport (scroll position). The "no replies
 # does not show" case passes (DOM-only assertion).
-- test: 'Embed mode when logged in with a topic that has replies with many replies shows floating timeline button when footer is not visible'
-  reason: 'Footer-below-viewport check needs scroll position.'
-- test: 'Embed mode when logged in with a topic that has replies with many replies opens the timeline when clicking the floating timeline button'
-  reason: 'Same scroll-anchored timeline button.'
+# (Both pass now: the footer's IntersectionObserver reports it below the viewport, so the floating
+#  timeline button appears and can be clicked.)
 
 # Misc single layout-dep specs:
 - test: 'Topic page when triple clicking to select a paragraph select the last paragraph'
