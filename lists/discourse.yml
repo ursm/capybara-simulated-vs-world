@@ -72,8 +72,6 @@
 # target LEAVING the viewport. Its sibling does not: giving `<img>` a real intrinsic size (correct,
 # Chrome-verified) moved the topic title, and where a direct-visit anchor lands needs text metrics
 # the coarse layout doesn't have.
-- test: 'Glimmer Header mobile topic-info shows when navigating direct to a later post'
-  reason: 'Direct-visit anchor position needs real text metrics; the header keeps its auth buttons.'
 
 
 # Post stream / nested view cloaking — cloak/uncloak based on
