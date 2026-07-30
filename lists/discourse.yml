@@ -68,8 +68,12 @@
 # Glimmer Header scroll / size measurements:
 - test: 'Glimmer Header sets header''s height css property'
   reason: 'Reads header.offsetHeight to set a CSS custom property.'
-# (Both `mobile topic-info` specs pass now that IntersectionObserver reports a target LEAVING the
-#  viewport — the header service keys the swap on exactly that — so they are no longer listed.)
+# `mobile topic-info only shows when scrolled down` passes now that IntersectionObserver reports a
+# target LEAVING the viewport. Its sibling does not: giving `<img>` a real intrinsic size (correct,
+# Chrome-verified) moved the topic title, and where a direct-visit anchor lands needs text metrics
+# the coarse layout doesn't have.
+- test: 'Glimmer Header mobile topic-info shows when navigating direct to a later post'
+  reason: 'Direct-visit anchor position needs real text metrics; the header keeps its auth buttons.'
 
 
 # Post stream / nested view cloaking — cloak/uncloak based on
