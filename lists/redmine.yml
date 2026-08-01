@@ -13,7 +13,7 @@
 - test: "OauthProviderSystemTest#test_application_creation_and_authorization"
   reason: "test reads Capybara.current_session.server.port; we run in-process with no real server"
 
-# (`test_sticky_issue_header_appears_on_scroll` passes now — real scroll geometry plus an
-#  IntersectionObserver that reports leaving the viewport is exactly what trips `is-visible`.)
-- test: "StickyIssueHeaderSystemTest#test_edit_heading_is_not_hidden_behind_sticky_header_when_edit_link_is_clicked"
-  reason: "same as above — requires real scroll + sticky positioning"
+# (The whole StickyIssueHeaderSystemTest passes now. `..._appears_on_scroll` went green with real
+#  scroll geometry plus an IntersectionObserver that reports leaving the viewport;
+#  `..._edit_heading_is_not_hidden_behind_sticky_header` followed once `margin-*` reported its `0px`
+#  initial instead of '' and the layout reader started resolving flow-relative properties.)
