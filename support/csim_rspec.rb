@@ -232,10 +232,16 @@ RSpec.configure do |config|
   # to Capybara's timeout) can stall the whole suite at one example.
   # Wrapping the example body in `Timeout::timeout` converts that
   # stall into a per-example failure so the run still completes.
-  # `CSIM_EXAMPLE_TIMEOUT_S=0` disables; default 120 s is well above
-  # the slowest legitimate Discourse system spec.
+  # `CSIM_EXAMPLE_TIMEOUT_S=0` disables.
+  #
+  # The limit is a STALL detector, not a performance budget, so it has to sit clear of the slowest
+  # legitimate example. Avo's `code_field` ACE spec measures 121.4 s (`--profile`, timeout
+  # disabled) against the old 120 s default — a 1 % margin that made it a coin flip: it failed run
+  # alone and passed in the suite, at unrelated commits, and cost several review cycles to
+  # attribute. 300 s restores the margin. The 121 s itself is the real finding — a real browser
+  # does that example in seconds — and belongs in the driver's perf backlog, not here.
   require 'timeout'
-  EXAMPLE_TIMEOUT_S = (ENV['CSIM_EXAMPLE_TIMEOUT_S'] || '120').to_i
+  EXAMPLE_TIMEOUT_S = (ENV['CSIM_EXAMPLE_TIMEOUT_S'] || '300').to_i
   if EXAMPLE_TIMEOUT_S > 0
     config.around(:each) do |example|
       Timeout.timeout(EXAMPLE_TIMEOUT_S, nil, "csim example timeout after #{EXAMPLE_TIMEOUT_S}s") do
