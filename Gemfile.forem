@@ -27,7 +27,7 @@ group :test do
   # cache + native-module path light up regardless of host.
   gem 'quickjs', '>= 0.19'
   gem 'quickjs-polyfill-intl'
-  gem 'rusty_racer', '~> 0.1.16'
+  gem 'rusty_racer', '~> 0.2', '>= 0.2.1'
 end
 
 # Rails 7.0 doesn't `require` these explicitly anywhere — it relies on

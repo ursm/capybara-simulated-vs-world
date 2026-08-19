@@ -644,13 +644,13 @@ GEM
       logger
     ruby2_keywords (0.0.5)
     rubyzip (3.3.0)
-    rusty_racer (0.1.16-aarch64-linux)
+    rusty_racer (0.2.1-aarch64-linux)
       rb_sys (~> 0.9)
-    rusty_racer (0.1.16-arm64-darwin)
+    rusty_racer (0.2.1-arm64-darwin)
       rb_sys (~> 0.9)
-    rusty_racer (0.1.16-x86_64-darwin)
+    rusty_racer (0.2.1-x86_64-darwin)
       rb_sys (~> 0.9)
-    rusty_racer (0.1.16-x86_64-linux)
+    rusty_racer (0.2.1-x86_64-linux)
       rb_sys (~> 0.9)
     sanitize (7.0.0)
       crass (~> 1.0.2)
@@ -932,7 +932,7 @@ DEPENDENCIES
   ruby-readability
   ruby-vips
   rubyzip
-  rusty_racer (~> 0.1.16)
+  rusty_racer (~> 0.2, >= 0.2.1)
   sanitize
   sassc-embedded
   sawyer

@@ -54,6 +54,32 @@ end
 # expecting to be ambiently available.
 %w[base64 bigdecimal csv drb logger mutex_m observer ostruct].each {|name| require name }
 
+# Discourse / Forem declare `gem 'multi_json'` before `gem 'oj'`, so Bundler loads MultiJson first
+# and it picks `:json_gem` as its default adapter. JsonGem's `JSON.dump(hash)` does NOT recurse into
+# ActiveModelSerializer instances held as Hash values — it falls back to `.to_s` on unknown classes
+# — and it turns a Ruby `Set` into an object rather than an array.
+#
+# This is a HOST-APP fix, so it runs for BOTH drivers. It used to sit below the driver guard, which
+# meant the real-browser runs never got it: Discourse's `Site#admin_config_login_routes` is a `Set`,
+# the SPA does `site.admin_config_login_routes.map(...)`, and Ember died with "is not a function"
+# during render — every admin page came back EMPTY and the real run reported 452 failures of 2052.
+# A baseline measured against that is worthless, which is how "the driver is 2x slower than Chrome"
+# got into the record.
+#
+# Oj's `dump` defaults to `use_to_json: true`, so unknown classes route through AMS's `to_json` and
+# nest correctly.
+# RSpec is not loaded yet when RUBYOPT pulls this file in — the driver-gated block further down
+# only reaches `RSpec.configure` because the requires between here and there bring it in. Load it
+# explicitly so the hook registers for the REAL driver too.
+begin
+  require 'rspec/core'
+rescue LoadError
+  # A minitest host (Redmine) has no rspec-core; it has no MultiJson problem either.
+end
+RSpec.configure do |config|
+  config.before(:suite) { MultiJson.use(:oj) if defined?(::MultiJson) && defined?(::Oj) }
+end if defined?(::RSpec)
+
 # The host-app boot fixes above (bundler/setup + stdlib-compat requires)
 # must run for BOTH drivers — real Discourse/Forem need them for their own
 # Rails boot, not just the simulated driver. Only the csim-driver-specific
@@ -303,21 +329,6 @@ RSpec.configure do |config|
     if defined?(::ActionDispatch::SystemTestCase) && Capybara.app.is_a?(::Rack::URLMap)
       ::ActionDispatch::SystemTestCase.start_application
     end
-
-    # Discourse / Forem declare `gem 'multi_json'` before `gem 'oj'`,
-    # so Bundler loads MultiJson first and it picks `:json_gem` as its
-    # default adapter. JsonGem's `JSON.dump(hash)` does NOT recurse
-    # into ActiveModelSerializer instances held as Hash values — it
-    # falls back to `.to_s` on unknown classes — so Discourse's
-    # preloaded `currentUser.sidebar_sections[].links` ends up as
-    # `["#<SidebarUrlSerializer:0x...>", ...]` and the community
-    # sidebar section renders empty. Real-browser CI doesn't hit this
-    # because Bundler-with-Bootsnap warms the gem set differently.
-    #
-    # Force the Oj adapter when both gems are loaded — its `dump`
-    # defaults to `use_to_json: true`, so unknown classes route
-    # through AMS's `to_json` and nest correctly.
-    MultiJson.use(:oj) if defined?(::MultiJson) && defined?(::Oj)
 
     # Discourse's spec/support/system_helpers.rb defines `locator(sel)`
     # as a thin pass-through to `page.driver.with_playwright_page { |p|
