@@ -104,9 +104,37 @@ module CsimDrivenBy
       return super(:simulated_mobile)
     end
 
+    # The host declares the browser window its layout-dependent specs were
+    # written against (`driven_by :cuprite, screen_size: [1400, 1024]`), and that
+    # size is not decoration: Turbo's lazy `<turbo-frame>`s, DLoadMore's
+    # IntersectionObserver sentinels and every scroll assertion are relative to
+    # it. Dropping it ran those specs at the driver's own 1024x768 default, which
+    # put an Avo tab's projects frame 24px BELOW the fold — so Turbo correctly
+    # declined to load it and the pagination the spec looks for never rendered.
+    # (Measured: Chrome puts the same frame at y=553 of a 1024-tall viewport, we
+    # had it at y=792 of 768.)
+    #
+    # Seeded through the same slot the mobile shape uses. It is read-and-cleared when the driver is
+    # CONSTRUCTED, which is what a host's `driven_by` precedes, so the size lands on the driver the
+    # suite actually runs with. A host that asked for two different sizes in one process would keep
+    # the first (Capybara caches a driver per name); none of the five does, and resizing a
+    # already-built driver from here has no supported way to reach it — `Capybara` exposes no
+    # session pool.
+    if (size = normalized_screen_size(options))
+      Capybara::Simulated.next_driver_viewport = size
+    end
+
     # Important: return the result of `super` so rspec-rails'
     # `driven_by(...).tap(&:use)` can chain off the registration.
     super(:simulated)
+  end
+
+  def normalized_screen_size(options)
+    size = options[:screen_size] || options[:window_size]
+    return nil unless size.respond_to?(:to_a)
+
+    w, h = size.to_a.map(&:to_i)
+    (w.to_i > 0 && h.to_i > 0) ? [w, h] : nil
   end
 
   MOBILE_DRIVER_CONFIG = {

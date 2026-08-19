@@ -86,8 +86,6 @@
 # sentinel; without layout it intersects eagerly and loads page 2 into
 # the initial render, so `initial_count` is 22 (page 1 + part of page 2)
 # instead of 20. Same class as the cloaking/load-more specs.
-- test: 'Nested view pagination load more roots initially shows first page of roots and loads more on scroll'
-  reason: 'DLoadMore IntersectionObserver loads page 2 eagerly without layout (initial_count 22 vs 20).'
 # Admin components config-area infinite-scroll: same class — a DLoadMore
 # IntersectionObserver against a `resize_window(height: 400)` viewport. Without
 # a layout/viewport-clip engine the in/out-of-viewport signal is unreliable, so
@@ -120,10 +118,6 @@
 
 # Welcome banner / Header Search responsiveness — scroll handlers
 # that hide one search element and show another.
-- test: !ruby/regexp '/\AWelcome banner when enabled when using search_(field|icon) search_experience hides /'
-  reason: 'Scroll handler swaps banner ↔ header search visibility.'
-- test: !ruby/regexp '/\AHeader Search - Responsive Behavior when welcome banner is enabled appears based on scroll/'
-  reason: 'Same scroll + viewport-width responsive swap.'
 
 # Embed mode floating timeline button — appears when the topic
 # footer is below the viewport (scroll position). The "no replies
@@ -160,10 +154,6 @@
 # the in-viewport `enable_welcome_banner=true` cases) pass now that
 # `focus()` respects display:none and `keyup` retargets to the active
 # element after a keydown handler blurs.
-- test: 'Search | Shortcuts for variations of search input when search_experience is search_field when enable_welcome_banner is true when welcome banner is not in the viewport displays and focuses header search when / is pressed and hides it when Escape is pressed'
-  reason: 'Needs real scroll + IntersectionObserver-against-viewport for welcomeBannerSearchInViewport to flip.'
-- test: 'Search | Shortcuts for variations of search input when search_experience is search_icon when enable_welcome_banner is true when welcome banner is not in the viewport displays and focuses search icon search when / is pressed and hides it when Escape is pressed'
-  reason: 'Same scroll-driven IntersectionObserver dependence.'
 
 
 
@@ -243,8 +233,6 @@
 # adapter wait) is waiting on an Ember boot signal our env doesn''t
 # emit. Needs a minimal QUnit + Ember harness repro outside
 # Discourse to bisect which adapter step stalls.
-- test: 'Theme qunit testing lists themes and can run tests by id, name and url'
-  reason: 'QUnit harness loads but `config.blocking` stays true — one of 5 begin callbacks (likely Ember-testing-helpers adapter) waits on a boot signal our env does not emit.'
 
 # ── Cross-session MessageBus delivery needs a real async runtime ───
 # `member_upcoming_changes` (default session) `visit "/"`, then a
@@ -267,3 +255,11 @@
 # poll's delivery now reflects in find-polling — DID land upstream.)
 - test: 'Member upcoming changes when user is logged in adds and removes the body class based on MessageBus subscription for client site settings'
   reason: 'Cross-session MessageBus delivery: the default session''s /client_settings long-poll can''t reach its real position before the using_session publish — Ember starts the poll during async init the lazy clock won''t drive at visit, and driving it breaks the first-find transient contract. Needs a real async runtime.'
+
+# Timeline-date clicks + the header-minimize scroll threshold. Fails with the REAL driver in this
+# environment too, one assertion EARLIER (Chrome never minimizes the header at all: it stops at the
+# first `have_search_icon`, where we get as far as the un-minimize). It passed here only while the
+# driver's click scrolled by the minimum instead of centring, which is not what a CDP driver does —
+# see the scroll-into-view alignment work. Re-audit if the real driver starts passing it.
+- test: 'Search when search menu on desktop with search field in header switches to search icon when header is minimized'
+  reason: 'Header-minimize scroll threshold; fails with CSIM_DRIVER=real in this environment as well (one assertion earlier).'
