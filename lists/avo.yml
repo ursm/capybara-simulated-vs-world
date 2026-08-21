@@ -149,8 +149,6 @@
 # loads every frame eagerly. Closing this gap needs a real viewport-
 # bounds model (track scroll position + element offsets); out of
 # scope until layout becomes more than a stub.
-- test: "HasAndBelongsToManyField show with an attached user detaches the user"
-  reason: "Eager lazy-frame load surfaces 'No related record found' from below-fold frames before the test's pre-detach assertion."
 - test: "HasOneField omits parent record hides the belongs_to field pointing back to the parent on the embedded show page"
   reason: "Eager lazy-frame load mounts the embedded show's own `[data-controller='tabs']`, so `click_tab` ambiguous-matches two tabSwitchers."
 - test: "Filters pagination resets when filters change with pagination set resets the pagination"
