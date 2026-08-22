@@ -16,6 +16,20 @@
 # Gemfile-resolved version (the local path) before the require.
 require 'bundler/setup'
 
+# Yama ptrace_scope=1 blocks same-uid rbspy/gdb attach; opt this process
+# in so a hung example can be snapshotted from outside
+# (`rbspy snapshot --pid <pid>`). PR_SET_PTRACER=0x59616d61 ("Yama"),
+# PR_SET_PTRACER_ANY=-1. Harmless where Yama is absent.
+begin
+  require 'fiddle'
+  Fiddle::Function.new(
+    Fiddle.dlopen(nil)['prctl'],
+    [Fiddle::TYPE_INT, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG, Fiddle::TYPE_LONG],
+    Fiddle::TYPE_INT
+  ).call(0x59616d61, -1, 0, 0, 0)
+rescue StandardError, LoadError
+end
+
 # Discourse's `000-mini_racer.rb` initializer sets
 # `MiniRacer::Platform.set_flags!(:single_threaded)` for ITS OWN V8
 # (PrettyText / theme migrations) whenever
@@ -294,12 +308,153 @@ RSpec.configure do |config|
   # alone and passed in the suite, at unrelated commits, and cost several review cycles to
   # attribute. 300 s restores the margin. The 121 s itself is the real finding — a real browser
   # does that example in seconds — and belongs in the driver's perf backlog, not here.
+  # TEMP diagnosis instrument (2026-08-22, Discourse themes-file hang): when
+  # CSIM_STALL_DUMP=<path> is set, a background thread watches the current
+  # example's wall clock; past CSIM_STALL_DUMP_AFTER_S (default 120) it appends
+  # every thread's Ruby backtrace plus the ActiveRecord lock owners
+  # (ThreadLoadInterlockAwareMonitor exposes @owner) to <path>. A deadlocked
+  # main thread can't report itself; this thread only needs a free GVL.
+  if ENV['CSIM_STALL_DUMP']
+    stall_after = (ENV['CSIM_STALL_DUMP_AFTER_S'] || '120').to_f
+    $csim_example_started = nil
+    $csim_example_desc    = nil
+    config.around(:each) do |example|
+      $csim_example_started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      $csim_example_desc    = example.id
+      begin
+        example.run
+      ensure
+        $csim_example_started = nil
+      end
+    end
+    Thread.new do
+      Thread.current.name = 'csim-stall-dump'
+      dumped_for = nil
+      loop do
+        sleep 15
+        started = $csim_example_started
+        next unless started
+        next if Process.clock_gettime(Process::CLOCK_MONOTONIC) - started < stall_after
+        next if dumped_for == started
+        dumped_for = started
+        # An IO failure (ENOSPC, EACCES) must not silently kill the diagnostics
+        # thread for the rest of the run.
+        begin
+          File.open(ENV['CSIM_STALL_DUMP'], 'a') do |f|
+            f.sync = true
+            f.puts "########## STALL #{Time.now} example=#{$csim_example_desc}"
+            # Owners FIRST, and only lock-free ivar reads: pool.connections takes
+            # the pool monitor and joins the very deadlock being dumped.
+            begin
+              pool = ActiveRecord::Base.connection_pool
+              pc   = pool.instance_variable_get(:@pinned_connection)
+              f.puts "pool=#{pool.object_id} pinned_connection=#{pc&.object_id.inspect}"
+              conns = (pool.instance_variable_get(:@connections) || []) | [pc].compact
+              conns.each do |c|
+                lk = c.instance_variable_get(:@lock)
+                f.puts "conn=#{c.object_id} lease_owner=#{c.instance_variable_get(:@owner).inspect} lock=#{lk.class} lock_owner=#{lk.instance_variable_get(:@owner).inspect} lock_count=#{lk.instance_variable_get(:@count).inspect} mutex_locked=#{lk.instance_variable_get(:@mutex)&.locked?.inspect}"
+              end
+            rescue StandardError => e
+              f.puts "AR introspection failed: #{e.class}: #{e.message}"
+            end
+            Thread.list.each do |t|
+              f.puts "--- thread=#{t.object_id} name=#{t.name.inspect} status=#{t.status.inspect} #{t == Thread.main ? '(MAIN)' : ''}"
+              (t.backtrace || ['(no ruby backtrace)']).each {|l| f.puts "    #{l}" }
+            end
+            # NATIVE stacks too: a main thread parked inside a native call (rusty's
+            # without_gvl has no unblock function) shows only `Context#call` at the
+            # Ruby level — the wedge's real location is in the C/Rust frames. The
+            # boot-time prctl(PR_SET_PTRACER_ANY) above is what lets same-uid gdb
+            # attach despite yama ptrace_scope=1.
+            if system('command -v gdb >/dev/null 2>&1')
+              f.puts '--- native stacks (gdb) ---'
+              f.flush
+              system("gdb -p #{Process.pid} -batch -ex 'set pagination off' -ex 'thread apply all bt 25' >> #{ENV['CSIM_STALL_DUMP']} 2>&1")
+            end
+            begin
+              m = SiteSetting.provider ? SiteSetting.instance_variable_get(:@mutex) : nil
+              f.puts "site_setting_mutex locked=#{m&.locked?.inspect}"
+            rescue StandardError => e
+              f.puts "SiteSetting introspection failed: #{e.class}: #{e.message}"
+            end
+            f.puts '########## END STALL DUMP'
+          end
+        rescue StandardError => e
+          warn "csim-stall-dump failed: #{e.class}: #{e.message}"
+        end
+      end
+    end
+  end
+
+  # Drain driver background app-requests BEFORE any other after-hook runs:
+  # Discourse's cleanup hooks hit the DB through mini_sql (`DB.exec`), which
+  # bypasses ActiveRecord's per-connection lock, so a still-running background
+  # request (async <img> load, keepalive beacon) on the same pinned connection
+  # can interleave on the raw PG socket and wedge it. The driver's own drain in
+  # `reset!` runs at Capybara.reset_sessions! — AFTER these hooks — hence this
+  # earlier pass. prepend_after runs ahead of all `after(:each)` hooks.
+  config.prepend_after(:each) do
+    sessions = Capybara.respond_to?(:session_pool, true) ? Capybara.send(:session_pool).values : [Capybara.current_session]
+    sessions.each do |s|
+      d = s&.driver
+      d.drain_background_requests if d.respond_to?(:drain_background_requests)
+    rescue StandardError
+      nil
+    end
+  end
+
   require 'timeout'
   EXAMPLE_TIMEOUT_S = (ENV['CSIM_EXAMPLE_TIMEOUT_S'] || '300').to_i
   if EXAMPLE_TIMEOUT_S > 0
+    # Timeout.timeout delivers via Thread#raise, which code blocked inside
+    # `Thread.handle_interrupt(Exception => :never)` defers indefinitely —
+    # ActiveRecord acquires its connection locks exactly that way, so an example
+    # wedged there shrugs off the timeout (and SIGTERM, which Ruby delivers
+    # through the same interrupt checkpoint) and hangs the whole run. Seen live
+    # on Discourse 2026-08-22: a lock pile-up behind a leftover driver background
+    # thread parked the suite at 0% CPU, kill -9 only. The escalation thread
+    # turns that into a diagnosable crash: one grace period after the deadline it
+    # dumps every thread's backtrace and hard-kills the process. SIGKILL over
+    # `Process.exit!` not for strength (measured: both work from a background
+    # thread while main is masked; both need this thread to get the GVL — a C
+    # call HOLDING the GVL would defeat either) but because KILL skips at_exit /
+    # ensure work that could itself wedge. The grace has to clear a legitimate
+    # post-timeout teardown (screenshot capture, app after-hooks, per-session
+    # driver drains), not just scheduling noise — hence minutes, not seconds.
+    escalation_grace = 120
+    example_deadline = nil
     config.around(:each) do |example|
-      Timeout.timeout(EXAMPLE_TIMEOUT_S, nil, "csim example timeout after #{EXAMPLE_TIMEOUT_S}s") do
-        example.run
+      example_deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + EXAMPLE_TIMEOUT_S
+      begin
+        Timeout.timeout(EXAMPLE_TIMEOUT_S, nil, "csim example timeout after #{EXAMPLE_TIMEOUT_S}s") do
+          example.run
+        end
+      ensure
+        example_deadline = nil
+      end
+    end
+    Thread.new do
+      Thread.current.name = 'csim-timeout-escalation'
+      loop do
+        sleep 10
+        deadline = example_deadline
+        next unless deadline
+        overdue = Process.clock_gettime(Process::CLOCK_MONOTONIC) - deadline
+        next unless overdue > escalation_grace
+        # The kill must happen even if the diagnostics raise (EPIPE on a dead
+        # stderr, a backtrace that won't format) — a silent watcher death would
+        # restore the undetectable hang this thread exists to prevent.
+        begin
+          $stderr.puts "csim: example timeout could not be delivered #{overdue.round}s past deadline (main thread under handle_interrupt(Exception => :never), or parked in a native call with no unblock function?) — dumping threads and killing the process. Check for orphaned child processes (minio, foreman) afterwards: after(:suite) cleanup will NOT run."
+          Thread.list.each do |t|
+            $stderr.puts "--- thread=#{t.object_id} name=#{t.name.inspect} status=#{t.status.inspect} #{t == Thread.main ? '(MAIN)' : ''}"
+            (t.backtrace || ['(no ruby backtrace)']).each {|l| $stderr.puts "    #{l}" }
+          end
+          $stderr.flush
+        rescue StandardError
+          nil
+        end
+        Process.kill('KILL', Process.pid)
       end
     end
   end
