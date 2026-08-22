@@ -169,7 +169,7 @@ module CsimDrivenBy
     # the first (Capybara caches a driver per name); none of the five does, and resizing a
     # already-built driver from here has no supported way to reach it — `Capybara` exposes no
     # session pool.
-    if (size = normalized_screen_size(options))
+    if (size = normalized_screen_size(options) || DESKTOP_DRIVER_VIEWPORTS[driver])
       Capybara::Simulated.next_driver_viewport = size
     end
 
@@ -185,6 +185,19 @@ module CsimDrivenBy
     w, h = size.to_a.map(&:to_i)
     (w.to_i > 0 && h.to_i > 0) ? [w, h] : nil
   end
+
+  # Discourse registers its desktop driver with an explicit Playwright viewport
+  # (`viewport: { width: 1400, height: 1400 }` on :playwright_chrome) instead of
+  # a `driven_by screen_size:` option, so the option sniffing above never sees
+  # it — and the size is as load-bearing as Avo's: at the driver's own 1024x768
+  # default the group-members page put DLoadMore's sentinel at y=780 of a
+  # 768-tall viewport (12px below the fold), so its IntersectionObserver
+  # correctly never fired and the infinite scroll never loaded page 2 — where
+  # Chrome at 1400 has it comfortably on screen. Same by-driver-name contract
+  # as the mobile table below.
+  DESKTOP_DRIVER_VIEWPORTS = {
+    playwright_chrome: [1400, 1400]
+  }.freeze
 
   MOBILE_DRIVER_CONFIG = {
     playwright_mobile_chrome: {
