@@ -128,8 +128,6 @@
 # Misc single layout-dep specs:
 - test: 'Topic page when triple clicking to select a paragraph select the last paragraph'
   reason: 'Triple-click word/sentence range needs layout for line wraps.'
-- test: 'User preferences | Navigation menu when visiting the user''s preferences page should allow the user to scroll the horizontal navigation menu when window width is narrow'
-  reason: 'Horizontal scroll mechanics.'
 
 # ACE editor only renders visible lines (clientHeight-driven virtual
 # scroller). With no layout the container's clientHeight is 0 → ACE
@@ -256,10 +254,3 @@
 - test: 'Member upcoming changes when user is logged in adds and removes the body class based on MessageBus subscription for client site settings'
   reason: 'Cross-session MessageBus delivery: the default session''s /client_settings long-poll can''t reach its real position before the using_session publish — Ember starts the poll during async init the lazy clock won''t drive at visit, and driving it breaks the first-find transient contract. Needs a real async runtime.'
 
-# Timeline-date clicks + the header-minimize scroll threshold. Fails with the REAL driver in this
-# environment too, one assertion EARLIER (Chrome never minimizes the header at all: it stops at the
-# first `have_search_icon`, where we get as far as the un-minimize). It passed here only while the
-# driver's click scrolled by the minimum instead of centring, which is not what a CDP driver does —
-# see the scroll-into-view alignment work. Re-audit if the real driver starts passing it.
-- test: 'Search when search menu on desktop with search field in header switches to search icon when header is minimized'
-  reason: 'Header-minimize scroll threshold; fails with CSIM_DRIVER=real in this environment as well (one assertion earlier).'
