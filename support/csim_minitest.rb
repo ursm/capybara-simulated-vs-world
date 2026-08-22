@@ -18,6 +18,15 @@ return unless ENV['CSIM_DRIVER'] == 'simulated'
 # released-gem one. Forcing `bundler/setup` first locks in the
 # Gemfile-resolved version (the local path) before the require.
 require 'bundler/setup'
+
+# Cap any single V8 call at 2 minutes (overridable). A nonterminating or
+# pathologically slow JS execution inside one call is otherwise UNINTERRUPTIBLE
+# (the driver runs V8 on the calling thread with no unblock function, so
+# Timeout/SIGTERM never land) — this converts it into a per-example
+# `RustyRacer::ScriptTerminatedError` whose #js_backtrace names the hot frame.
+# Discourse's ~35% full-suite freeze was exactly this (prosemirror cascade
+# blow-up); legitimate calls are ms-scale, so 120s is pure headroom.
+ENV['CSIM_V8_CALL_TIMEOUT_MS'] ||= '120000'
 require 'capybara/simulated'
 require 'action_dispatch/system_test_case'
 

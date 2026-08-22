@@ -16,6 +16,15 @@
 # Gemfile-resolved version (the local path) before the require.
 require 'bundler/setup'
 
+# Cap any single V8 call at 2 minutes (overridable). A nonterminating or
+# pathologically slow JS execution inside one call is otherwise UNINTERRUPTIBLE
+# (the driver runs V8 on the calling thread with no unblock function, so
+# Timeout/SIGTERM never land) — this converts it into a per-example
+# `RustyRacer::ScriptTerminatedError` whose #js_backtrace names the hot frame.
+# Discourse's ~35% full-suite freeze was exactly this (prosemirror cascade
+# blow-up); legitimate calls are ms-scale, so 120s is pure headroom.
+ENV['CSIM_V8_CALL_TIMEOUT_MS'] ||= '120000'
+
 # Yama ptrace_scope=1 blocks same-uid rbspy/gdb attach; opt this process
 # in so a hung example can be snapshotted from outside
 # (`rbspy snapshot --pid <pid>`). PR_SET_PTRACER=0x59616d61 ("Yama"),
