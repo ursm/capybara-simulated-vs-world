@@ -1,10 +1,14 @@
 # Tests we don't expect capybara-simulated to satisfy. Each entry is
-# `{test:, reason:[, engine:]}`. `test:` is preferred as the RSpec
-# `full_description` (stable across upstream line-number moves) but
-# may also be a `./spec/...rb:LINE` location string or a Regexp
-# matched against either. `engine:` is optional; when set, the entry
-# is honoured only when `CSIM_JS_ENGINE` matches (`v8` or `quickjs`),
-# so engine-divergent tests don't flip-to-FIXED on the other side.
+# `{test:, reason:[, engine:][, skip:][, fresh_http_cache:]}`. `test:`
+# is preferred as the RSpec `full_description` (stable across upstream
+# line-number moves) but may also be a `./spec/...rb:LINE` location
+# string or a Regexp matched against either. `engine:` is optional;
+# when set, the entry is honoured only when `CSIM_JS_ENGINE` matches
+# (`v8` or `quickjs`), so engine-divergent tests don't flip-to-FIXED on
+# the other side. `skip: true` skips the body (no FIXED detection) for
+# tests that leak class-level state when they fail partway. `fresh_http_cache:
+# true` is not a failure at all: the example runs for real, from the cold
+# HTTP cache a fresh Playwright context starts with (see csim_rspec.rb).
 
 # ── ProseMirror (rich) editor mode ────────────────────────────────
 # `with prosemirror editor` shared context sets composition_mode: :rich;
@@ -254,3 +258,17 @@
 - test: 'Member upcoming changes when user is logged in adds and removes the body class based on MessageBus subscription for client site settings'
   reason: 'Cross-session MessageBus delivery: the default session''s /client_settings long-poll can''t reach its real position before the using_session publish — Ember starts the poll during async init the lazy clock won''t drive at visit, and driving it breaks the first-find transient contract. Needs a real async runtime.'
 
+# ── Relies on a per-test cold HTTP cache (Playwright new context) ────
+# The colour-palette stylesheet URL is digested from `color_scheme.id` +
+# `color_scheme.version` (not its colours) and served
+# `Cache-Control: immutable` for a year. `fab!` reuses the row across
+# examples and the transaction rollback resets `version`, so the SAME
+# URL carries a different palette per example. Playwright's fresh
+# browser context per test never sees the previous bytes; the driver's
+# RFC 9111 cache keeps fresh immutable responses across `reset!` like a
+# persistent browser profile (a Selenium-Chrome run of this spec would
+# be order-dependent the same way). Not a driver failure — give the
+# example the cold cache it was written against.
+- test: 'Admin Color Palette Config Area Page applies the changes live when editing the currently active palette'
+  reason: 'The palette stylesheet URL (id + version digest, immutable) is reused with new bytes across rolled-back examples; the example assumes a cold HTTP cache per test.'
+  fresh_http_cache: true

@@ -26,8 +26,9 @@ apps/<name>/                # submodule, SHA-pinned to a known-good upstream com
 Gemfile.<name>              # eval upstream's Gemfile + layer capybara-simulated/quickjs
 support/csim_minitest.rb    # RUBYOPT preload for Minitest hosts (Redmine)
 support/csim_rspec.rb       # RUBYOPT preload for RSpec hosts (Forem)
-lists/<name>.yml            # `{test:, reason:}` skip list — `test:` is an exact
-                            # description / location string or a Regexp
+lists/<name>.yml            # `{test:, reason:[, engine:][, skip:][, fresh_http_cache:]}`
+                            # per-test list — `test:` is an exact description /
+                            # location string or a Regexp
 bin/run-<name>              # cd into the app, set BUNDLE_GEMFILE/RUBYOPT,
                             # exec the host's test runner
 ```

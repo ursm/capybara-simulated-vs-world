@@ -234,7 +234,7 @@ require 'rspec/core'
 require_relative 'csim_expected_failures'
 
 CSIM_STRING_FAILURES, CSIM_REGEXP_FAILURES, _ =
-  CsimExpectedFailures.load(ENV['CSIM_EXPECTED_FAILURES'], source: 'csim_rspec', extra_keys: ['skip'])
+  CsimExpectedFailures.load(ENV['CSIM_EXPECTED_FAILURES'], source: 'csim_rspec', extra_keys: ['skip', 'fresh_http_cache'])
 
 # `pending` (not `skip`): if the example unexpectedly passes, RSpec
 # fails it as "FIXED — the test passed; remove `pending` from it",
@@ -255,6 +255,14 @@ RSpec.configure do |config|
     matched = CSIM_STRING_FAILURES[desc] || CSIM_STRING_FAILURES[loc] ||
               CSIM_REGEXP_FAILURES.find {|entry| entry[:matcher].match?(desc) || entry[:matcher].match?(loc) }
     next unless matched
+    # `fresh_http_cache: true` is not an expected failure: the example passes,
+    # but only from the cold HTTP cache a fresh Playwright context starts with
+    # (its app serves new bytes at an `immutable` URL a previous example already
+    # loaded). Give it that cache and run it for real.
+    if matched[:fresh_http_cache]
+      Capybara::Simulated.clear_http_cache
+      next
+    end
     if matched[:skip]
       # Discourse's `after(:each)` hook does `page.execute_script(...)`
       # even on skipped examples. Without an explicit current_driver

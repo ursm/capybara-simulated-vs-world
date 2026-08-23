@@ -1,5 +1,7 @@
 # Shared YAML expected-failures loader for `csim_rspec.rb` and
-# `csim_minitest.rb`. Reads the list at `CSIM_EXPECTED_FAILURES`,
+# `csim_minitest.rb` (an entry can also be a per-test driver annotation
+# rather than a failure — csim_rspec's `fresh_http_cache:`). Reads the
+# list at `CSIM_EXPECTED_FAILURES`,
 # applies the `engine:` filter (Capybara::Simulated::JS_ENGINES),
 # splits matchers into a String-keyed hash (O(1) per-spec hit) and a
 # Regexp-only array (scanned linearly; few entries).
@@ -41,6 +43,8 @@ module CsimExpectedFailures
       end
       next if h['engine'] && h['engine'] != active_engine
 
+      unknown = h.keys - %w[test reason engine] - extra_keys.map(&:to_s)
+      raise "#{source}: unknown key(s) #{unknown.inspect} on #{h['test'].inspect}; typo, or a key this runner doesn't honour?" unless unknown.empty?
       rec = {matcher: h.fetch('test'), reason: h.fetch('reason')}
       extra_keys.each {|k| rec[k.to_sym] = h.fetch(k.to_s, false) }
       case rec[:matcher]
