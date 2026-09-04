@@ -21,6 +21,7 @@ PATH
   remote: /home/ursm/Code/github.com/ursm/capybara-simulated
   specs:
     capybara-simulated (0.10.0)
+      brotli (~> 0.5)
       capybara (>= 3.37)
       rack (>= 2.2)
       ruby-vips (~> 2.2)
@@ -178,6 +179,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.24.3)
       msgpack (~> 1.2)
+    brotli (0.8.0)
     builder (3.3.0)
     bump (0.10.0)
     bundler-integrity (1.0.9)
@@ -882,6 +884,7 @@ CHECKSUMS
   bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
   bindex (0.8.1) sha256=7b1ecc9dc539ed8bccfc8cb4d2732046227b09d6f37582ff12e50a5047ceb17e
   bootsnap (1.24.3) sha256=f7fa3d20597e2f0aa52b0a1aba83fb54d4f79e9c2e210ec4fa1e8895514dcad8
+  brotli (0.8.0) sha256=0c5a42046b3b603fb109656881147fd76064c034b7d19c1b4fcc32a093a4d55d
   builder (3.3.0) sha256=497918d2f9dca528fdca4b88d84e4ef4387256d984b8154e9d5d3fe5a9c8835f
   bump (0.10.0) sha256=07929cf79031d2863f55e7b111e164566be10c43f8c42d67db7cb3b5745f0975
   bundler-integrity (1.0.9) sha256=1d33c3257e3a3c85eb0bcc7e29b54c8620fb220fc8ee1872676265fe586a1e20

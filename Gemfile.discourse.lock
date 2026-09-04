@@ -2,6 +2,7 @@ PATH
   remote: /home/ursm/Code/github.com/ursm/capybara-simulated
   specs:
     capybara-simulated (0.10.0)
+      brotli (~> 0.5)
       capybara (>= 3.37)
       rack (>= 2.2)
       ruby-vips (~> 2.2)
@@ -109,6 +110,7 @@ GEM
     bigdecimal (3.3.1)
     bootsnap (1.24.4)
       msgpack (~> 1.2)
+    brotli (0.8.0)
     builder (3.3.0)
     bullet (8.1.1)
       activesupport (>= 3.0.0)
