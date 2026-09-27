@@ -130,14 +130,6 @@
   reason: "Algolia autocomplete widget needs real layout — see Search cluster"
 
 
-# ── Tippy: tooltip positioning requires getBoundingClientRect ──
-- test: "Record previews opens the preview"
-  reason: |
-    Tippy mounts the popover via `appendChild(<div id="tippy-N">)`
-    using `getBoundingClientRect` to compute placement. v3's
-    zero-geometry stub causes Tippy to bail before appending —
-    `#tippy-1` never appears in the DOM.
-
 # ── Lazy turbo-frames load eagerly without viewport intersection ──
 #
 # Our IntersectionObserver fires for any element that's in the DOM
