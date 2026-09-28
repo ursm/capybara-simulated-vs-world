@@ -7,13 +7,13 @@ PATH
       rack (>= 2.2)
       rb_sys (~> 0.9)
       ruby-vips (~> 2.2)
-      rusty_racer (~> 0.2, >= 0.2.3)
+      rusty_racer (~> 0.2, >= 0.2.4)
       uri-idna (~> 0.3)
 
 PATH
   remote: /home/ursm/Code/github.com/ursm/rusty_racer
   specs:
-    rusty_racer (0.2.3)
+    rusty_racer (0.2.4)
       rb_sys (~> 0.9)
 
 GEM

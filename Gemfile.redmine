@@ -9,9 +9,9 @@ group :test do
   else
     gem 'capybara-simulated', github: 'ursm/capybara-simulated'
   end
-  # Local path (native-dom branch): capybara-simulated's csim_native extension calls
-  # rusty_racer::install_classes / set_realm_init_hook, which exist only on this branch
-  # (not the released gem) — the released gem would double-define the RustyRacer classes.
+  # Local path: capybara-simulated's csim_native links rusty_racer's crate by path, so the
+  # gem's Ruby side is taken from the same checkout (0.2.4+ also skips loading its own .so
+  # once csim_native has defined the classes; an older one would load a second V8).
   gem 'rusty_racer', path: File.expand_path('../rusty_racer', __dir__)
   gem 'stackprof'
 end
