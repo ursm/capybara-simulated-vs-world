@@ -88,10 +88,6 @@ fi
 # ambient Bundler.setup.
 export RUBYOPT="-r$ROOT/support/csim_rspec.rb ${RUBYOPT:-}"
 
-# Default to V8 (rusty_racer); override with `CSIM_JS_ENGINE=quickjs`
-# for the slower-but-fork-safe QuickJS path.
-export CSIM_JS_ENGINE="${CSIM_JS_ENGINE:-v8}"
-
 # Discourse's before-each calls `driven_by(:playwright_chrome)` or
 # `:playwright_mobile_chrome`; csim_rspec's `CsimDrivenBy` override
 # routes both to `:simulated`. Default to system specs.

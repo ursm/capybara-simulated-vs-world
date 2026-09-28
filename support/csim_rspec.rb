@@ -218,7 +218,6 @@ module Capybara::Simulated
       ::Capybara.register_driver :simulated_mobile do |app|
         ::Capybara::Simulated::Driver.new(
           app,
-          js_engine:  ENV['CSIM_JS_ENGINE']&.to_sym,
           viewport:   cfg[:viewport],
           user_agent: cfg[:user_agent]
         )
@@ -228,8 +227,9 @@ module Capybara::Simulated
 end
 
 # Expected-failure handling. Same YAML format as csim_minitest.rb's
-# (`{test:, reason:[, engine:][, skip:]}`); `test:` matches against
-# either RSpec's `example.full_description` or `example.location`.
+# (`{test:, reason:[, skip:][, fresh_http_cache:]}`); `test:` matches
+# against either RSpec's `example.full_description` or
+# `example.location`.
 require 'rspec/core'
 require_relative 'csim_expected_failures'
 

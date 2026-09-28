@@ -1,10 +1,8 @@
 # Tests we don't expect capybara-simulated to satisfy. Each entry is
-# `{test:, reason:[, engine:]}`. `test:` is preferred as the RSpec
+# `{test:, reason:}`. `test:` is preferred as the RSpec
 # `full_description` (stable across upstream line-number moves) but
 # may also be a `./spec/...rb:LINE` location string or a Regexp
-# matched against either. `engine:` is optional; when set, the entry
-# is honoured only when `CSIM_JS_ENGINE` matches (`v8` or `quickjs`),
-# so engine-divergent tests don't flip-to-FIXED on the other side.
+# matched against either.
 #
 # Cleared 2026-05-15 — the previous list was from v2 era and many
 # entries had since started passing on v3. Re-populate with entries

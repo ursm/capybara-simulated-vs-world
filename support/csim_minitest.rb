@@ -94,7 +94,7 @@ end
 ActionDispatch::SystemTestCase.singleton_class.prepend(CsimDrivenBy)
 
 # Expected-failure handling. Same YAML format as csim_rspec.rb's
-# (`{test:, reason:[, engine:]}`); `test:` is an exact `Class#method`
+# (`{test:, reason:}`); `test:` is an exact `Class#method`
 # string or a Regexp matched against the same.
 require 'minitest'
 require_relative 'csim_expected_failures'

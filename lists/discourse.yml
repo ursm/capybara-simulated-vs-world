@@ -1,14 +1,12 @@
 # Tests we don't expect capybara-simulated to satisfy. Each entry is
-# `{test:, reason:[, engine:][, skip:][, fresh_http_cache:]}`. `test:`
-# is preferred as the RSpec `full_description` (stable across upstream
+# `{test:, reason:[, skip:][, fresh_http_cache:]}`. `test:` is
+# preferred as the RSpec `full_description` (stable across upstream
 # line-number moves) but may also be a `./spec/...rb:LINE` location
-# string or a Regexp matched against either. `engine:` is optional;
-# when set, the entry is honoured only when `CSIM_JS_ENGINE` matches
-# (`v8` or `quickjs`), so engine-divergent tests don't flip-to-FIXED on
-# the other side. `skip: true` skips the body (no FIXED detection) for
-# tests that leak class-level state when they fail partway. `fresh_http_cache:
-# true` is not a failure at all: the example runs for real, from the cold
-# HTTP cache a fresh Playwright context starts with (see csim_rspec.rb).
+# string or a Regexp matched against either. `skip: true` skips the
+# body (no FIXED detection) for tests that leak class-level state when
+# they fail partway. `fresh_http_cache: true` is not a failure at all:
+# the example runs for real, from the cold HTTP cache a fresh
+# Playwright context starts with (see csim_rspec.rb).
 
 # ── ProseMirror (rich) editor mode ────────────────────────────────
 # `with prosemirror editor` shared context sets composition_mode: :rich;
