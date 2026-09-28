@@ -11,9 +11,6 @@ group :test do
   else
     gem 'capybara-simulated', github: 'ursm/capybara-simulated'
   end
-  # Pull in QuickJS so `CSIM_JS_ENGINE=quickjs` works too.
-  gem 'quickjs', '>= 0.19'
-  gem 'quickjs-polyfill-intl'
   # Local path (native-dom branch): capybara-simulated's csim_native extension calls
   # rusty_racer::install_classes / set_realm_init_hook, which exist only on this branch
   # (not the released gem) — the released gem would double-define the RustyRacer classes.

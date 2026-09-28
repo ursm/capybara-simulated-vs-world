@@ -7,6 +7,7 @@ PATH
       rack (>= 2.2)
       rb_sys (~> 0.9)
       ruby-vips (~> 2.2)
+      rusty_racer (~> 0.2, >= 0.2.3)
       uri-idna (~> 0.3)
 
 PATH
@@ -468,11 +469,6 @@ GEM
     public_suffix (7.0.5)
     puma (8.0.1)
       nio4r (~> 2.0)
-    quickjs (0.21.0)
-      json
-      securerandom
-    quickjs-polyfill-intl (0.2.0)
-      quickjs (>= 0.19.0)
     racc (1.8.1)
     rack (2.2.23)
     rack-mini-profiler (4.0.1)
@@ -896,8 +892,6 @@ DEPENDENCIES
   propshaft
   pry-rails
   puma
-  quickjs (>= 0.19)
-  quickjs-polyfill-intl
   rack (< 3)
   rack-mini-profiler
   rack-protection
