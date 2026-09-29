@@ -62,8 +62,6 @@
   reason: "Flatpickr debounce timing — see lists/avo.yml header"
 - test: "Date field on eastern zone in an eastern (positive) Timezone edit keeps the right value on update and save"
   reason: "Flatpickr debounce timing — TZ-converted display value never propagates"
-- test: "Date field on UTC edit keeps the right value on update and save"
-  reason: "Flatpickr debounce timing — UTC update never propagates"
 - test: "Date field on western zone in a western (negative) Timezone edit keeps the right value on update and save"
   reason: "Flatpickr debounce timing — TZ-converted display value never propagates"
 - test: "timezone On Romania (EET) with CET timezone configured edit when changing the value saves the valid date"
