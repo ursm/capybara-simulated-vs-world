@@ -27,7 +27,6 @@ PATH
       rb_sys (~> 0.9)
       ruby-vips (~> 2.2)
       rusty_racer (~> 0.2, >= 0.2.4)
-      uri-idna (~> 0.3)
 
 PATH
   remote: /home/ursm/Code/github.com/ursm/rusty_racer
@@ -714,7 +713,6 @@ GEM
       unicode-emoji (~> 4.1)
     unicode-emoji (4.2.0)
     uri (1.1.1)
-    uri-idna (0.3.1)
     useragent (0.16.11)
     view_component (3.23.2)
       activesupport (>= 5.2.0, < 8.1)
@@ -1095,7 +1093,6 @@ CHECKSUMS
   unicode-display_width (3.2.0) sha256=0cdd96b5681a5949cdbc2c55e7b420facae74c4aaf9a9815eee1087cb1853c42
   unicode-emoji (4.2.0) sha256=519e69150f75652e40bf736106cfbc8f0f73aa3fb6a65afe62fefa7f80b0f80f
   uri (1.1.1) sha256=379fa58d27ffb1387eaada68c749d1426738bd0f654d812fcc07e7568f5c57c6
-  uri-idna (0.3.1) sha256=c8601a9ca545670a763f5a7c56c99d7072bc2b1f6d83df63e6f35c264b609823
   useragent (0.16.11) sha256=700e6413ad4bb954bb63547fa098dddf7b0ebe75b40cc6f93b8d54255b173844
   view_component (3.23.2) sha256=3c2fed4b9e38bf074fa3d42ca55eedbb2cc070e0f3c31d7c13a50b0db530892b
   virtus (2.0.0) sha256=8841dae4eb7fcc097320ba5ea516bf1839e5d056c61ee27138aa4bddd6e3d1c2

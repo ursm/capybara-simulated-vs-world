@@ -17,7 +17,6 @@ PATH
       rb_sys (~> 0.9)
       ruby-vips (~> 2.2)
       rusty_racer (~> 0.2, >= 0.2.4)
-      uri-idna (~> 0.3)
 
 PATH
   remote: /home/ursm/Code/github.com/ursm/rusty_racer
@@ -908,7 +907,6 @@ GEM
       unicode-emoji (~> 4.1)
     unicode-emoji (4.1.0)
     uri (1.0.4)
-    uri-idna (0.3.1)
     useragent (0.16.11)
     validate_url (1.0.15)
       activemodel (>= 3.0.0)
