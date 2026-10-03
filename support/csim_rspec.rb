@@ -138,9 +138,10 @@ module CsimDrivenBy
     Capybara.save_path = Object.const_get(download_const).to_s if download_const
 
     # Discourse tags `describe "...", mobile: true` so its rails_helper
-    # asks for `:playwright_mobile_chrome` — registered with both an
-    # iPhone viewport and User-Agent. Both signals matter: viewport
-    # drives `matchMedia('(max-width: 700px)')` branches; UA drives
+    # asks for `:playwright_mobile_chrome` — registered with an iPhone
+    # viewport, User-Agent and `hasTouch`. All three matter: viewport
+    # drives `matchMedia('(max-width: 700px)')` branches; touch drives
+    # `(pointer: coarse)` (Discourse's `capabilities.touch`); UA drives
     # Discourse's server-side rendering when `viewport_based_mobile_
     # mode = false`. Route to a separate `:simulated_mobile` driver
     # name (registered lazily below) so Capybara's session pool keeps
@@ -202,6 +203,7 @@ module CsimDrivenBy
   MOBILE_DRIVER_CONFIG = {
     playwright_mobile_chrome: {
       viewport:   [390, 664],
+      touch:      true,
       user_agent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) ' \
                   'AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 ' \
                   'Mobile/15E148 Safari/604.1'
@@ -219,7 +221,8 @@ module Capybara::Simulated
         ::Capybara::Simulated::Driver.new(
           app,
           viewport:   cfg[:viewport],
-          user_agent: cfg[:user_agent]
+          user_agent: cfg[:user_agent],
+          touch:      cfg[:touch]
         )
       end
     end
