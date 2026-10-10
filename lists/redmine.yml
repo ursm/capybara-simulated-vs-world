@@ -7,9 +7,6 @@
 - test: "GanttsTest#test_selected_columns_can_be_resized_by_dragging"
   reason: "uses Capybara::Node#drag_to with builder.action(:button_down/up); driver lacks Capybara action-chain API"
 
-- test: "IssuesImportTest#test_import_issues_without_failures"
-  reason: "click on `span.drdn` wrapper expects layout-aware click delegation to inner `.drdn-trigger`; we click the wrapper itself, no event reaches the trigger handler"
-
 - test: "OauthProviderSystemTest#test_application_creation_and_authorization"
   reason: "test reads Capybara.current_session.server.port; we run in-process with no real server"
 
