@@ -108,24 +108,6 @@
 # (newline insertion) runs, matching the UI Events spec's microtask
 # checkpoint between dispatch and default action.
 
-# ── Algolia autocomplete: `input.aa-Input` never constructed ──
-#
-# Avo's search uses `@algolia/autocomplete-js`. The widget mounts
-# itself onto a host element by creating a `<input class="aa-Input">`
-# sibling. In v3 the mount never produces the input — tests querying
-# `//input[@class='aa-Input']` find nothing. Algolia's autocomplete
-# uses `getBoundingClientRect` for panel positioning and has its own
-# render loop that gates on measurable geometry; without layout it
-# bails before constructing the input shell.
-
-- test: "Search resource search with multi-word query finds the record when searching with multiple words"
-  reason: "Algolia autocomplete widget needs real layout — see lists/avo.yml header"
-- test: "Search resource search with multi-word query finds the record when searching with a partial multi-word query"
-  reason: "Algolia autocomplete widget needs real layout — see lists/avo.yml header"
-- test: "TestHelpers isolated tests search opens the search box, write and select first result"
-  reason: "Algolia autocomplete widget needs real layout — see Search cluster"
-
-
 # ── Lazy turbo-frames load eagerly without viewport intersection ──
 #
 # Our IntersectionObserver fires for any element that's in the DOM
