@@ -5,13 +5,7 @@ PATH
       capybara (>= 3.37)
       rack (>= 2.2)
       rb_sys (~> 0.9)
-      rusty_racer (~> 0.2, >= 0.2.4)
-
-PATH
-  remote: /home/ursm/Code/github.com/ursm/rusty_racer
-  specs:
-    rusty_racer (0.2.4)
-      rb_sys (~> 0.9)
+      rusty_racer (= 0.2.5)
 
 GEM
   remote: https://rubygems.org/
@@ -378,6 +372,16 @@ GEM
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
     rubyzip (3.2.2)
+    rusty_racer (0.2.5)
+      rb_sys (~> 0.9)
+    rusty_racer (0.2.5-aarch64-linux)
+      rb_sys (~> 0.9)
+    rusty_racer (0.2.5-arm64-darwin)
+      rb_sys (~> 0.9)
+    rusty_racer (0.2.5-x86_64-darwin)
+      rb_sys (~> 0.9)
+    rusty_racer (0.2.5-x86_64-linux)
+      rb_sys (~> 0.9)
     sanitize (7.0.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.16.8)
@@ -494,7 +498,6 @@ DEPENDENCIES
   rubocop-performance (~> 1.26.0)
   rubocop-rails (~> 2.33.4)
   rubyzip (~> 3.2.2)
-  rusty_racer!
   sanitize (~> 7.0)
   selenium-webdriver (>= 4.11.0)
   simplecov (~> 0.22.0)
@@ -651,7 +654,11 @@ CHECKSUMS
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
   ruby2_keywords (0.0.5) sha256=ffd13740c573b7301cf7a2e61fc857b2a8e3d3aff32545d6f8300d8bae10e3ef
   rubyzip (3.2.2) sha256=c0ed99385f0625415c8f05bcae33fe649ed2952894a95ff8b08f26ca57ea5b3c
-  rusty_racer (0.2.4)
+  rusty_racer (0.2.5) sha256=46c7415ff2ac34cc62808e3d1ca59ad6401e933d98e9962156e1cbff95f0dc03
+  rusty_racer (0.2.5-aarch64-linux) sha256=a1eeab5c289bc5c701030f7ab69d2ac6f73ad387be5ee6e56b2f944852001c30
+  rusty_racer (0.2.5-arm64-darwin) sha256=71ef88c6303c2cec9382a0a179c6ae03bde581a58a0bdf5bbfb4c3c5c38254b1
+  rusty_racer (0.2.5-x86_64-darwin) sha256=cfd0e6138fb4a8e65bf3e754597a8f45ce3e61e32680adb6c0a6beffb7e924c8
+  rusty_racer (0.2.5-x86_64-linux) sha256=006020dc027682d34d375b58584e8c5da2acb7014811b829c3be64adbfe4156a
   sanitize (7.0.0) sha256=269d1b9d7326e69307723af5643ec032ff86ad616e72a3b36d301ac75a273984
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
   selenium-webdriver (4.43.0) sha256=a634377b964b701c6ac0a009ce3a08fa34ec1e1e7fe9a6d57e3088d14529a65c

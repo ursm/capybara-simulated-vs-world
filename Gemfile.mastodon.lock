@@ -14,13 +14,7 @@ PATH
       capybara (>= 3.37)
       rack (>= 2.2)
       rb_sys (~> 0.9)
-      rusty_racer (~> 0.2, >= 0.2.4)
-
-PATH
-  remote: /home/ursm/Code/github.com/ursm/rusty_racer
-  specs:
-    rusty_racer (0.2.4)
-      rb_sys (~> 0.9)
+      rusty_racer (= 0.2.5)
 
 GEM
   remote: https://rubygems.org/
@@ -814,6 +808,8 @@ GEM
     rubyzip (3.2.2)
     rufus-scheduler (3.9.2)
       fugit (~> 1.1, >= 1.11.1)
+    rusty_racer (0.2.5-x86_64-linux)
+      rb_sys (~> 0.9)
     safety_net_attestation (0.5.0)
       jwt (>= 2.0, < 4.0)
     sanitize (7.0.0)
@@ -1085,7 +1081,6 @@ DEPENDENCIES
   ruby-progressbar (~> 1.13)
   ruby-vips (~> 2.2)
   rubyzip (~> 3.0)
-  rusty_racer!
   sanitize (~> 7.0)
   scenic (~> 1.7)
   shoulda-matchers

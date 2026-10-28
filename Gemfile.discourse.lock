@@ -5,13 +5,7 @@ PATH
       capybara (>= 3.37)
       rack (>= 2.2)
       rb_sys (~> 0.9)
-      rusty_racer (~> 0.2, >= 0.2.4)
-
-PATH
-  remote: /home/ursm/Code/github.com/ursm/rusty_racer
-  specs:
-    rusty_racer (0.2.4)
-      rb_sys (~> 0.9)
+      rusty_racer (= 0.2.5)
 
 GEM
   remote: https://rubygems.org/
@@ -646,6 +640,14 @@ GEM
       logger
     ruby2_keywords (0.0.5)
     rubyzip (3.3.0)
+    rusty_racer (0.2.5-aarch64-linux)
+      rb_sys (~> 0.9)
+    rusty_racer (0.2.5-arm64-darwin)
+      rb_sys (~> 0.9)
+    rusty_racer (0.2.5-x86_64-darwin)
+      rb_sys (~> 0.9)
+    rusty_racer (0.2.5-x86_64-linux)
+      rb_sys (~> 0.9)
     sanitize (7.0.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.16.8)
@@ -923,7 +925,6 @@ DEPENDENCIES
   ruby-readability
   ruby-vips
   rubyzip
-  rusty_racer!
   sanitize
   sassc-embedded
   sawyer

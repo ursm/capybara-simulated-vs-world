@@ -23,7 +23,7 @@ list entry, not a hand-wave.
 
 ```
 apps/<name>/                # submodule, SHA-pinned to a known-good upstream commit
-Gemfile.<name>              # eval upstream's Gemfile + layer capybara-simulated/rusty_racer
+Gemfile.<name>              # eval upstream's Gemfile + layer capybara-simulated
 support/csim_minitest.rb    # RUBYOPT preload for Minitest hosts (Redmine)
 support/csim_rspec.rb       # RUBYOPT preload for RSpec hosts (Forem)
 lists/<name>.yml            # `{test:, reason:[, skip:][, fresh_http_cache:]}`
@@ -48,7 +48,8 @@ The preload files do two things:
 1. `git submodule add <repo-url> apps/<name>` and check out the SHA you
    want to pin against.
 2. Create `Gemfile.<name>` that `eval_gemfile`s the upstream Gemfile
-   and layers `capybara-simulated` (path) + `rusty_racer` (path) on top.
+   and layers `capybara-simulated` (path) on top — it brings the released
+   `rusty_racer` its gemspec pins.
 3. Create `bin/run-<name>` modelled on `bin/run-redmine` /
    `bin/run-forem` — it exports `BUNDLE_GEMFILE`, `RUBYOPT`, and any
    app-specific env (e.g. `APP_PROTOCOL`, `COMMUNITY_NAME`).
